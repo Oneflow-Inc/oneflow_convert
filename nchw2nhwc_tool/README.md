@@ -5,6 +5,14 @@
 
 #### 执行指令
 
+- 模型转换
+
+```
+python3 nchw2nhwc.py --input_model_dir="./resnet50" --output_model_dir="./resnet50_nhwc"
+```
+
+- 模型推理
+
 ```
 python3 inference.py --log_dir="./log" --model_load_dir="./resnet50" --image_path="./fish.jpg" --channel_last=False
 ```
