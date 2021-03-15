@@ -287,13 +287,13 @@ def InferenceNet(images: tp.Numpy.Placeholder((1, 3, 224, 224), dtype=flow.float
 def main():
     flow.env.log_dir(args.log_dir)
     assert os.path.isdir(args.model_load_dir)
-    check_point = flow.train.CheckPoint()
-    check_point.load(args.model_load_dir)
+    flow.load_variables(flow.checkpoint.get(args.model_load_dir))
 
     image = load_image(args.image_path)
     predictions = InferenceNet(image)
     clsidx = predictions.argmax()
     print(predictions.max(), clsidx_2_labels[clsidx])
+    # flow.checkpoint.save("./resnet50")
 
 
 if __name__ == "__main__":

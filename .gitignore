@@ -1,0 +1,8 @@
+*.zip
+resnet_v15_of_best_model_val_top1_77318/
+*.jpg
+*.tgz
+log/
+__pycache__
+*.pyc
+resnet50/
