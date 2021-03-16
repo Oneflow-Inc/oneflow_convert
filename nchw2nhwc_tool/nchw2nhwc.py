@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import oneflow as flow
 import shutil
+import struct
 
 parser = argparse.ArgumentParser()
 
@@ -24,6 +25,10 @@ files = os.listdir(input_model_dir)
 for file in files:
     m = os.path.join(input_model_dir, file)
     new_m = os.path.join(output_model_dir, file)
+
+    if not os.path.exists(new_m):
+        os.makedirs(new_m)
+    
     if (os.path.isdir(m)):
         weight_file = os.path.join(m, "out")
         meta_file = os.path.join(m, "meta")
@@ -38,25 +43,30 @@ for file in files:
 
         if len(dims)  == 4:
             print(dims)
+            weight = []
             # [n, c, h, w] - > [n, h, w, c]
             # [0, 1, 2, 3] -> [0, 2, 3, 1]
-            weight = np.fromfile(weight_file, count)
+            binfile = open(weight_file, 'rb')
+            size = os.path.getsize(weight_file)
+            for i in range(size // 4):
+                data = binfile.read(4)
+                print(data)
+                weight.append(struct.unpack('f', data))
+            
+            weight = np.array(weight)
             print(weight.shape)
             weight = weight.reshape(dims)
             weight = np.transpose(weight, (0, 2, 3, 1))
-        if not os.path.exists(new_weight_file):
-            os.mkdir(new_weight_file)
-        if not os.path.exists(new_meta_file):
-            os.mkdir(new_meta_file)
+        
+        os.mknod(new_weight_file)
+        os.mknod(new_meta_file)
         
         f = open(new_weight_file, 'wb')
-        f.write(weight)
+        f.write(np.ascontiguousarray(weight))
         f.close()
         shutil.copy(meta_file, new_meta_file)
         
     elif (m == "snapshot_done"):
-        if not os.path.exists(new_m):
-            os.mkdir(new_m)
         shutil.copy(m, new_m)
     else:
         pass
