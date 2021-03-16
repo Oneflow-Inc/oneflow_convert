@@ -52,7 +52,6 @@ for file in files:
         dims = list(map(int, str(tensor_shape, encoding = "utf8").strip().split()))
 
         if len(dims)  == 4:
-            print(dims)
             weight = []
             # [n, c, h, w] - > [n, h, w, c]
             # [0, 1, 2, 3] -> [0, 2, 3, 1]
@@ -62,17 +61,19 @@ for file in files:
                 data = binfile.read(4)
                 weight.append(struct.unpack('f', data))
             
-            weight = np.array(weight)
+            weight = np.array(weight, dtype=np.float32)
             weight = weight.reshape(dims)
             weight = np.transpose(weight, (0, 2, 3, 1))
+
+            os.mknod(new_weight_file)
+            
+            f = open(new_weight_file, 'wb')
+            f.write(np.ascontiguousarray(weight))
+            f.close()
+        else:
+            os.mknod(new_weight_file)
+            shutil.copy(weight_file, new_weight_file)
         
-        os.mknod(new_weight_file)
-        # os.mknod(new_meta_file)
-        
-        f = open(new_weight_file, 'wb')
-        f.write(np.ascontiguousarray(weight))
-        f.close()
-        # shutil.copy(meta_file, new_meta_file)
     elif (file == "snapshot_done"):
         if not os.path.exists(new_m):
             os.mknod(new_m)

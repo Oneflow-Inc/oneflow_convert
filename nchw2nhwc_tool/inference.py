@@ -219,7 +219,6 @@ class ResnetBuilder(object):
             output = self.residual_stage(
                 output, stage_name, counts, filters, filters_inner, 1 if i == 0 else 2
             )
-
         return output
 
     def resnet_stem(self, input):
@@ -234,7 +233,6 @@ class ResnetBuilder(object):
 def resnet50(images, args, trainable=True, training=True):
     weight_regularizer = None
     builder = ResnetBuilder(weight_regularizer, trainable, training, args.channel_last, args.fuse_bn_relu, args.fuse_bn_add_relu)
-
     if args.pad_output:
         if args.channel_last: 
             paddings = ((0, 0), (0, 0), (0, 0), (0, 1))
@@ -266,15 +264,12 @@ def resnet50(images, args, trainable=True, training=True):
 #---------------------------------------------------#
 
 def load_image(image_path='test_img/ILSVRC2012_val_00020287.JPEG'):
-    print(image_path)
     im = Image.open(image_path)
     im = im.resize((224, 224))
     im = im.convert('RGB')  # 有的图像是单通道的，不加转换会报错
     im = np.array(im).astype('float32')
     im = (im - [123.68, 116.779, 103.939]) / [58.393, 57.12, 57.375]
-    print(im.shape)
     im = np.transpose(im, (2, 0, 1))
-    print(im.shape)
     im = np.expand_dims(im, axis=0)
     if args.channel_last:
         im = np.transpose(im, (0, 2, 3, 1))
@@ -282,7 +277,7 @@ def load_image(image_path='test_img/ILSVRC2012_val_00020287.JPEG'):
 
 
 @flow.global_function("predict", flow.function_config())
-def InferenceNet(images: tp.Numpy.Placeholder((1, 3, 224, 224), dtype=flow.float)) -> tp.Numpy:
+def InferenceNet(images: tp.Numpy.Placeholder((1, 224, 224, 3), dtype=flow.float)) -> tp.Numpy:
     logits = resnet50(images, args, training=False)
     predictions = flow.nn.softmax(logits)
     return predictions
