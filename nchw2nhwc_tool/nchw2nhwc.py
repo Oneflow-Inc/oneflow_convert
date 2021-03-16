@@ -22,6 +22,16 @@ output_model_dir = args.output_model_dir
 
 files = os.listdir(input_model_dir)
 
+if os.path.exists(output_model_dir):
+    del_list = os.listdir(output_model_dir)
+    for f in del_list:
+        file_path = os.path.join(output_model_dir, f)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    os.rmdir(output_model_dir)
+
 for file in files:
     m = os.path.join(input_model_dir, file)
     new_m = os.path.join(output_model_dir, file)
@@ -50,11 +60,9 @@ for file in files:
             size = os.path.getsize(weight_file)
             for i in range(size // 4):
                 data = binfile.read(4)
-                print(data)
                 weight.append(struct.unpack('f', data))
             
             weight = np.array(weight)
-            print(weight.shape)
             weight = weight.reshape(dims)
             weight = np.transpose(weight, (0, 2, 3, 1))
         
