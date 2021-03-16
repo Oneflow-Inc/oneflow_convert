@@ -63,6 +63,7 @@ BLOCK_FILTERS_INNER = [64, 128, 256, 512]
 class ResnetBuilder(object):
     def __init__(self, weight_regularizer, trainable=True, training=True, channel_last=False, fuse_bn_relu=True, fuse_bn_add_relu=True):
         self.data_format = "NHWC" if channel_last else "NCHW"
+        print(self.data_format)
         self.weight_initializer = flow.variance_scaling_initializer(2, 'fan_in', 'random_normal',
                                                                     data_format=self.data_format)
         self.weight_regularizer = weight_regularizer
@@ -272,8 +273,12 @@ def load_image(image_path='test_img/ILSVRC2012_val_00020287.JPEG'):
     im = im.convert('RGB')  # 有的图像是单通道的，不加转换会报错
     im = np.array(im).astype('float32')
     im = (im - [123.68, 116.779, 103.939]) / [58.393, 57.12, 57.375]
+    print(im.shape)
     im = np.transpose(im, (2, 0, 1))
+    print(im.shape)
     im = np.expand_dims(im, axis=0)
+    if args.channel_last:
+        im = np.transpose(im, (0, 2, 3, 1))
     return np.ascontiguousarray(im, 'float32')
 
 

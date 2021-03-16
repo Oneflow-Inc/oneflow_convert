@@ -36,10 +36,10 @@ for file in files:
     m = os.path.join(input_model_dir, file)
     new_m = os.path.join(output_model_dir, file)
 
-    if not os.path.exists(new_m):
-        os.makedirs(new_m)
-    
     if (os.path.isdir(m)):
+        if not os.path.exists(new_m):
+            os.makedirs(new_m)
+        
         weight_file = os.path.join(m, "out")
         meta_file = os.path.join(m, "meta")
         
@@ -75,6 +75,7 @@ for file in files:
         shutil.copy(meta_file, new_meta_file)
         
     elif (m == "snapshot_done"):
+        os.mknod(new_m)
         shutil.copy(m, new_m)
     else:
         pass
