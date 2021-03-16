@@ -21,5 +21,6 @@ python3 nchw2nhwc.py --input_model_dir="./resnet50" --output_model_dir="./resnet
 
 ## TODO
 
-- [ ] 基于ResNet50完成NCHW->NHWC权重转换，并使用转换后的权重跑通网络，验证正确性
-- [ ] 重构代码，提供一个更加友好的接口
+- [x] 完成NCHW->NHWC模型转换脚本
+- [ ] 基于ResNet50用转换后的权重跑通网络，验证正确性
+- [ ] 合并PR

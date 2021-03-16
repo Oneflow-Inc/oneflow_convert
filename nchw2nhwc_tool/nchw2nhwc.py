@@ -67,15 +67,15 @@ for file in files:
             weight = np.transpose(weight, (0, 2, 3, 1))
         
         os.mknod(new_weight_file)
-        os.mknod(new_meta_file)
+        # os.mknod(new_meta_file)
         
         f = open(new_weight_file, 'wb')
         f.write(np.ascontiguousarray(weight))
         f.close()
-        shutil.copy(meta_file, new_meta_file)
-        
-    elif (m == "snapshot_done"):
-        os.mknod(new_m)
+        # shutil.copy(meta_file, new_meta_file)
+    elif (file == "snapshot_done"):
+        if not os.path.exists(new_m):
+            os.mknod(new_m)
         shutil.copy(m, new_m)
     else:
         pass
