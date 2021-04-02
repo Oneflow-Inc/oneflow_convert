@@ -51,11 +51,6 @@ cd oneflow_onnx
 python3 setup.py install
 ```
 
-```sh
-git clone https://github.com/Oneflow-Inc/oneflow_convert_tools
-python setup.py install
-```
-
 #### 使用方法
 
 请参考[使用示例](examples/README.md)
