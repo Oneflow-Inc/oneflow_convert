@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import torchvision
-
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -232,13 +231,9 @@ class MobileNetV3_Small(nn.Module):
         return out
 
 
-def test_MobileNetV3_Large(test_case):
+def test_MobileNetV3_Large():
     load_pytorch_module_and_check(
-        test_case, MobileNetV3_Large, input_size=(1, 3, 224, 224), train_flag=False,
+        MobileNetV3_Large, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
 
-
-def test_MobileNetV3_Small(test_case):
-    load_pytorch_module_and_check(
-        test_case, MobileNetV3_Small, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_MobileNetV3_Large()

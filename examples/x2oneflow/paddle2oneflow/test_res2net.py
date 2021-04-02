@@ -299,7 +299,7 @@ def Res2Net200_26w_4s(**args):
 
 def test_Res2Net200_26w_4s():
     load_paddle_module_and_check(
-        Res2Net50_14w_8s, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
+        Res2Net50_48w_2s, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
 test_Res2Net200_26w_4s()

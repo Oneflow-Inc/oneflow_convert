@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -130,13 +130,9 @@ def ShuffleNetG3():
     return ShuffleNet(cfg)
 
 
-def test_shufflenet_v1_g2(test_case):
+def test_shufflenet_v1_g2():
     load_pytorch_module_and_check(
-        test_case, ShuffleNetG2, input_size=(1, 3, 32, 32), train_flag=False,
+        ShuffleNetG2, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
 
-
-def test_shufflenet_v1_g3(test_case):
-    load_pytorch_module_and_check(
-        test_case, ShuffleNetG3, input_size=(1, 3, 32, 32), train_flag=False,
-    )
+test_shufflenet_v1_g2()

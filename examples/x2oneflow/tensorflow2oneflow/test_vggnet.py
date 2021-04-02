@@ -17,9 +17,9 @@ import tensorflow as tf
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg19 import VGG19
 
-from oneflow.python.test.onnx.load.util import load_tensorflow2_module_and_check
+from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_vgg16(test_case):
+def test_vgg16():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -28,9 +28,9 @@ def test_vgg16(test_case):
             x = self.vgg(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 224, 224, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
-def test_vgg19(test_case):
+def test_vgg19():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -39,5 +39,6 @@ def test_vgg19(test_case):
             x = self.vgg(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 224, 224, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
+test_vgg16()

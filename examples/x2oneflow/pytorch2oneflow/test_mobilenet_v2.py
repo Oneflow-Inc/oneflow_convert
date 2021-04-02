@@ -15,15 +15,17 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 
-def test_mobilenet_v2(test_case):
+def test_mobilenet_v2():
     load_pytorch_module_and_check(
-        test_case,
         torchvision.models.mobilenet_v2,
         input_size=(1, 3, 224, 224),
         input_min_val=0,
         input_max_val=1,
         train_flag=False,
+        flow_weight_dir="/tmp/oneflow" 
     )
+
+test_mobilenet_v2()

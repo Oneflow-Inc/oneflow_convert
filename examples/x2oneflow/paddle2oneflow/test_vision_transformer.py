@@ -438,14 +438,9 @@ def ViT_huge_patch32_384(**kwargs):
     return model
 
 
-def test_ViT_small_patch16_224(test_case):
+def test_ViT_small_patch16_224():
     load_paddle_module_and_check(
-        test_case, ViT_small_patch16_224, input_size=(1, 3, 224, 224), train_flag=False,
+        ViT_small_patch16_224, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_ViT_small_patch16_224(test_case)
+test_ViT_small_patch16_224()

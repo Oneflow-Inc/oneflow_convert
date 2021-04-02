@@ -342,14 +342,9 @@ def Xception71(**args):
     return model
 
 
-def test_Xception41(test_case):
+def test_Xception41():
     load_paddle_module_and_check(
-        test_case, Xception41, input_size=(1, 3, 224, 224), train_flag=False,
+        Xception41, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_Xception41(test_case)
+test_Xception41()

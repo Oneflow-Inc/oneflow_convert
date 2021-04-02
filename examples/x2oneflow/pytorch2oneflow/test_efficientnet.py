@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from util import convert_to_onnx_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -181,7 +181,9 @@ def EfficientNetB0():
     return EfficientNet(cfg)
 
 
-def test_efficientNetB0(test_case):
+def test_efficientNetB0():
     load_pytorch_module_and_check(
-        test_case, EfficientNetB0, input_size=(1, 3, 32, 32), train_flag=False,
+        EfficientNetB0, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+
+test_efficientNetB0()

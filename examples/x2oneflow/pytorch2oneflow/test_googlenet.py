@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import torchvision
-
-from util import convert_to_onnx_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 # https://github.com/weiaicunzai/pytorch-cifar100/blob/master/models/googlenet.py
 
@@ -118,7 +117,8 @@ class GoogLeNet(nn.Module):
         return out
 
 
-def test_googlenet(test_case):
+def test_googlenet():
     load_pytorch_module_and_check(
-        test_case, GoogLeNet, input_size=(1, 3, 32, 32), train_flag=False,
+        GoogLeNet, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+test_googlenet()

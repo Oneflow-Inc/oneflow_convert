@@ -15,9 +15,9 @@ limitations under the License.
 """
 import tensorflow as tf
 from tensorflow.keras.applications.densenet import DenseNet121
-from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_DenseNet121(test_case):
+def test_DenseNet121():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -26,5 +26,6 @@ def test_DenseNet121(test_case):
             x = self.DenseNet121(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 224, 224, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
+test_DenseNet121()

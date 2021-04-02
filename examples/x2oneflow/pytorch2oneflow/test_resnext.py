@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -126,7 +126,9 @@ def ResNeXt29_32x4d():
     return ResNeXt(num_blocks=[3, 3, 3], cardinality=32, bottleneck_width=4)
 
 
-def test_resnext(test_case):
+def test_resnext():
     load_pytorch_module_and_check(
-        test_case, ResNeXt29_2x64d, input_size=(1, 3, 32, 32), train_flag=False,
+        ResNeXt29_2x64d, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+
+test_resnext()

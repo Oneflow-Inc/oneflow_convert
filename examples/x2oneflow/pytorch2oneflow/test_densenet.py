@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from util import convert_to_onnx_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 """DenseNet in PyTorch."""
 import math
@@ -127,7 +127,9 @@ def densenet_cifar():
     return DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=12)
 
 
-def test_densenet(test_case):
+def test_densenet():
     load_pytorch_module_and_check(
-        test_case, densenet_cifar, input_size=(1, 3, 32, 32), train_flag=False,
+        densenet_cifar, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_densenet()

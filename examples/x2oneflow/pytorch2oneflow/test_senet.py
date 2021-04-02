@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -191,7 +191,9 @@ def seresnet152():
     return SEResNet(BottleneckResidualSEBlock, [3, 8, 36, 3])
 
 
-def test_senet(test_case):
+def test_senet():
     load_pytorch_module_and_check(
-        test_case, seresnet18, input_size=(1, 3, 32, 32), train_flag=False,
+        seresnet18, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+
+test_senet()

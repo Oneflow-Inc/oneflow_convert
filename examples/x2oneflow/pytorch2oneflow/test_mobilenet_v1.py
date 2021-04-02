@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 # https://github.com/weiaicunzai/pytorch-cifar100/blob/master/models/mobilenet.py
 
@@ -158,7 +158,9 @@ class MobileNetV1(nn.Module):
         return x
 
 
-def test_mobilenet_v1(test_case):
+def test_mobilenet_v1():
     load_pytorch_module_and_check(
-        test_case, MobileNetV1, input_size=(1, 3, 32, 32), train_flag=False,
+        MobileNetV1, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+
+test_mobilenet_v1()

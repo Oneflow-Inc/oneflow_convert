@@ -319,7 +319,9 @@ def SE_ResNeXt152_64x4d(**args):
     return model
 
 
-def test_SE_ResNeXt50_32x4d(test_case):
+def test_SE_ResNeXt50_32x4d():
     load_paddle_module_and_check(
         SE_ResNeXt50_32x4d, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_SE_ResNeXt50_32x4d()

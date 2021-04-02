@@ -16,9 +16,9 @@ limitations under the License.
 import tensorflow as tf
 from tensorflow.keras.applications.resnet import ResNet50, ResNet101
 
-from oneflow.python.test.onnx.load.util import load_tensorflow2_module_and_check
+from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_resnet50(test_case):
+def test_resnet50():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -27,9 +27,9 @@ def test_resnet50(test_case):
             x = self.resnet50(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 224, 224, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
-def test_resnet101(test_case):
+def test_resnet101():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -38,5 +38,6 @@ def test_resnet101(test_case):
             x = self.resnet101(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 224, 224, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
+test_resnet50()

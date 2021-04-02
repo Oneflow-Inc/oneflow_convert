@@ -15,9 +15,9 @@ limitations under the License.
 """
 import tensorflow as tf
 from tensorflow.keras.applications.inception_v3 import InceptionV3
-from oneflow.python.test.onnx.load.util import load_tensorflow2_module_and_check
+from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_InceptionV3(test_case):
+def test_InceptionV3():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
@@ -26,10 +26,6 @@ def test_InceptionV3(test_case):
             x = self.InceptionV3(x)
             return x
 
-    load_tensorflow2_module_and_check(test_case, Net, input_size=(1, 299, 299, 3), train_flag=False)
+    load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
 
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_InceptionV3(test_case)
+test_InceptionV3()

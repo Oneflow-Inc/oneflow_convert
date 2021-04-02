@@ -173,7 +173,9 @@ def SqueezeNet1_1(**args):
     return model
 
 
-def test_SqueezeNet1_0(test_case):
+def test_SqueezeNet1_0():
     load_paddle_module_and_check(
-        test_case, SqueezeNet1_0, input_size=(1, 3, 224, 224), train_flag=False,
+        SqueezeNet1_0, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_SqueezeNet1_0()

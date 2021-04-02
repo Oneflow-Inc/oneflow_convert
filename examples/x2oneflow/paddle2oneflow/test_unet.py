@@ -159,14 +159,9 @@ def unet():
     return UNet(num_classes=21)
 
 
-def test_unet(test_case):
+def test_unet():
     load_paddle_module_and_check(
-        test_case, unet, input_size=(1, 3, 1024, 512), train_flag=False,
+        unet, input_size=(1, 3, 1024, 512), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_unet(test_case)
+test_unet()

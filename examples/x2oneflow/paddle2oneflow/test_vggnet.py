@@ -183,7 +183,9 @@ def VGG19(**args):
     return model
 
 
-def test_VGG16(test_case):
+def test_VGG16():
     load_paddle_module_and_check(
-        test_case, VGG16, input_size=(1, 3, 224, 224), train_flag=False,
+        VGG11, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_VGG16()

@@ -15,7 +15,7 @@ limitations under the License.
 """
 import torchvision
 
-from oneflow.python.test.onnx.load.util import load_pytorch_module_and_check
+from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 import torch
 import torch.nn as nn
@@ -164,7 +164,9 @@ def RegNetY_400MF():
     return RegNet(cfg)
 
 
-def test_regnet(test_case):
+def test_regnet():
     load_pytorch_module_and_check(
-        test_case, RegNetX_200MF, input_size=(1, 3, 32, 32), train_flag=False,
+        RegNetX_200MF, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
+
+test_regnet()
