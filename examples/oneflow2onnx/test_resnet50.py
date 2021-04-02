@@ -191,6 +191,6 @@ def test_resnet50():
         predictions = flow.nn.softmax(logits)
         return predictions
 
-    convert_to_onnx_and_check(InferenceNet)
+    convert_to_onnx_and_check(InferenceNet, flow_weight_dir=None, onnx_model_path="/tmp")
 
 test_resnet50()

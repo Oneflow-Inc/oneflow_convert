@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: oneflow-onnx
+Version: 0.1.0
+Summary: a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.
+Home-page: https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx
+Author: zhangxiaoyu
+Author-email: zhangxiaoyu@oneflow.org
+License: Apache 2.0
+Description: oneflow_onnx is a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.
+        
+        Usage: oneflow_onnx --model_dir src --save_file dist
+        GitHub: https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx
+        Email: zhangxiaoyu@oneflow.org
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/plain

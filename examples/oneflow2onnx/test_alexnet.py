@@ -135,7 +135,7 @@ def test_alexnet():
     def alexnet_eval_job(x: tp.Numpy.Placeholder((1, 227, 227, 3))):
         return alexnet(x, None, False)
 
-    convert_to_onnx_and_check(alexnet_eval_job)
+    convert_to_onnx_and_check(alexnet_eval_job, flow_weight_dir=None, onnx_model_path="/tmp")
 
 test_alexnet()
 

@@ -24,7 +24,7 @@ long_description += "Email: zhangxiaoyu@oneflow.org"
 
 setuptools.setup(
     name="oneflow_onnx",
-    version=0.6,
+    version="0.1.0",
     author="zhangxiaoyu",
     author_email="zhangxiaoyu@oneflow.org",
     description="a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.",
@@ -38,5 +38,5 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    license='Apache 2.0',
-    entry_points={'console_scripts': ['oneflow_onnx=oneflow_onnx.command:main']})
+    license='Apache 2.0'
+)
