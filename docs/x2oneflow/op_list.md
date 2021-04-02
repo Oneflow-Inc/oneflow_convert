@@ -33,7 +33,7 @@
 
 - 分组卷积存在问题，已给TensorFlow2ONNX团队PR。
 
-## Pytorch2OneFlow
+## Pytorch
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
@@ -45,7 +45,7 @@
 | 21 |Pow        | 22 | TanH            | 23 | Sigmoid       | 24 | Cast      |
 | 25 | Pad       | 26 | Reduce_Mean     | 27 | Reshape       | 28 | AdaptiveAvgPool |
 
-## Paddle2OneFlow
+## PaddlePaddle
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
