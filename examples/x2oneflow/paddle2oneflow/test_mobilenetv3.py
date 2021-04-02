@@ -42,7 +42,7 @@ __all__ = [
     "MobileNetV3_large_x1_25",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 def make_divisible(v, divisor=8, min_value=None):
@@ -371,14 +371,9 @@ def MobileNetV3_large_x1_25(**args):
     return model
 
 
-def test_MobileNetV3(test_case):
+def test_MobileNetV3():
     load_paddle_module_and_check(
-        test_case, MobileNetV3, input_size=(1, 3, 224, 224), train_flag=False,
+        MobileNetV3, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_MobileNetV3(test_case)
+test_MobileNetV3()

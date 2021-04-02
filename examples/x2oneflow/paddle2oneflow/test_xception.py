@@ -25,7 +25,7 @@ import sys
 
 __all__ = ["Xception41", "Xception65", "Xception71"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):

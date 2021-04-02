@@ -36,7 +36,7 @@ __all__ = [
     "RegNetY_32GF",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 def quantize_float(f, q):
@@ -391,13 +391,9 @@ def RegNetY_32GF(**args):
     return model
 
 
-def test_RegNetX_200MF(test_case):
+def test_RegNetX_200MF():
     load_paddle_module_and_check(
-        test_case, RegNetX_200MF, input_size=(1, 3, 224, 224), train_flag=False,
+        RegNetX_200MF, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_RegNetX_4GF(test_case):
-    load_paddle_module_and_check(
-        test_case, RegNetX_4GF, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_RegNetX_200MF()

@@ -32,7 +32,7 @@ __all__ = [
     "DPN131",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -446,31 +446,9 @@ def DPN131(**args):
     return model
 
 
-def test_dpn68(test_case):
+def test_dpn68():
     load_paddle_module_and_check(
-        test_case, DPN68, input_size=(1, 3, 224, 224), train_flag=False,
+        DPN68, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_dpn92(test_case):
-    load_paddle_module_and_check(
-        test_case, DPN92, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_dpn98(test_case):
-    load_paddle_module_and_check(
-        test_case, DPN98, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_dpn107(test_case):
-    load_paddle_module_and_check(
-        test_case, DPN107, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_dpn131(test_case):
-    load_paddle_module_and_check(
-        test_case, DPN131, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_dpn68()

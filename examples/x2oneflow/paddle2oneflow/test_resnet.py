@@ -30,7 +30,7 @@ import math
 
 __all__ = ["ResNet18", "ResNet34", "ResNet50", "ResNet101", "ResNet152"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -342,13 +342,9 @@ def ResNet152(**args):
     return model
 
 
-def test_ResNet18(test_case):
+def test_ResNet18():
     load_paddle_module_and_check(
-        test_case, ResNet18, input_size=(1, 3, 224, 224), train_flag=False,
+        ResNet18, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_ResNet152(test_case):
-    load_paddle_module_and_check(
-        test_case, ResNet152, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_ResNet18()

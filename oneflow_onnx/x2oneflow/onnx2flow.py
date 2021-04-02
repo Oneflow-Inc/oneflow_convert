@@ -123,10 +123,6 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
-    if not os.path.exists("/home/zhangxiaoyu/temp_onnx"):
-        os.makedirs("/home/zhangxiaoyu/temp_onnx")
-    onnx.save(onnx_model, "/home/zhangxiaoyu/temp_onnx/temp.onnx")
-
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
     BackendHandler.WEIGHT_SAVE_DIR = model_weight_dir
@@ -209,7 +205,7 @@ def from_paddle(
         shape=inputs.shape, dtype="float32", name=input_names
     )
 
-    mode_str = "/tmp/model"
+    mode_str = "/tmp/tmp"
 
     paddle.onnx.export(
         paddle_model,
@@ -239,7 +235,7 @@ def from_tensorflow2(
     # )
     spec = (tf.TensorSpec(inputs.shape, tf.float32, name=input_names),)
 
-    mode_str = "/tmp/model.onnx"
+    mode_str = "/tmp/tmp.onnx"
 
     model_proto, _ = tf2onnx.convert.from_keras(
         tf_model, input_signature=spec, opset=11, output_path=mode_str

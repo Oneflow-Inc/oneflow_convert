@@ -22,7 +22,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 __all__ = ["SqueezeNet1_0", "SqueezeNet1_1"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class MakeFireConv(nn.Layer):

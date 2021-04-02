@@ -22,7 +22,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 def check_data(data, number):

@@ -37,7 +37,7 @@ __all__ = [
     "EfficientNetB7",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 GlobalParams = collections.namedtuple(
@@ -969,55 +969,9 @@ def EfficientNetB7(padding_type="SAME", override_params=None, use_se=True, **arg
     return model
 
 
-def test_EfficientNetB0_small(test_case):
+def test_EfficientNetB0_small():
     load_paddle_module_and_check(
-        test_case, EfficientNetB0_small, input_size=(1, 3, 224, 224), train_flag=False,
+        EfficientNetB0_small, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_EfficientNetB0(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB0, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB1(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB1, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB2(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB2, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB3(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB3, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB4(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB4, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB5(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB5, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB6(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB6, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_EfficientNetB7(test_case):
-    load_paddle_module_and_check(
-        test_case, EfficientNetB7, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_EfficientNetB0_small()

@@ -40,7 +40,7 @@ __all__ = [
     "Res2Net200_26w_4s",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -297,20 +297,9 @@ def Res2Net200_26w_4s(**args):
     return model
 
 
-def test_Res2Net200_26w_4s(test_case):
+def test_Res2Net200_26w_4s():
     load_paddle_module_and_check(
-        test_case, Res2Net50_48w_2s, input_size=(1, 3, 224, 224), train_flag=False,
+        Res2Net50_14w_8s, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_Res2Net200_26w_4s(test_case):
-    load_paddle_module_and_check(
-        test_case, Res2Net50_48w_2s, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_Res2Net200_26w_4s(test_case)
+test_Res2Net200_26w_4s()

@@ -29,7 +29,7 @@ import math
 
 __all__ = ["MobileNetV1_x0_25", "MobileNetV1_x0_5", "MobileNetV1_x0_75", "MobileNetV1"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -293,7 +293,9 @@ def MobileNetV1(**args):
     return model
 
 
-def test_MobileNetV1(test_case):
+def test_MobileNetV1():
     load_paddle_module_and_check(
-        test_case, MobileNetV1, input_size=(1, 3, 224, 224), train_flag=False,
+        MobileNetV1, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_MobileNetV1()

@@ -24,7 +24,7 @@ from paddle.nn.initializer import Uniform, KaimingNormal
 
 __all__ = ["GhostNet_x0_5", "GhostNet_x1_0", "GhostNet_x1_3"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -355,26 +355,9 @@ def GhostNet_x1_3(**args):
     return model
 
 
-def test_GhostNet_x0_5(test_case):
+def test_GhostNet_x0_5():
     load_paddle_module_and_check(
-        test_case, GhostNet_x0_5, input_size=(1, 3, 224, 224), train_flag=False,
+        GhostNet_x0_5, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_GhostNet_x1_0(test_case):
-    load_paddle_module_and_check(
-        test_case, GhostNet_x1_0, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_GhostNet_x1_3(test_case):
-    load_paddle_module_and_check(
-        test_case, GhostNet_x1_3, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_GhostNet_x0_5(test_case)
+test_GhostNet_x0_5()

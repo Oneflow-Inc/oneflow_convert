@@ -22,7 +22,7 @@ from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
 __all__ = ["VGG11", "VGG13", "VGG16", "VGG19"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBlock(nn.Layer):

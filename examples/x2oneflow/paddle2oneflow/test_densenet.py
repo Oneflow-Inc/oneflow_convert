@@ -25,7 +25,7 @@ import math
 
 __all__ = ["DenseNet121", "DenseNet161", "DenseNet169", "DenseNet201", "DenseNet264"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class BNACConvLayer(nn.Layer):
@@ -326,38 +326,9 @@ def DenseNet264(**args):
     return model
 
 
-def test_densenet121(test_case):
+def test_densenet121():
     load_paddle_module_and_check(
-        test_case, DenseNet121, input_size=(1, 3, 224, 224), train_flag=False,
+        DenseNet121, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_densenet161(test_case):
-    load_paddle_module_and_check(
-        test_case, DenseNet161, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_densenet169(test_case):
-    load_paddle_module_and_check(
-        test_case, DenseNet169, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_densenet201(test_case):
-    load_paddle_module_and_check(
-        test_case, DenseNet201, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-def test_densenet264(test_case):
-    load_paddle_module_and_check(
-        test_case, DenseNet264, input_size=(1, 3, 224, 224), train_flag=False,
-    )
-
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_densenet121(test_case)
+test_densenet121()

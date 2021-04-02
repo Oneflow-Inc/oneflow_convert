@@ -34,7 +34,7 @@ __all__ = [
     "RepVGG_B3g4",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBN(nn.Layer):
@@ -378,13 +378,9 @@ def RepVGG_B3g4(**kwargs):
     )
 
 
-def test_RepVGG_A0(test_case):
+def test_RepVGG_A0():
     load_paddle_module_and_check(
-        test_case, RepVGG_A0, input_size=(1, 3, 224, 224), train_flag=False,
+        RepVGG_A0, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_RepVGG_B3g4(test_case):
-    load_paddle_module_and_check(
-        test_case, RepVGG_B3g4, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_RepVGG_A0()

@@ -30,18 +30,18 @@ import oneflow.typing as tp
 
 
 def load_pytorch_module_and_check(
-    test_case,
     pt_module_class,
     input_size=None,
     input_min_val=-10,
     input_max_val=10,
     train_flag=True,
+    flow_weight_dir="/tmp/oneflow",
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)
     pt_module = pt_module_class()
 
-    model_weight_save_dir = "/home/zhangxiaoyu/tmp"
+    model_weight_save_dir = flow_weight_dir
 
     if train_flag == True:
 
@@ -113,24 +113,22 @@ def load_pytorch_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
-    msg = "success"
-    test_case.assertTrue(np.allclose(flow_res, pytorch_res, rtol=1e-3, atol=1e-5), msg)
 
 
 def load_paddle_module_and_check(
-    test_case,
     pd_module_class,
     input_size=None,
     input_min_val=-10,
     input_max_val=10,
     train_flag=False,
+    flow_weight_dir="/tmp/oneflow",
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)
     pd_module = pd_module_class()
 
     paddle.set_device("gpu")
-    model_weight_save_dir = "/home/zhangxiaoyu/tmp"
+    model_weight_save_dir = flow_weight_dir
 
     if train_flag == True:
 
@@ -200,17 +198,15 @@ def load_paddle_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
-    msg = "success"
-    test_case.assertTrue(np.allclose(flow_res, paddle_res, rtol=1e-3, atol=1e-5), msg)
 
 
 def load_tensorflow2_module_and_check(
-    test_case,
     tf_module_class,
     input_size=None,
     input_min_val=-10,
     input_max_val=10,
     train_flag=False,
+    flow_weight_dir="/tmp/oneflow",
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)
@@ -218,7 +214,7 @@ def load_tensorflow2_module_and_check(
     
     # flow.config.enable_debug_mode(True)
 
-    model_weight_save_dir = "/home/zhangxiaoyu/tmp"
+    model_weight_save_dir = flow_weight_dir
 
     if train_flag == True:
 
@@ -290,7 +286,3 @@ def load_tensorflow2_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
-    msg = "success"
-    test_case.assertTrue(
-        np.allclose(flow_res, tensorflow_res, rtol=1e-3, atol=1e-5), msg
-    )

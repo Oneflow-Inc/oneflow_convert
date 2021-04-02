@@ -31,7 +31,7 @@ __all__ = [
     "ViT_huge_patch32_384",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 trunc_normal_ = TruncatedNormal(std=0.02)
 zeros_ = Constant(value=0.0)

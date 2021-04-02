@@ -33,7 +33,7 @@ __all__ = [
     "ShuffleNetV2_swish",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 def channel_shuffle(x, groups):

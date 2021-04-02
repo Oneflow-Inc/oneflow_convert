@@ -25,7 +25,7 @@ import math
 
 __all__ = ["GoogLeNet"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 def xavier(channels, filter_size, name):
@@ -220,14 +220,9 @@ def GoogLeNet(**args):
     return model
 
 
-def test_GoogLeNet(test_case):
+def test_GoogLeNet():
     load_paddle_module_and_check(
-        test_case, GoogLeNet, input_size=(1, 3, 224, 224), train_flag=False,
+        GoogLeNet, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-from absl import app
-from absl.testing import absltest
-
-test_case = absltest.TestCase
-test_GoogLeNet(test_case)
+test_GoogLeNet()

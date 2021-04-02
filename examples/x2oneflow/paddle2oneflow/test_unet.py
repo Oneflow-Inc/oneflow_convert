@@ -17,7 +17,7 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNReLU(nn.Layer):

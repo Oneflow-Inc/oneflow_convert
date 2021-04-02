@@ -37,7 +37,7 @@ __all__ = [
     "ResNeXt152_64x4d",
 ]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -258,13 +258,9 @@ def ResNeXt152_64x4d(**args):
     return model
 
 
-def test_ResNeXt50_32x4d(test_case):
+def test_ResNeXt50_32x4d():
     load_paddle_module_and_check(
-        test_case, ResNeXt50_32x4d, input_size=(1, 3, 224, 224), train_flag=False,
+        ResNeXt50_32x4d, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-
-def test_ResNeXt152_64x4d(test_case):
-    load_paddle_module_and_check(
-        test_case, ResNeXt152_64x4d, input_size=(1, 3, 224, 224), train_flag=False,
-    )
+test_ResNeXt50_32x4d()

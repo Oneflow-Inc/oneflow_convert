@@ -25,7 +25,7 @@ import math
 
 __all__ = ["DarkNet53"]
 
-from oneflow.python.test.onnx.load.util import load_paddle_module_and_check
+from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
 
 
 class ConvBNLayer(nn.Layer):
@@ -174,7 +174,9 @@ def DarkNet53(**args):
     return model
 
 
-def test_darknet(test_case):
+def test_darknet():
     load_paddle_module_and_check(
-        test_case, DarkNet53, input_size=(1, 3, 224, 224), train_flag=False,
+        DarkNet53, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
+
+test_darknet()
