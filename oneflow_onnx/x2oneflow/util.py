@@ -27,6 +27,7 @@ import tensorflow as tf
 
 import oneflow as flow
 import oneflow.typing as tp
+from oneflow_onnx.x2oneflow.onnx2flow import from_onnx, from_pytorch, from_paddle, from_tensorflow2
 
 
 def load_pytorch_module_and_check(
@@ -54,7 +55,7 @@ def load_pytorch_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_pytorch(
+            y = from_pytorch(
                 pt_module,
                 x,
                 model_weight_dir=model_weight_save_dir,
@@ -76,7 +77,7 @@ def load_pytorch_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_pytorch(
+            y = from_pytorch(
                 pt_module,
                 x,
                 model_weight_dir=model_weight_save_dir,
@@ -140,7 +141,7 @@ def load_paddle_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_paddle(
+            y = from_paddle(
                 pd_module,
                 x,
                 model_weight_dir=model_weight_save_dir,
@@ -162,7 +163,7 @@ def load_paddle_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_paddle(
+            y = from_paddle(
                 pd_module,
                 x,
                 model_weight_dir=model_weight_save_dir,
@@ -226,7 +227,7 @@ def load_tensorflow2_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_tensorflow2(
+            y = from_tensorflow2(
                 tf_module,
                 x,
                 model_weight_dir=model_weight_save_dir,
@@ -248,7 +249,7 @@ def load_tensorflow2_module_and_check(
                 initializer=flow.zeros_initializer(),
             )
 
-            y = flow.from_tensorflow2(
+            y = from_tensorflow2(
                 tf_module,
                 x,
                 model_weight_dir=model_weight_save_dir,

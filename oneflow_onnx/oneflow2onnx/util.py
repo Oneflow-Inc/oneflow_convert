@@ -21,7 +21,7 @@ from collections import OrderedDict
 import tempfile
 import os
 import shutil
-
+from oneflow_onnx.oneflow2onnx.flow2onnx import Export
 
 def convert_to_onnx_and_check(
     job_func,
@@ -51,7 +51,7 @@ def convert_to_onnx_and_check(
             pass
         onnx_model_dir = onnx_model_path
         onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
-        flow.onnx.export(
+        Export(
             job_func,
             flow_weight_dir.name,
             onnx_model_path,
@@ -64,7 +64,7 @@ def convert_to_onnx_and_check(
             pass
         onnx_model_dir = onnx_model_path
         onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
-        flow.onnx.export(
+        Export(
             job_func,
             flow_weight_dir,
             onnx_model_path,

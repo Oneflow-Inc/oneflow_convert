@@ -224,9 +224,6 @@ def TopologicalSort(g, continue_on_error):
             # if we continue on error, ignore graph cycles so we can report all missing ops
             pass
 
-
-@session_ctx.try_init_default_session
-@oneflow_export("onnx.export")
 def Export(
     job_func: Callable,
     model_save_dir: Text,

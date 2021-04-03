@@ -60,7 +60,6 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-@oneflow_export("from_onnx")
 def from_onnx(
     onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False
 ):
@@ -166,7 +165,6 @@ def from_onnx(
     return {output_name: d[output_name] for output_name in output_names}
 
 
-@oneflow_export("from_pytorch")
 def from_pytorch(
     torch_model, inputs, model_weight_dir="/tmp", do_onnxsim=True, train_flag=True
 ):
@@ -195,7 +193,6 @@ def from_pytorch(
     )
 
 
-@oneflow_export("from_paddle")
 def from_paddle(
     paddle_model, inputs, model_weight_dir="/tmp", do_onnxsim=True, train_flag=True
 ):
@@ -225,7 +222,6 @@ def from_paddle(
     )
 
 
-@oneflow_export("from_tensorflow2")
 def from_tensorflow2(
     tf_model, inputs, model_weight_dir="/tmp", do_onnxsim=True, train_flag=True
 ):
