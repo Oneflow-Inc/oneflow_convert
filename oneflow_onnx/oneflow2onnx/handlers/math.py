@@ -27,9 +27,9 @@ import numpy as np
 from onnx import onnx_pb
 from onnx import TensorProto
 from oneflow.python.framework import id_util
-from oneflow.python.onnx import constants, util
-from oneflow.python.onnx.save.handler import flow_op
-from oneflow.python.onnx.save.handlers import common
+from oneflow_onnx import constants, util
+from oneflow_onnx.oneflow2onnx.handler import flow_op
+from oneflow_onnx.oneflow2onnx.handlers import common
 
 logger = logging.getLogger(__name__)
 

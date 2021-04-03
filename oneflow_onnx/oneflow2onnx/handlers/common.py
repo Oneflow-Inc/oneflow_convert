@@ -23,7 +23,7 @@ from __future__ import absolute_import
 
 import logging
 
-from oneflow.python.onnx import constants
+from oneflow_onnx import constants
 
 
 logger = logging.getLogger(__name__)

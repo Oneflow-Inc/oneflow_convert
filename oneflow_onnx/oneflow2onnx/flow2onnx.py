@@ -16,7 +16,7 @@ limitations under the License.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-# oneflow.python.onnx.oneflow.python.onnx - rewrite oneflow graph to onnx graph
+# oneflow_onnx.oneflow_onnx - rewrite oneflow graph to onnx graph
 
 from __future__ import division
 from __future__ import print_function
@@ -39,11 +39,11 @@ import oneflow
 import oneflow.python.framework.c_api_util as c_api_util
 import oneflow.python.framework.session_context as session_ctx
 from oneflow.python.oneflow_export import oneflow_export
-import oneflow.python.onnx
-from oneflow.python.onnx import constants, schemas, util
-from oneflow.python.onnx.save import handler, optimizer
-from oneflow.python.onnx.onnx_wrapper import Graph
-import oneflow.python.onnx.save.handlers  # pylint: disable=unused-import
+import oneflow_onnx
+from oneflow_onnx import constants, schemas, util
+from oneflow_onnx.oneflow2onnx import handler, optimizer
+from oneflow_onnx.onnx_wrapper import Graph
+import oneflow_onnx.oneflow2onnx.handlers  # pylint: disable=unused-import
 
 logger = logging.getLogger(__name__)
 
@@ -241,7 +241,7 @@ def Export(
         model_save_dir: The directory containing oneflow model weights. Users are expected to call check_point.save(dir), wait for the model saving finishing, and pass the argument 'dir' as model_save_dir.
         onnx_filename: a string for the output filename
         continue_on_error: if an op can't be processed (aka there is no mapping), continue
-        opset: the opset to be used (int, default is oneflow.python.onnx.constants.PREFERRED_OPSET)
+        opset: the opset to be used (int, default is oneflow_onnx.constants.PREFERRED_OPSET)
         extra_opset: list of extra opset's, for example the opset's used by custom ops
         shape_override: dict with inputs that override the shapes given by oneflow
         external_data: Save weights as ONNX external data, usually to bypass the 2GB file size limit of protobuf.

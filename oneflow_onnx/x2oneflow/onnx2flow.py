@@ -31,12 +31,12 @@ from onnx.backend.base import namedtupledict
 from onnx.helper import make_opsetid
 import oneflow as flow
 
-from oneflow.python.onnx import util
+from oneflow_onnx import util
 from oneflow.python.oneflow_export import oneflow_export
-from oneflow.python.onnx.load.handler import BackendHandler
+from oneflow_onnx.x2oneflow.handler import BackendHandler
 
-from oneflow.python.onnx.load.handlers import *
-from oneflow.python.onnx.onnx_wrapper import Node as OnnxNode
+from oneflow_onnx.x2oneflow.handlers import *
+from oneflow_onnx.onnx_wrapper import Node as OnnxNode
 import io
 import tempfile
 import os

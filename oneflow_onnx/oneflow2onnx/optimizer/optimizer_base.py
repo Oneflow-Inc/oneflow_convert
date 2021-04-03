@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 import copy
 import logging
 
-from oneflow.python.onnx import util
+from oneflow_onnx import util
 
 
 class GraphOptimizerBase(object):

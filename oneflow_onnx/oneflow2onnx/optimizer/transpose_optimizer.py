@@ -24,8 +24,8 @@ from collections import defaultdict
 import numpy as np
 import onnx
 from oneflow.python.framework import id_util
-from oneflow.python.onnx.constants import NCHW_TO_NHWC, NHWC_TO_NCHW
-from oneflow.python.onnx import util
+from oneflow_onnx.constants import NCHW_TO_NHWC, NHWC_TO_NCHW
+from oneflow_onnx import util
 from .optimizer_base import GraphOptimizerBase
 
 

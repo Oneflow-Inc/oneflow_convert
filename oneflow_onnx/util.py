@@ -16,7 +16,7 @@ limitations under the License.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-# oneflow.python.onnx.util - misc utilities for oneflow.python.onnx
+# oneflow_onnx.util - misc utilities for oneflow_onnx
 
 from __future__ import division
 from __future__ import print_function
@@ -35,7 +35,7 @@ from onnx import helper, onnx_pb, defs, numpy_helper
 import six
 
 from oneflow.python.framework import id_util
-from oneflow.python.onnx import constants
+from oneflow_onnx import constants
 import oneflow
 import oneflow_api
 

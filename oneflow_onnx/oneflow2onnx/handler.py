@@ -28,7 +28,7 @@ import inspect
 
 from onnx import defs
 
-from oneflow.python.onnx import constants
+from oneflow_onnx import constants
 
 
 class flow_op:

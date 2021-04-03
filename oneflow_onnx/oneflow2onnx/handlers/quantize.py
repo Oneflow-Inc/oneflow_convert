@@ -25,8 +25,8 @@ import logging
 import numpy as np
 from typing import Optional, Callable
 from oneflow.python.framework import id_util
-from oneflow.python.onnx.onnx_wrapper import Graph, Node
-from oneflow.python.onnx.save.handler import flow_op
+from oneflow_onnx.onnx_wrapper import Graph, Node
+from oneflow_onnx.oneflow2onnx.handler import flow_op
 
 
 logger = logging.getLogger(__name__)

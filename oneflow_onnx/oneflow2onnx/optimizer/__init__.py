@@ -16,7 +16,7 @@ limitations under the License.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-# oneflow.python.onnx.optimizer module
+# oneflow_onnx.optimizer module
 
 from __future__ import division
 from __future__ import print_function

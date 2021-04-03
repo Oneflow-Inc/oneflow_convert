@@ -16,7 +16,7 @@ limitations under the License.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-# oneflow.python.onnx.onnx_wrapper - class to manage graph manipulation on top of onnx
+# oneflow_onnx.onnx_wrapper - class to manage graph manipulation on top of onnx
 
 from __future__ import division
 from __future__ import print_function
@@ -41,11 +41,10 @@ from onnx import (
 )
 
 from oneflow.python.framework import id_util
-from oneflow.python.onnx import util
-from oneflow.python.onnx.util import FindOpset
-from oneflow.python.onnx.save import optimizer
-from oneflow.python.onnx.schemas import get_schema, InferOnnxShapeDtype
-from oneflow.python.onnx import constants
+from oneflow_onnx import util
+from oneflow_onnx.oneflow2onnx import optimizer
+from oneflow_onnx.schemas import get_schema, InferOnnxShapeDtype
+from oneflow_onnx import constants
 
 logger = logging.getLogger(__name__)
 
@@ -406,7 +405,7 @@ class Graph(object):
 
         self._model_save_dir = model_save_dir
         self._output_shapes = output_shapes
-        self._opset = FindOpset(opset)
+        self._opset = util.FindOpset(opset)
 
         if extra_opset is not None:
             util.MakeSure(isinstance(extra_opset, list), "invalid extra_opset")
@@ -968,7 +967,7 @@ class Graph(object):
         self.ResetNodes(ret)
 
     def MakeGraph(
-        self, doc, onnx_filename, external_data=False, graph_name="oneflow.python.onnx"
+        self, doc, onnx_filename, external_data=False, graph_name="oneflow_onnx"
     ):
         """
         Create GraphProto for onnx from internal graph.
@@ -1042,7 +1041,7 @@ class Graph(object):
         onnx_filename,
         external_data=False,
         optimize=False,
-        graph_name="oneflow.python.onnx",
+        graph_name="oneflow_onnx",
         **kwargs
     ):
         """
@@ -1056,7 +1055,7 @@ class Graph(object):
         )
 
         if "producer_name" not in kwargs:
-            kwargs = {"producer_name": "oneflow.python.onnx"}
+            kwargs = {"producer_name": "oneflow_onnx"}
 
         if "opset_imports" not in kwargs:
             opsets = []

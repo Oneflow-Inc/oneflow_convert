@@ -18,10 +18,10 @@ from functools import reduce
 
 import numpy as np
 
-from oneflow.python.onnx.load.handler import BackendHandler
-from oneflow.python.onnx.load.handler import onnx_op
-from oneflow.python.onnx.load.handler import flow_func
-from oneflow.python.onnx.load.handlers.common import ReductionMixin
+from oneflow_onnx.x2oneflow.handler import BackendHandler
+from oneflow_onnx.x2oneflow.handler import onnx_op
+from oneflow_onnx.x2oneflow.handler import flow_func
+from oneflow_onnx.x2oneflow.handlers.common import ReductionMixin
 from oneflow.python.ops import reduce_mean
 import oneflow as flow
 

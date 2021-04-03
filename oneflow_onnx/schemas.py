@@ -26,8 +26,8 @@ import copy
 from collections import defaultdict, OrderedDict
 from onnx import defs, helper, TensorProto, OperatorSetIdProto, shape_inference
 
-from oneflow.python.onnx import constants
-from oneflow.python.onnx import util
+from oneflow_onnx import constants
+from oneflow_onnx import util
 
 logger = logging.getLogger(__name__)
 

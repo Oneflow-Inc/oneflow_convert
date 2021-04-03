@@ -19,10 +19,10 @@ from onnx import numpy_helper
 
 import oneflow as flow
 from oneflow.python.ops import get_variable
-from oneflow.python.onnx import util
-from oneflow.python.onnx.load.handler import BackendHandler
-from oneflow.python.onnx.load.handler import onnx_op
-from oneflow.python.onnx.load.handler import flow_func
+from oneflow_onnx import util
+from oneflow_onnx.x2oneflow.handler import BackendHandler
+from oneflow_onnx.x2oneflow.handler import onnx_op
+from oneflow_onnx.x2oneflow.handler import flow_func
 
 import os
 

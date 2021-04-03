@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import oneflow as flow
-from oneflow.python.onnx.load.handler import BackendHandler
-from oneflow.python.onnx.load.handler import onnx_op
-from oneflow.python.onnx.load.handler import flow_func
+from oneflow_onnx.x2oneflow.handler import BackendHandler
+from oneflow_onnx.x2oneflow.handler import onnx_op
+from oneflow_onnx.x2oneflow.handler import flow_func
 from oneflow.python.ops import math_unary_elementwise_ops
 from oneflow.python.ops import math_binary_elementwise_ops
 from oneflow.python.ops import math_ops
 from oneflow.python.ops import array_ops
 from oneflow.python.ops import linalg
-from oneflow.python.onnx.load.handlers.common import ArithmeticMixin, BasicMathMixin
-from oneflow.python.onnx import util as onnx_util
+from oneflow_onnx.x2oneflow.handlers.common import ArithmeticMixin, BasicMathMixin
+from oneflow_onnx import util as onnx_util
 
 
 @onnx_op("Add")

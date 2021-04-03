@@ -21,7 +21,7 @@ limitations under the License.
 
 from __future__ import unicode_literals
 
-from oneflow.python.onnx.util import ONNX_DTYPE_NAMES  # lgtm[py/unsafe-cyclic-import]
+from oneflow_onnx import util  # lgtm[py/unsafe-cyclic-import]
 from .optimizer_base import GraphOptimizerBase  # lgtm[py/unsafe-cyclic-import]
 
 # pylint: disable=logging-not-lazy,unused-argument,missing-docstring,unused-variable,arguments-differ
@@ -88,7 +88,7 @@ class BackToBackOptimizer(GraphOptimizerBase):
         """remove long chains of cast ops"""
         q2 = []
         type1 = node.attrs["to"]
-        type1_name = ONNX_DTYPE_NAMES[type1] if type1 in ONNX_DTYPE_NAMES else ""
+        type1_name = util.ONNX_DTYPE_NAMES[type1] if type1 in util.ONNX_DTYPE_NAMES else ""
 
         # if parent node is cast node, and same type, delete this one
         pnode = node.input_nodes[0]
@@ -106,7 +106,7 @@ class BackToBackOptimizer(GraphOptimizerBase):
         can_reduce = True
         for node2 in consumer_nodes:
             type2 = node2.attrs["to"]
-            type2_name = ONNX_DTYPE_NAMES[type2] if type2 in ONNX_DTYPE_NAMES else ""
+            type2_name = util.ONNX_DTYPE_NAMES[type2] if type2 in util.ONNX_DTYPE_NAMES else ""
 
             if "float" in type1_name or type1_name == "double":
                 # high information type. ok to eliminate

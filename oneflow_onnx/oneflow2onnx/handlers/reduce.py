@@ -27,8 +27,8 @@ import numpy as np
 from onnx import onnx_pb, helper
 
 from oneflow.python.framework import id_util
-from oneflow.python.onnx import util
-from oneflow.python.onnx.save.handler import flow_op
+from oneflow_onnx import util
+from oneflow_onnx.oneflow2onnx.handler import flow_op
 
 logger = logging.getLogger(__name__)
 

@@ -20,7 +20,7 @@ limitations under the License.
 # op in loop's body graph can be moved out to the loop
 
 from oneflow.python.framework import id_util
-from oneflow.python.onnx.util import MakeSure
+from oneflow_onnx import util
 from .optimizer_base import GraphOptimizerBase
 
 
@@ -52,7 +52,7 @@ class LoopOptimizer(GraphOptimizerBase):
 
     @staticmethod
     def ConsumerNodesNum(graph, node):
-        MakeSure(
+        util.MakeSure(
             len(node.output_tensor_names) == 1,
             "only consider node with only one output",
         )

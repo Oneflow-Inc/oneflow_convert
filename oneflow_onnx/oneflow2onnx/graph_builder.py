@@ -16,7 +16,7 @@ limitations under the License.
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-# oneflow.python.onnx.graph_helper - class to help building graph, such as helping to make complex node
+# oneflow_onnx.graph_helper - class to help building graph, such as helping to make complex node
 
 from __future__ import division
 from __future__ import print_function
@@ -26,7 +26,7 @@ from __future__ import absolute_import
 import numpy as np
 import logging
 from oneflow.python.framework import id_util
-from oneflow.python.onnx import util
+from oneflow_onnx import util
 
 
 # pylint: disable=missing-docstring
