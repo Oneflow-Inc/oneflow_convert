@@ -4,3 +4,6 @@
 log/
 __pycache__/
 *.pyc
+build/
+dist/
+oneflow_onnx.egg-info/
