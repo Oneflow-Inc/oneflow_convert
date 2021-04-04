@@ -1,6 +1,6 @@
 # X2OneFlow模型测试库
 
-目前X2OneFlow支持40+的TensorFlow OP，30+的Caffe Layer，40+的ONNX OP，110+的PyTorch Aten，10+的PyTorch Prim，覆盖了大部分CV分类模型常用的操作。我们在如下模型列表中测试了X2OneFlow的转换。
+目前X2OneFlow 支持40+的ONNX OP，30+的Tensorflow/Pytorch/PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。我们在如下模型列表中测试了X2OneFlow的转换。
 
 ## Pytorch
 

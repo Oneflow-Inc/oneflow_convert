@@ -1,6 +1,6 @@
 # OneFlow2ONNX 支持的OP列表
 
-> 目前OneFlow2ONNX 支持60+的ONNX OP，我们在下面的列表中列出了目前OneFlow2ONNX支持的全部OP
+> 目前OneFlow2ONNX 支持60+的ONNX OP，我们在下面的列表中列出了目前OneFlow支持导出的全部ONNX OP
 
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
@@ -20,3 +20,5 @@
 | 49 | Less     | 50 | Pad       | 51 |AveragePool| 52 | MaxPool            |
 | 53 | Conv     | 54 | QuantizeLinear | 56 | ReduceMin    | 57 | BatchNormalization|
 | 58 | ReduceSum| 59 | ReduceProd | 60 | ArgMax   | 61 | ArgMin             |
+|62  | Reshape  | 63 | Squeeze    | 64 | Transpose| 65 | Concat             |
+| 66 | Cast     | 67 | Identity   | 68 | Mul      |
