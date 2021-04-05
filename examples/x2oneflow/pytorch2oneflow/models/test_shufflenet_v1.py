@@ -134,5 +134,3 @@ def test_shufflenet_v1_g2():
     load_pytorch_module_and_check(
         ShuffleNetG2, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
-
-test_shufflenet_v1_g2()

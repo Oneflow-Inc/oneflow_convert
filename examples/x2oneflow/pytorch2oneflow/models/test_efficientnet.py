@@ -185,5 +185,3 @@ def test_efficientNetB0():
     load_pytorch_module_and_check(
         EfficientNetB0, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
-
-test_efficientNetB0()

@@ -18,11 +18,10 @@ import torchvision
 from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 
-def test_resnet18():
+def test_vgg16():
     load_pytorch_module_and_check(
-        torchvision.models.resnet18,
+        torchvision.models.vgg16,
         input_size=(1, 3, 224, 224),
         train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
+        flow_weight_dir="/tmp/oneflow"
     )
-test_resnet18()

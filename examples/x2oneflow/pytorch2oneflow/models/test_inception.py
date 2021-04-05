@@ -347,5 +347,3 @@ def test_inception_v3():
     load_pytorch_module_and_check(
         InceptionV3, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
-
-test_inception_v3()

@@ -235,5 +235,3 @@ def test_MobileNetV3_Large():
     load_pytorch_module_and_check(
         MobileNetV3_Large, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow" 
     )
-
-test_MobileNetV3_Large()

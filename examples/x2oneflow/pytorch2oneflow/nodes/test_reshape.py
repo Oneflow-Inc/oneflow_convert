@@ -13,19 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import torchvision
+import torch
+from torch import nn
 
 from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 
-def test_mobilenet_v2():
-    load_pytorch_module_and_check(
-        torchvision.models.mobilenet_v2,
-        input_size=(1, 3, 224, 224),
-        input_min_val=0,
-        input_max_val=1,
-        train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
-    )
+# TODO(daquexian): add tests for 0 and -1 after flow.reshape supports it
+def test_reshape():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.reshape(x, (5, 12))
+            return x
 
-test_mobilenet_v2()
+    load_pytorch_module_and_check(Net, (2, 5, 3, 2))

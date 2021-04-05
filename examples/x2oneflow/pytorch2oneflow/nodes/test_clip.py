@@ -13,17 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import torchvision
+import torch
+from torch import nn
 
 from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 
-def test_vgg16():
-    load_pytorch_module_and_check(
-        torchvision.models.vgg16,
-        input_size=(1, 3, 224, 224),
-        train_flag=False,
-        flow_weight_dir="/tmp/oneflow"
-    )
+def test_clip_min_max():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.clamp(x, min=-0.5, max=3.1)
+            return x
 
-test_vgg16()
+    load_pytorch_module_and_check(Net)
+
+
+def test_clip_min():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.clamp(x, min=-2.2)
+            return x
+
+    load_pytorch_module_and_check(Net)
+
+
+def test_clip_max():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.clamp(x, max=1.2)
+            return x
+
+    load_pytorch_module_and_check(Net)

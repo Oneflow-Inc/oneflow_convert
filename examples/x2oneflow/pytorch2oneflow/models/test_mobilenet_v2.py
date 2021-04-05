@@ -18,12 +18,12 @@ import torchvision
 from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
 
-def test_alexnet():
+def test_mobilenet_v2():
     load_pytorch_module_and_check(
-        torchvision.models.alexnet,
+        torchvision.models.mobilenet_v2,
         input_size=(1, 3, 224, 224),
+        input_min_val=0,
+        input_max_val=1,
         train_flag=False,
-        flow_weight_dir="/tmp/oneflow"
+        flow_weight_dir="/tmp/oneflow" 
     )
-
-test_alexnet()

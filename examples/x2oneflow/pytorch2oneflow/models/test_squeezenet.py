@@ -43,5 +43,3 @@ def test_squeezenet1_1():
         train_flag=False,
         flow_weight_dir="/tmp/oneflow" 
     )
-
-test_squeezenet()
