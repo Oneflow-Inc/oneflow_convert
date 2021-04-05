@@ -14,18 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.python.keras.applications.mobilenet_v3 import MobileNetV3Small
+
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_MobileNetV3():
+def test_pad():
     class Net(tf.keras.Model):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.MobileNetV3 = MobileNetV3Small(weights=None)
         def call(self, x):
-            x = self.MobileNetV3(x)
+            x = tf.pad(x, paddings=tf.constant([[0, 0], [2, 2], [3, 3], [0, 0]]), mode="CONSTANT")
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net)
 
-test_MobileNetV3()
+
+def test_pad_with_value():
+    class Net(tf.keras.Model):
+        def call(self, x):
+            x = tf.pad(x, paddings=tf.constant([[0, 0], [2, 2], [3, 3], [0, 0]]), mode="CONSTANT", constant_values=3.5)
+            return x
+
+    load_tensorflow2_module_and_check(Net)
+

@@ -14,18 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
+from tensorflow.keras.applications.mobilenet import MobileNet
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_MobileNetV2():
+def test_MobileNet():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.MobileNetV2 = MobileNetV2(weights=None)
+            self.MobileNet = MobileNet(weights=None)
         def call(self, x):
-            x = self.MobileNetV2(x)
+            x = self.MobileNet(x)
             return x
 
     load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
-
-test_MobileNetV2()

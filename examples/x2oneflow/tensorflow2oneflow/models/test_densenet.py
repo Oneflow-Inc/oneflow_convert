@@ -27,5 +27,3 @@ def test_DenseNet121():
             return x
 
     load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
-
-test_DenseNet121()

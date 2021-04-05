@@ -14,18 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.mobilenet import MobileNet
+
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_MobileNet():
+
+def test_flatten():
     class Net(tf.keras.Model):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.MobileNet = MobileNet(weights=None)
         def call(self, x):
-            x = self.MobileNet(x)
+            flatten = tf.keras.layers.Flatten()
+            x = flatten(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net)
 
-test_MobileNet()
+

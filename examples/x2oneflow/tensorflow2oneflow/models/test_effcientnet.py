@@ -14,18 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.applications.efficientnet import EfficientNetB0
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_InceptionV3():
+def test_EfficientNetB0():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.InceptionV3 = InceptionV3(weights=None)
+            self.EfficientNetB0 = EfficientNetB0(weights=None)
         def call(self, x):
-            x = self.InceptionV3(x)
+            x = self.EfficientNetB0(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
-
-test_InceptionV3()
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")

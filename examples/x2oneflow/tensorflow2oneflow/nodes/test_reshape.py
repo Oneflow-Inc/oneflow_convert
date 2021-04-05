@@ -14,18 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.efficientnet import EfficientNetB0
+
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_EfficientNetB0():
+
+# TODO(daquexian): add tests for 0 and -1 after flow.reshape supports it
+def test_reshape():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.EfficientNetB0 = EfficientNetB0(weights=None)
+            self.reshape = tf.keras.layers.Reshape(target_shape=(3, 10))
         def call(self, x):
-            x = self.EfficientNetB0(x)
+            x = self.reshape(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net, (2, 5, 3, 2))
 
-test_EfficientNetB0()

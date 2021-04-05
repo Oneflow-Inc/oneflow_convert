@@ -14,19 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.xception import Xception
+from tensorflow.python.keras.applications.mobilenet_v3 import MobileNetV3Small
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_Xception():
+def test_MobileNetV3():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.Xception = Xception(weights=None)
+            self.MobileNetV3 = MobileNetV3Small(weights=None)
         def call(self, x):
-            x = self.Xception(x)
+            x = self.MobileNetV3(x)
             return x
 
     load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
-
-
-test_Xception()

@@ -14,31 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.applications.vgg19 import VGG19
 
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
-def test_vgg16():
+
+def test_bn():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.vgg = VGG16(weights=None)
+            self.bn = tf.keras.layers.BatchNormalization(axis=1, trainable=False)
+
         def call(self, x):
-            x = self.vgg(x)
+            x = self.bn(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net)
 
-def test_vgg19():
+def test_bn_withoutscale():
     class Net(tf.keras.Model):
         def __init__(self):
             super(Net, self).__init__()
-            self.vgg = VGG19(weights=None)
+            self.bn = tf.keras.layers.BatchNormalization(axis=1, scale=False, trainable=False)
+
         def call(self, x):
-            x = self.vgg(x)
+            x = self.bn(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net)
 
-test_vgg16()
+from absl import app
+from absl.testing import absltest
+
+ = absltest.TestCase
+test_bn_withoutscale()
