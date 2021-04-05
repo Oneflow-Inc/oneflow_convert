@@ -65,7 +65,7 @@
 | XceptionNet        | Yes                                                          |
 | Xception_DeepLab   | Yes                                                          |
 | Vision_Transformer | No（"op_name: Constant_20 already exist in job: job_eval"）  |
-| Res2Net            | No（split op bug，working）                                  |
+| Res2Net            | Yes                                  |
 | Unet               | No（OneFlow的上采样OP和Paddle未对齐）                        |
 
 

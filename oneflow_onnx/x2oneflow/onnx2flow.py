@@ -122,6 +122,10 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
+    if not os.path.exists("/tmp"):
+        os.makedirs("/tmp")
+    onnx.save(onnx_model, "/tmp/model.onnx")
+
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
     BackendHandler.WEIGHT_SAVE_DIR = model_weight_dir
