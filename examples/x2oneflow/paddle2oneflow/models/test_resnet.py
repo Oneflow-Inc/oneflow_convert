@@ -346,5 +346,3 @@ def test_ResNet18():
     load_paddle_module_and_check(
         ResNet18, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_ResNet18()

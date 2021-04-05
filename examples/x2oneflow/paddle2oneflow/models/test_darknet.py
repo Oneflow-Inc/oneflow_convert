@@ -178,5 +178,3 @@ def test_darknet():
     load_paddle_module_and_check(
         DarkNet53, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_darknet()

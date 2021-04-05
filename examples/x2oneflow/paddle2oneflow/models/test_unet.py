@@ -163,5 +163,3 @@ def test_unet():
     load_paddle_module_and_check(
         unet, input_size=(1, 3, 1024, 512), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_unet()

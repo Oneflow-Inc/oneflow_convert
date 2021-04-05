@@ -284,4 +284,3 @@ def test_MobileNetV2():
         MobileNetV2, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-test_MobileNetV2()

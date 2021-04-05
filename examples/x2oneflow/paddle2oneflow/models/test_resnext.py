@@ -29,15 +29,12 @@ from paddle.nn.initializer import Uniform
 import math
 
 __all__ = [
-    "Res2Net50_48w_2s",
-    "Res2Net50_26w_4s",
-    "Res2Net50_14w_8s",
-    "Res2Net50_48w_2s",
-    "Res2Net50_26w_6s",
-    "Res2Net50_26w_8s",
-    "Res2Net101_26w_4s",
-    "Res2Net152_26w_4s",
-    "Res2Net200_26w_4s",
+    "ResNeXt50_32x4d",
+    "ResNeXt50_64x4d",
+    "ResNeXt101_32x4d",
+    "ResNeXt101_64x4d",
+    "ResNeXt152_32x4d",
+    "ResNeXt152_64x4d",
 ]
 
 from oneflow_onnx.x2oneflow.util import load_paddle_module_and_check
@@ -87,45 +84,29 @@ class ConvBNLayer(nn.Layer):
 
 class BottleneckBlock(nn.Layer):
     def __init__(
-        self,
-        num_channels1,
-        num_channels2,
-        num_filters,
-        stride,
-        scales,
-        shortcut=True,
-        if_first=False,
-        name=None,
+        self, num_channels, num_filters, stride, cardinality, shortcut=True, name=None
     ):
         super(BottleneckBlock, self).__init__()
-        self.stride = stride
-        self.scales = scales
+
         self.conv0 = ConvBNLayer(
-            num_channels=num_channels1,
+            num_channels=num_channels,
             num_filters=num_filters,
             filter_size=1,
             act="relu",
             name=name + "_branch2a",
         )
-        self.conv1_list = []
-        for s in range(scales - 1):
-            conv1 = self.add_sublayer(
-                name + "_branch2b_" + str(s + 1),
-                ConvBNLayer(
-                    num_channels=num_filters // scales,
-                    num_filters=num_filters // scales,
-                    filter_size=3,
-                    stride=stride,
-                    act="relu",
-                    name=name + "_branch2b_" + str(s + 1),
-                ),
-            )
-            self.conv1_list.append(conv1)
-        self.pool2d_avg = AvgPool2D(kernel_size=3, stride=stride, padding=1)
-
+        self.conv1 = ConvBNLayer(
+            num_channels=num_filters,
+            num_filters=num_filters,
+            filter_size=3,
+            groups=cardinality,
+            stride=stride,
+            act="relu",
+            name=name + "_branch2b",
+        )
         self.conv2 = ConvBNLayer(
             num_channels=num_filters,
-            num_filters=num_channels2,
+            num_filters=num_filters * 2 if cardinality == 32 else num_filters,
             filter_size=1,
             act=None,
             name=name + "_branch2c",
@@ -133,8 +114,8 @@ class BottleneckBlock(nn.Layer):
 
         if not shortcut:
             self.short = ConvBNLayer(
-                num_channels=num_channels1,
-                num_filters=num_channels2,
+                num_channels=num_channels,
+                num_filters=num_filters * 2 if cardinality == 32 else num_filters,
                 filter_size=1,
                 stride=stride,
                 name=name + "_branch1",
@@ -144,63 +125,55 @@ class BottleneckBlock(nn.Layer):
 
     def forward(self, inputs):
         y = self.conv0(inputs)
-        xs = paddle.split(y, self.scales, 1)
-        ys = []
-        for s, conv1 in enumerate(self.conv1_list):
-            if s == 0 or self.stride == 2:
-                ys.append(conv1(xs[s]))
-            else:
-                ys.append(conv1(paddle.add(xs[s], ys[-1])))
-        if self.stride == 1:
-            ys.append(xs[-1])
-        else:
-            ys.append(self.pool2d_avg(xs[-1]))
-        conv1 = paddle.concat(ys, axis=1)
+        conv1 = self.conv1(y)
         conv2 = self.conv2(conv1)
 
         if self.shortcut:
             short = inputs
         else:
             short = self.short(inputs)
+
         y = paddle.add(x=short, y=conv2)
         y = F.relu(y)
         return y
 
 
-class Res2Net(nn.Layer):
-    def __init__(self, layers=50, scales=4, width=26, class_dim=1000):
-        super(Res2Net, self).__init__()
+class ResNeXt(nn.Layer):
+    def __init__(self, layers=50, class_dim=1000, cardinality=32):
+        super(ResNeXt, self).__init__()
 
         self.layers = layers
-        self.scales = scales
-        self.width = width
-        basic_width = self.width * self.scales
-        supported_layers = [50, 101, 152, 200]
+        self.cardinality = cardinality
+        supported_layers = [50, 101, 152]
         assert (
             layers in supported_layers
         ), "supported layers are {} but input layer is {}".format(
             supported_layers, layers
         )
-
+        supported_cardinality = [32, 64]
+        assert (
+            cardinality in supported_cardinality
+        ), "supported cardinality is {} but input cardinality is {}".format(
+            supported_cardinality, cardinality
+        )
         if layers == 50:
             depth = [3, 4, 6, 3]
         elif layers == 101:
             depth = [3, 4, 23, 3]
         elif layers == 152:
             depth = [3, 8, 36, 3]
-        elif layers == 200:
-            depth = [3, 12, 48, 3]
         num_channels = [64, 256, 512, 1024]
-        num_channels2 = [256, 512, 1024, 2048]
-        num_filters = [basic_width * t for t in [1, 2, 4, 8]]
+        num_filters = (
+            [128, 256, 512, 1024] if cardinality == 32 else [256, 512, 1024, 2048]
+        )
 
-        self.conv1 = ConvBNLayer(
+        self.conv = ConvBNLayer(
             num_channels=3,
             num_filters=64,
             filter_size=7,
             stride=2,
             act="relu",
-            name="conv1",
+            name="res_conv1",
         )
         self.pool2d_max = MaxPool2D(kernel_size=3, stride=2, padding=1)
 
@@ -218,15 +191,13 @@ class Res2Net(nn.Layer):
                 bottleneck_block = self.add_sublayer(
                     "bb_%d_%d" % (block, i),
                     BottleneckBlock(
-                        num_channels1=num_channels[block]
+                        num_channels=num_channels[block]
                         if i == 0
-                        else num_channels2[block],
-                        num_channels2=num_channels2[block],
+                        else num_filters[block] * int(64 // self.cardinality),
                         num_filters=num_filters[block],
                         stride=2 if i == 0 and block != 0 else 1,
-                        scales=scales,
+                        cardinality=self.cardinality,
                         shortcut=shortcut,
-                        if_first=block == i == 0,
                         name=conv_name,
                     ),
                 )
@@ -247,7 +218,7 @@ class Res2Net(nn.Layer):
         )
 
     def forward(self, inputs):
-        y = self.conv1(inputs)
+        y = self.conv(inputs)
         y = self.pool2d_max(y)
         for block in self.block_list:
             y = block(y)
@@ -257,49 +228,37 @@ class Res2Net(nn.Layer):
         return y
 
 
-def Res2Net50_48w_2s(**args):
-    model = Res2Net(layers=50, scales=2, width=48, **args)
+def ResNeXt50_32x4d(**args):
+    model = ResNeXt(layers=50, cardinality=32, **args)
     return model
 
 
-def Res2Net50_26w_4s(**args):
-    model = Res2Net(layers=50, scales=4, width=26, **args)
+def ResNeXt50_64x4d(**args):
+    model = ResNeXt(layers=50, cardinality=64, **args)
     return model
 
 
-def Res2Net50_14w_8s(**args):
-    model = Res2Net(layers=50, scales=8, width=14, **args)
+def ResNeXt101_32x4d(**args):
+    model = ResNeXt(layers=101, cardinality=32, **args)
     return model
 
 
-def Res2Net50_26w_6s(**args):
-    model = Res2Net(layers=50, scales=6, width=26, **args)
+def ResNeXt101_64x4d(**args):
+    model = ResNeXt(layers=101, cardinality=64, **args)
     return model
 
 
-def Res2Net50_26w_8s(**args):
-    model = Res2Net(layers=50, scales=8, width=26, **args)
+def ResNeXt152_32x4d(**args):
+    model = ResNeXt(layers=152, cardinality=32, **args)
     return model
 
 
-def Res2Net101_26w_4s(**args):
-    model = Res2Net(layers=101, scales=4, width=26, **args)
+def ResNeXt152_64x4d(**args):
+    model = ResNeXt(layers=152, cardinality=64, **args)
     return model
 
 
-def Res2Net152_26w_4s(**args):
-    model = Res2Net(layers=152, scales=4, width=26, **args)
-    return model
-
-
-def Res2Net200_26w_4s(**args):
-    model = Res2Net(layers=200, scales=4, width=26, **args)
-    return model
-
-
-def test_Res2Net200_26w_4s():
+def test_ResNeXt50_32x4d():
     load_paddle_module_and_check(
-        Res2Net50_48w_2s, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
+        ResNeXt50_32x4d, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_Res2Net200_26w_4s()

@@ -337,5 +337,3 @@ def test_ShuffleNetV2_x0_25():
     load_paddle_module_and_check(
         ShuffleNetV2_x0_25, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_ShuffleNetV2_x0_25()

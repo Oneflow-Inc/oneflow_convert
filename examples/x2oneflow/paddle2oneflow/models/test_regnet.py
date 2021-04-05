@@ -396,4 +396,3 @@ def test_RegNetX_200MF():
         RegNetX_200MF, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
 
-test_RegNetX_200MF()

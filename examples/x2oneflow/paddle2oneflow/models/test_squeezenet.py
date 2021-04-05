@@ -177,5 +177,3 @@ def test_SqueezeNet1_0():
     load_paddle_module_and_check(
         SqueezeNet1_0, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_SqueezeNet1_0()

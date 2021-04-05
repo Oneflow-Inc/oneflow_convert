@@ -359,5 +359,3 @@ def test_GhostNet_x0_5():
     load_paddle_module_and_check(
         GhostNet_x0_5, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_GhostNet_x0_5()

@@ -346,5 +346,3 @@ def test_Xception41():
     load_paddle_module_and_check(
         Xception41, input_size=(1, 3, 224, 224), train_flag=False, flow_weight_dir="/tmp/oneflow"
     )
-
-test_Xception41()
