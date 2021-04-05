@@ -137,5 +137,4 @@ def test_alexnet():
 
     convert_to_onnx_and_check(alexnet_eval_job, flow_weight_dir=None, onnx_model_path="/tmp")
 
-test_alexnet()
 

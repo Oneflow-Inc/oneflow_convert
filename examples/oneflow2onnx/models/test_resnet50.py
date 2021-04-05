@@ -192,5 +192,3 @@ def test_resnet50():
         return predictions
 
     convert_to_onnx_and_check(InferenceNet, flow_weight_dir=None, onnx_model_path="/tmp")
-
-test_resnet50()

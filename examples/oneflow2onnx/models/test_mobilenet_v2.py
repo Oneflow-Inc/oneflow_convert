@@ -399,4 +399,3 @@ def test_mobilenetv2():
 
     convert_to_onnx_and_check(mobilenetv2, flow_weight_dir=None, onnx_model_path="/tmp")
 
-test_mobilenetv2()
