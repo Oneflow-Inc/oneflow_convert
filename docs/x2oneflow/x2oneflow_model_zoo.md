@@ -53,7 +53,7 @@
 | MobileNetV2        | Yes                                                          |
 | MobileNetV3        | Yes                                                          |
 | RegNet             | Yes                                                          |
-| DenseNet           | No（msg: "op_name: Concat_58 already exist in job: job_eval"） |
+| DenseNet           | Yes                                                          |
 | EfficientNet       | Yes                                                          |
 | InceptionNet       | Yes                                                          |
 | ShuffleNetV2       | Yes                                                          |

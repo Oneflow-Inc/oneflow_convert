@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 
 def from_onnx(
-    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False
+    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False,
 ):
     input_names = [x.name for x in onnx_model.graph.input]
     if type(inputs) is not dict:
@@ -122,9 +122,30 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
+    # to solve paddlepaddle2oneflow flatten bug
+    if from_paddle == True:
+        reshape_name = {}
+        for i, node in enumerate(onnx_model.graph.node):
+            if node.op_type == "Reshape" and node.input[1][:6] == "Concat":
+                node_cp = node
+                onnx_model.graph.node.remove(node)
+                origin_shape_name = node_cp.input[1]
+                new_shape_name = "PaddleFlatten" + node_cp.input[1][6:]
+                node_cp.input[1] = new_shape_name
+                reshape_name[origin_shape_name] = new_shape_name
+                onnx_model.graph.node.insert(i, node_cp)
+        
+        for x in onnx_model.graph.initializer:
+            if x.name in reshape_name:
+                x.name = reshape_name[x.name]
+        for x in onnx_model.graph.input:
+            if x.name in reshape_name:
+                onnx_model.graph.input.remove(x)
+    
+    # to save onnx model after onnx_simplifier
     if not os.path.exists("/tmp"):
         os.makedirs("/tmp")
-    onnx.save(onnx_model, "/tmp/model.onnx")
+    onnx.save(onnx_model, "/tmp/simp.onnx")
 
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
@@ -223,6 +244,7 @@ def from_paddle(
         dict(zip([input_names], [inputs])),
         model_weight_dir=model_weight_dir,
         do_onnxsim=do_onnxsim,
+        from_paddle=True,
     )
 
 
