@@ -23,6 +23,7 @@ try:
 except ImportError:  # will be 3.x series
     pass
 
+import copy
 from onnx import defs
 from onnx import numpy_helper
 from onnx.backend.base import Backend
@@ -122,31 +123,62 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
-    # to solve paddlepaddle2oneflow flatten bug
-    if from_paddle == True:
-        reshape_name = {}
-        for i, node in enumerate(onnx_model.graph.node):
-            if node.op_type == "Reshape" and node.input[1][:6] == "Concat":
-                node_cp = node
-                onnx_model.graph.node.remove(node)
-                origin_shape_name = node_cp.input[1]
-                new_shape_name = "PaddleFlatten" + node_cp.input[1][6:]
-                node_cp.input[1] = new_shape_name
-                reshape_name[origin_shape_name] = new_shape_name
-                onnx_model.graph.node.insert(i, node_cp)
-        
-        for x in onnx_model.graph.initializer:
-            if x.name in reshape_name:
-                x.name = reshape_name[x.name]
-        for x in onnx_model.graph.input:
-            if x.name in reshape_name:
-                onnx_model.graph.input.remove(x)
-    
     # to save onnx model after onnx_simplifier
     if not os.path.exists("/tmp"):
         os.makedirs("/tmp")
     onnx.save(onnx_model, "/tmp/simp.onnx")
 
+    # to solve paddlepaddle2oneflow flatten bug
+    if from_paddle == True:
+        # reshape_name = {}
+        # for i, node in enumerate(onnx_model.graph.node):
+        #     if node.op_type == "Reshape" and node.input[1][:6] == "Concat":
+        #         node_cp = node
+        #         onnx_model.graph.node.remove(node)
+        #         origin_shape_name = node_cp.input[1]
+        #         new_shape_name = "PaddleFlatten" + "_" + node_cp.input[1][6:]
+        #         node_cp.input[1] = new_shape_name
+        #         reshape_name[origin_shape_name] = new_shape_name
+        #         onnx_model.graph.node.insert(i, node_cp)
+        
+        # for x in onnx_model.graph.initializer:
+        #     if x.name in reshape_name:
+        #         x.name = reshape_name[x.name]
+        # for x in onnx_model.graph.input:
+        #     if x.name in reshape_name:
+        #         onnx_model.graph.input.remove(x)
+        
+        graph_input_name = {}
+        graph_initializer_name = []
+        for x in onnx_model.graph.initializer:
+            graph_initializer_name.append(x.name)
+
+        for i, node in enumerate(onnx_model.graph.node):
+            # node_cp = node
+            node_cp = copy.deepcopy(node)
+            for j in range(len(node.input)):
+                if node.input[j] in graph_initializer_name:
+                    node_cp.input[j] = node.name + "_" + node.input[j]
+                    graph_input_name[node_cp.input[j]] = node.input[j]
+            onnx_model.graph.node.remove(node)
+            onnx_model.graph.node.insert(i, node_cp)
+        
+        extend_op = []
+        for k, v in graph_input_name.items():
+            for x in onnx_model.graph.initializer:
+                base_name = x.name
+                if x.name == v:
+                    x.name = k
+                    for k2, v2 in graph_input_name.items():
+                        if v2 == base_name and k2 != k:
+                            x_cp = copy.deepcopy(x)
+                            x_cp.name = k2
+                            extend_op.append(x_cp)
+            for x in onnx_model.graph.input:
+                if x.name == v:
+                    onnx_model.graph.input.remove(x)
+        for x in extend_op:
+            onnx_model.graph.initializer.extend([x])
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
     BackendHandler.WEIGHT_SAVE_DIR = model_weight_dir
