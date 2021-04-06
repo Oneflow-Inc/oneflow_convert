@@ -74,7 +74,6 @@ class Flatten(BackendHandler):
         x = tensor_dict[node.input_tensor_names[0]]
         shape = x.shape
         axis = node.attrs.get("axis", 1)
-
         if axis == 0:
             cal_shape = (1, -1)
         else:

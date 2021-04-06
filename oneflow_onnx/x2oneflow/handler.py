@@ -52,12 +52,12 @@ class BackendHandler:
     @classmethod
     def handle(cls, node, tensor_dict, **kwargs):
         """ Main method in handler. It will find corresponding versioned handle method,
-    whose name format is `version_%d`. So prefix `version_` is reserved in onnx-tensorflow.
+    whose name format is `version_%d`. So prefix `version_` is reserved in onnx-oneflow.
     DON'T use it for other purpose.
 
     :param node: NodeProto for backend.
     :param kwargs: Other args.
-    :return: TensorflowNode for backend.
+    :return: OneFlowNode for backend.
     """
         ver_handle = getattr(cls, "version_{}".format(cls.SINCE_VERSION), None)
         if ver_handle:
@@ -133,21 +133,21 @@ class BackendHandler:
     @classmethod
     def _process_attrs(cls, attrs):
         """ Private method for processing attrs.
-    Param for this processor got from `get_attrs_processor_param`.
-    Param is dict contains two key: `default` and `raname`.
-    First add default value to attrs if key does not exist.
-    Second rename key to new key.
+        Param for this processor got from `get_attrs_processor_param`.
+        Param is dict contains two key: `default` and `raname`.
+        First add default value to attrs if key does not exist.
+        Second rename key to new key.
 
-    For example:
-      attrs = {"keep_dims": True}
-      param = {"default": {"axis": 1},
-               "rename": {"keep_dims": "keepdims"}}
+        For example:
+        attrs = {"keep_dims": True}
+        param = {"default": {"axis": 1},
+                "rename": {"keep_dims": "keepdims"}}
 
-      processed_attrs = {"axis": "1", "keepdims": True}
+        processed_attrs = {"axis": "1", "keepdims": True}
 
-    :param attrs: Process target attrs.
-    :return: Processed attrs.
-    """
+        :param attrs: Process target attrs.
+        :return: Processed attrs.
+        """
         param = {"rename": {}, "default": {}}
         param.update(cls.get_attrs_processor_param())
 
