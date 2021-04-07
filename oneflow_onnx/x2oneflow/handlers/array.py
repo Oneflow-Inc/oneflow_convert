@@ -365,8 +365,10 @@ class Max(BackendHandler):
     def _common(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         max_v = tensor_dict[node.input_tensor_names[1]]
-        max_v = kwargs["init_dict"][node.input_tensor_names[1]]
-        return flow.math.clip_by_value(x, max_value=max_v)
+        if node.input_tensor_names[1] in kwargs["init_dict"]:
+            max_v = kwargs["init_dict"][node.input_tensor_names[1]]
+            return flow.math.clip_by_value(x, max_value=max_v)
+        return flow.math.maximum(x, max_v)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

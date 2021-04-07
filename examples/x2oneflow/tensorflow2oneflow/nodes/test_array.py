@@ -72,4 +72,3 @@ def test_shape():
         def call(self, x):
             return tf.shape(x)
     load_tensorflow2_module_and_check(Net)
-

@@ -30,7 +30,7 @@ def test_clip_min_max():
 def test_clip_min():
     class Net(tf.keras.Model):
         def call(self, x):
-            x = tf.clip_by_value(x, clip_value_min=-2.2)
+            x = tf.clip_by_value(x, clip_value_min=-2.2, clip_value_max=float('inf'))
             return x
 
     load_tensorflow2_module_and_check(Net)
@@ -39,13 +39,7 @@ def test_clip_min():
 def test_clip_max():
     class Net(tf.keras.Model):
         def call(self, x):
-            x = tf.clip_by_value(x, clip_value_max=1.2)
+            x = tf.clip_by_value(x, clip_value_max=1.2, clip_value_min=float('-inf'))
             return x
 
     load_tensorflow2_module_and_check(Net)
-
-from absl import app
-from absl.testing import absltest
-
- = absltest.TestCase
-test_clip_min_max()

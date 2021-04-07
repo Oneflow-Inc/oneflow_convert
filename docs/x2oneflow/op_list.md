@@ -21,24 +21,14 @@
 |33 | Split      | 34 | Min             | 35 | Max           | 36 | Constant |
 |37 | HardSigmoid| 38 | Gemm            | 39 | MatMul        | 40 | Erf      |
 |41 | Cast       | 42 | GlobalMaxPool   | 43 | GlobalAveragePool |44|ReduceMax|
-|45 | Identity   | 46 | Rsqrt           |
+|45 | Identity   | 46 | Rsqrt           | 47 | LeakyRelu     | 
 ## TensorFlow
 
-| 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
-|------|------|------|------|------|------|------|------|
-| 1  | relu      | 2 |concatenate | 3  |   expand_dims   | 4 | transpose|
-| 5  | batchnorm | 6 |slice       | 7  |   gather        | 8 | clip_by_value|
-| 9  | conv2d    | 10| depthwiseconv2d| 11| flatten      | 12| add      |
-| 13 | sub       | 14| mul        | 15 | div             | 16| pow      |
-| 17 | sqrt      | 18| tanh       | 19 | sigmoid         | 20| erf      |
-| 21 | cast      | 22| pad        | 23 | maxpool         | 24| avgpool  |
-| 25 | globalavgpool| 26| globalmaxpool | 27 | reduce_mean| 28| reshape |
-| 29 | softmax   |30 | relu6      |   
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
 | 1  | Relu             | 2  | Relu6          | 3  | Shape          | 4  | Abs                   |
-| 5  | Sigmoid          | 6  | Exp            | 7  | Rsqrt          | 8  | swish_f32             |
+| 5  | Sigmoid          | 6  | Exp            | 7  | Rsqrt          | 8  | Swish                 |
 | 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 | RealDiv               |
 | 13 | Sub              | 14 | Maximum        | 15 | Mul            | 16 | FloorDiv              |
 | 17 | Placeholder      | 18 | Const          | 19 | Transpose      | 20 | FusedBatchNorm        |

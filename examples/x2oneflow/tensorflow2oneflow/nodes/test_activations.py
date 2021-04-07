@@ -43,3 +43,12 @@ def test_swish():
             return x
 
     load_tensorflow2_module_and_check(Net)
+
+def test_leaky_relu():
+    class Net(tf.keras.Model):
+
+        def call(self, x, training=False):
+            x = tf.nn.leaky_relu(x, alpha=0.2)
+            return x
+
+    load_tensorflow2_module_and_check(Net)

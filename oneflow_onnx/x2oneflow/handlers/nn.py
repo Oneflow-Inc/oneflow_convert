@@ -341,3 +341,17 @@ class Softmax(BackendHandler):
     @classmethod
     def version_11(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("LeakyRelu")
+@flow_func(flow.nn.leaky_relu)
+class LeakyRelu(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)

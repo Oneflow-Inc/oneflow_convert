@@ -127,6 +127,15 @@ def test_rsqrt():
        def call(self, x):
            x = tf.math.rsqrt(x)
            return x
+
     load_tensorflow2_module_and_check(Net)
 
+def test_maximum():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           x = tf.math.maximum(x, x*2)
+           return x
 
+    load_tensorflow2_module_and_check(Net)
+
+test_maximum()
