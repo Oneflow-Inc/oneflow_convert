@@ -138,6 +138,14 @@ def test_maximum():
 
     load_tensorflow2_module_and_check(Net)
 
+def test_minimum():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           x = tf.math.minimum(x, x*2)
+           return x
+
+    load_tensorflow2_module_and_check(Net)
+
 def test_floordiv():
     class Net(tf.keras.Model):
        def call(self, x):
@@ -189,3 +197,54 @@ def test_range():
            return tf.range(start=3, limit=18, delta=3)
 
     load_tensorflow2_module_and_check(Net)
+
+def test_greater_equal():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.greater_equal(2*x, x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_fill():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.fill([2, 3], 9)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_floor():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.floor(x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_softplus():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.softplus(x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_greater():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.greater(2*x, x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_negative():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.negative(x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_ceil():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.ceil(x)
+
+    load_tensorflow2_module_and_check(Net)
+
+test_ceil()

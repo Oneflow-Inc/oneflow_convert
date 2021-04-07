@@ -81,4 +81,9 @@ def test_const():
 
     load_tensorflow2_module_and_check(Net)
 
+def test_identity():
+    class Net(tf.keras.Model):
+        def call(self, x):
+            return tf.identity(x)
 
+    load_tensorflow2_module_and_check(Net)

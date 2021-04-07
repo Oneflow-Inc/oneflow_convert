@@ -394,7 +394,7 @@ class Floor(BackendHandler):
         return cls._common(node, tensor_dict, **kwargs)
 
 @onnx_op("ArgMax")
-class Floor(BackendHandler):
+class ArgMax(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
@@ -426,4 +426,100 @@ class Range(BackendHandler):
     
     @classmethod
     def version_11(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Greater")
+@flow_func(math_ops.greater)
+class Greater(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_9(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Less")
+@flow_func(math_ops.less)
+class Less(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_9(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Softplus")
+@flow_func(flow.math.softplus)
+class Softplus(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+@onnx_op("Neg")
+@flow_func(flow.math.negative)
+class Neg(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+
+@onnx_op("Ceil")
+@flow_func(flow.math.ceil)
+class Ceil(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)

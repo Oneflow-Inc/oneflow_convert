@@ -336,8 +336,11 @@ class Min(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
-        min_v = kwargs["init_dict"][node.input_tensor_names[1]]
-        return flow.math.clip_by_value(x, min_value=min_v)
+        min_v = tensor_dict[node.input_tensor_names[1]]
+        if node.input_tensor_names[1] in kwargs["init_dict"]:
+            min_v = kwargs["init_dict"][node.input_tensor_names[1]]
+            return flow.math.clip_by_value(x, min_value=min_v)
+        return flow.math.minimum(x, min_v)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

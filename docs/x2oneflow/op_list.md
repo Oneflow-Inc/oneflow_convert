@@ -23,6 +23,7 @@
 |41 | ~~Cast~~   | 42 | GlobalMaxPool   | 43 | GlobalAveragePool |44|ReduceMax|
 |45 | Identity   | 46 | Rsqrt           | 47 | LeakyRelu     | 48 | Abs       |
 |49 | Exp        | 50 | Reciprocal      | 51 | Floor         | 52 | ArgMax    |
+|53 | Range      | 54 | Greator         | 55 | Less          | 
 
 ## TensorFlow
 
@@ -31,26 +32,25 @@
 |------|------|------|------|------|------|------|------|
 | 1  | Relu             | 2  | Relu6          | 3  | Shape          | 4  | Abs                   |
 | 5  | Sigmoid          | 6  | Exp            | 7  | Rsqrt          | 8  | Swish                 |
-| 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 |                       |
+| 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 | Greater               |
 | 13 | Sub              | 14 | Maximum        | 15 | Mul            | 16 | FloorDiv              |
-| 17 |                  | 18 | Const          | 19 | Transpose      | 20 | BatchNormalization    |
+| 17 | Pow              | 18 | Const          | 19 | Transpose      | 20 | BatchNormalization    |
 | 21 | Conv2D           | 22 | BiasAdd        | 23 | MaxPool        | 24 | DepthwiseConv2D       |
 | 25 | Reshape          | 26 | AvgPool        | 27 |                | 28 | SquaredDifference     |
-| 29 |                  | 30 |                | 31 | Pad            | 32 | ~~ResizeBilinear~~    |
+| 29 | Neg              | 30 | Ceil           | 31 | Pad            | 32 | ~~ResizeBilinear~~    |
 | 33 | ReduceMean       | 34 | MatMul         | 35 | ArgMax         | 36 |                       |
 | 37 | Slice            | 38 | Sum            | 39 | Max            | 40 |                       |
 | 41 | ~~Cast~~         | 42 | Split          | 43 | Squeeze        | 44 | ~~ResizeNearestNeighbor~~ |
-| 45 | Softmax          | 46 | Range          | 47 | ConcatV2       | 48 | MirrorPad             |
-| 49 | Identity         | 50 | GreaterEqual   | 51 | StopGradient   | 52 | Minimum               |
-| 53 | RadnomUniform    | 54 | Fill           | 55 | Floor          | 56 | DepthToSpace          |
-| 57 | Sqrt             | 58 | Softplus       | 59 | Erf            | 60 | AddV2                 |
-| 61 | LessEqual        | 62 | BatchMatMul    | 63 | BatchMatMulV2  | 64 | ExpandDims            |
-| 65 | BatchToSpaceND   | 66 | SpaceToBatchND | 67 | OneHot         | 68 | Pow                   |
-| 69 | All              | 70 | GatherV2       | 71 | IteratorV2     | 72 | Neg |
-| 73 | Greater | 74 | FloorMod | 75 | LogicalAdd | 76 | Prod |
-| 77 | Equal | 78 | Conv3D | 79 | Ceil | 80 | AddN |
-| 81 | DivNoNan | 82 | Where | 83 | MirrorPad | 84 | Size |
-| 85 | TopKv2 | 
+| 45 | Softmax          | 46 | Range          | 47 |                | 48 |                       |
+| 49 | Identity         | 50 |~~GreaterEqual~~| 51 |                | 52 | Minimum               |
+| 53 |                  | 54 | Fill           | 55 | Floor          | 56 |                       |
+| 57 | Sqrt             | 58 | Softplus       | 59 | Erf            | 60 |                       |
+| 61 | ~~LessEqual~~    | 62 |                | 63 |                | 64 | ExpandDims            |
+| 65 |                  | 66 |                | 67 |          | 68 |                    |
+| 69 | All              | 70 |        | 71 |      | 72 |  |
+| 73 |  | 74 | FloorMod | 75 | LogicalAdd | 76 | Prod |
+| 77 | Equal | 78 | Conv3D | 79 |  | 80 | AddN |
+| 81 | DivNoNan | 82 | Where | 83 |  | 84 | Size |
 
 - 分组卷积存在问题，已给TensorFlow2ONNX团队PR。
 
