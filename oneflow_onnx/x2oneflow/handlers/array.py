@@ -389,3 +389,4 @@ class Max(BackendHandler):
     @classmethod
     def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+

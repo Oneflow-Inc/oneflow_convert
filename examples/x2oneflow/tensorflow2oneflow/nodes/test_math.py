@@ -137,3 +137,11 @@ def test_maximum():
            return x
 
     load_tensorflow2_module_and_check(Net)
+
+def test_floordiv():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           x = tf.math.floordiv(x*1.5, x)
+           return x
+
+    load_tensorflow2_module_and_check(Net)
