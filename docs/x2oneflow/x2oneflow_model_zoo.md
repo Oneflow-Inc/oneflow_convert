@@ -66,7 +66,6 @@
 | Xception_DeepLab   | Yes                                                          |
 | Vision_Transformer | Yes                                                          |
 | Res2Net            | Yes                                                          |
-| Unet               | No（OneFlow的上采样OP和Paddle未对齐）                        |
 
 
 - 模型的测试代码均可以在本工程的examples中找到
