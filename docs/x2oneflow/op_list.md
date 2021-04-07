@@ -25,6 +25,7 @@
 |49 | Exp        | 50 | Reciprocal      | 51 | Floor         | 52 | ArgMax    |
 |53 | Range      | 54 | Greator         | 55 | Less          | 56 | Softplus  |
 |57 | Neg        | 58 | Ceil            | 59 | Where         | 60 | Equal     |
+|61 | Sign       |
 
 ## TensorFlow
 
