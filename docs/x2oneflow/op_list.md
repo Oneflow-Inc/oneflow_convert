@@ -29,7 +29,7 @@
 |------|------|------|------|------|------|------|------|
 | 1  | Relu             | 2  | Relu6          | 3  | Shape          | 4  | Abs                   |
 | 5  | Sigmoid          | 6  | Exp            | 7  | Rsqrt          | 8  | Swish                 |
-| 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 | RealDiv               |
+| 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 |                       |
 | 13 | Sub              | 14 | Maximum        | 15 | Mul            | 16 | FloorDiv              |
 | 17 | Placeholder      | 18 | Const          | 19 | Transpose      | 20 | FusedBatchNorm        |
 | 21 | Conv2D           | 22 | BiasAdd        | 23 | MaxPool        | 24 | DepthwiseConv2dNative |

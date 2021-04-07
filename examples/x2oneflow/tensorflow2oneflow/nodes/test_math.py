@@ -137,5 +137,3 @@ def test_maximum():
            return x
 
     load_tensorflow2_module_and_check(Net)
-
-test_maximum()
