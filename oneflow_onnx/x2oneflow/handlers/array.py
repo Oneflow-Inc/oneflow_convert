@@ -147,8 +147,9 @@ class Unsqueeze(BackendHandler):
 class Squeeze(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
-        axes = node.attrs.pop("axes")
-        node.attrs["axis"] = axes
+        if node.attrs.get("axes"):
+            axes = node.attrs.pop("axes")
+            node.attrs["axis"] = axes
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
     @classmethod

@@ -145,3 +145,47 @@ def test_floordiv():
            return x
 
     load_tensorflow2_module_and_check(Net)
+
+def test_bias_add():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           ipt1 = np.random.uniform(low=-10, high=10, size=(1, 1, 1, 5)).astype(np.float32)
+           bias = tf.constant(ipt1, dtype=tf.float32)
+           return tf.nn.bias_add(x, bias)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_squared_difference():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.squared_difference(x, x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_argmax():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.argmax(x, axis=1)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_slice():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.slice(x, [1, 0, 0, 0], [1, 1, 2, 4])
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_squeeze():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.squeeze(x)
+
+    load_tensorflow2_module_and_check(Net, input_size=(1, 2, 1, 2))
+
+def test_range():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.range(start=3, limit=18, delta=3)
+
+    load_tensorflow2_module_and_check(Net)

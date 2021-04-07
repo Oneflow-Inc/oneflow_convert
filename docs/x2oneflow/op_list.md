@@ -20,8 +20,10 @@
 |29 | Squeeze    | 30 | Expand          | 31 | Gather        | 32 | Slice   |
 |33 | Split      | 34 | Min             | 35 | Max           | 36 | Constant |
 |37 | HardSigmoid| 38 | Gemm            | 39 | MatMul        | 40 | Erf      |
-|41 | Cast       | 42 | GlobalMaxPool   | 43 | GlobalAveragePool |44|ReduceMax|
-|45 | Identity   | 46 | Rsqrt           | 47 | LeakyRelu     | 
+|41 | ~~Cast~~   | 42 | GlobalMaxPool   | 43 | GlobalAveragePool |44|ReduceMax|
+|45 | Identity   | 46 | Rsqrt           | 47 | LeakyRelu     | 48 | Abs       |
+|49 | Exp        | 50 | Reciprocal      | 51 | Floor         | 52 | ArgMax    |
+
 ## TensorFlow
 
 
@@ -31,13 +33,13 @@
 | 5  | Sigmoid          | 6  | Exp            | 7  | Rsqrt          | 8  | Swish                 |
 | 9  | Tanh             | 10 | LeakyRelu      | 11 | Add            | 12 |                       |
 | 13 | Sub              | 14 | Maximum        | 15 | Mul            | 16 | FloorDiv              |
-| 17 | Placeholder      | 18 | Const          | 19 | Transpose      | 20 | FusedBatchNorm        |
-| 21 | Conv2D           | 22 | BiasAdd        | 23 | MaxPool        | 24 | DepthwiseConv2dNative |
-| 25 | Reshape          | 26 | AvgPool        | 27 | SplitV         | 28 | SquaredDifference     |
-| 29 | Tile             | 30 | Pack           | 31 | Pad            | 32 | ResizeBilinear        |
-| 33 | Mean             | 34 | MatMul         | 35 | ArgMax         | 36 | StridedSlice          |
-| 37 | Slice            | 38 | Sum            | 39 | Max            | 40 | Conv2DBackpropInput   |
-| 41 | Cast             | 42 | Split          | 43 | Squeeze        | 44 | ResizeNearestNeighbor |
+| 17 |                  | 18 | Const          | 19 | Transpose      | 20 | BatchNormalization    |
+| 21 | Conv2D           | 22 | BiasAdd        | 23 | MaxPool        | 24 | DepthwiseConv2D       |
+| 25 | Reshape          | 26 | AvgPool        | 27 |                | 28 | SquaredDifference     |
+| 29 |                  | 30 |                | 31 | Pad            | 32 | ~~ResizeBilinear~~    |
+| 33 | ReduceMean       | 34 | MatMul         | 35 | ArgMax         | 36 |                       |
+| 37 | Slice            | 38 | Sum            | 39 | Max            | 40 |                       |
+| 41 | ~~Cast~~         | 42 | Split          | 43 | Squeeze        | 44 | ~~ResizeNearestNeighbor~~ |
 | 45 | Softmax          | 46 | Range          | 47 | ConcatV2       | 48 | MirrorPad             |
 | 49 | Identity         | 50 | GreaterEqual   | 51 | StopGradient   | 52 | Minimum               |
 | 53 | RadnomUniform    | 54 | Fill           | 55 | Floor          | 56 | DepthToSpace          |
@@ -48,7 +50,7 @@
 | 73 | Greater | 74 | FloorMod | 75 | LogicalAdd | 76 | Prod |
 | 77 | Equal | 78 | Conv3D | 79 | Ceil | 80 | AddN |
 | 81 | DivNoNan | 82 | Where | 83 | MirrorPad | 84 | Size |
-| 85 | TopKv2 | 86 | SplitV |  |  |  |  |
+| 85 | TopKv2 | 
 
 - 分组卷积存在问题，已给TensorFlow2ONNX团队PR。
 

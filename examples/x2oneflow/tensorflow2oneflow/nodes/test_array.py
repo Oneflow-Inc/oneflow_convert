@@ -71,4 +71,14 @@ def test_shape():
     class Net(tf.keras.Model):
         def call(self, x):
             return tf.shape(x)
+
     load_tensorflow2_module_and_check(Net)
+
+def test_const():
+    class Net(tf.keras.Model):
+        def call(self, x):
+            return tf.constant([1, 2, 3, 4, 5])
+
+    load_tensorflow2_module_and_check(Net)
+
+
