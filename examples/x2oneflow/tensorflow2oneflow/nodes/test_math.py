@@ -247,4 +247,23 @@ def test_ceil():
 
     load_tensorflow2_module_and_check(Net)
 
-test_ceil()
+def test_where():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.where([True, False, False, True], [1,2,3,4], [100,200,300,400])
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_size():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.size(x)
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_equal():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           return tf.math.equal(x, x)
+
+    load_tensorflow2_module_and_check(Net)

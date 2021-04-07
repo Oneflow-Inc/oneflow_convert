@@ -523,3 +523,37 @@ class Ceil(BackendHandler):
     @classmethod
     def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Where")
+@flow_func(flow.where)
+class Where(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_9(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Equal")
+@flow_func(flow.math.equal)
+class Equal(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_11(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
