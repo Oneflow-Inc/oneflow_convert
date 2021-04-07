@@ -316,3 +316,60 @@ class Cast(BackendHandler):
     @classmethod
     def version_9(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Abs")
+class Abs(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
+        return flow.math.abs(x)
+
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Exp")
+class Exp(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
+        return flow.math.exp(x)
+
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Reciprocal")
+class Reciprocal(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
+        return 1.0 / x
+
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)

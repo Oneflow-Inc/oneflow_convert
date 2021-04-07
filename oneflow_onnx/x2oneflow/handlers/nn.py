@@ -220,7 +220,6 @@ class Relu(BackendHandler):
     def version_14(cls, node, tensor_dict, **kwargs):
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
-
 @onnx_op("SoftmaxCrossEntropyLoss")
 @flow_func(nn_ops.sparse_softmax_cross_entropy_with_logits)
 class SoftmaxCrossEntropyLoss(BackendHandler):

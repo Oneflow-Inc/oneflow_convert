@@ -106,3 +106,27 @@ def test_erf():
 
 #     load_tensorflow2_module_and_check(Net)
 
+def test_abs():
+    class Net(tf.keras.Model):
+        def call(self, x):
+            x = tf.math.abs(x)
+            return x
+    
+    load_tensorflow2_module_and_check(Net)
+
+def test_exp():
+    class Net(tf.keras.Model):
+        def call(self, x):
+            x = tf.math.exp(x)
+            return x
+    
+    load_tensorflow2_module_and_check(Net)
+
+def test_rsqrt():
+    class Net(tf.keras.Model):
+       def call(self, x):
+           x = tf.math.rsqrt(x)
+           return x
+    load_tensorflow2_module_and_check(Net)
+
+

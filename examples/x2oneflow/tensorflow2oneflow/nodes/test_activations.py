@@ -26,3 +26,20 @@ def test_relu():
 
     load_tensorflow2_module_and_check(Net)
 
+def test_relu6():
+    class Net(tf.keras.Model):
+
+        def call(self, x, training=False):
+            x = tf.keras.activations.relu(x, max_value=6.0)
+            return x
+
+    load_tensorflow2_module_and_check(Net)
+
+def test_swish():
+    class Net(tf.keras.Model):
+
+        def call(self, x, training=False):
+            x = tf.keras.activations.swish(x)
+            return x
+
+    load_tensorflow2_module_and_check(Net)
