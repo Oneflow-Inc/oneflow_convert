@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import paddle
+import numpy as np
 import paddle.nn as nn
 import paddle.nn.functional as F
 
@@ -118,3 +119,77 @@ def test_clip():
 #             return x
 
 #     load_paddle_module_and_check(Net)
+
+def test_abs():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.abs(x)
+            return x
+
+    load_paddle_module_and_check(Net)
+
+def test_acos():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.acos(x)
+            return x
+
+    load_paddle_module_and_check(Net)
+
+def test_add_v2():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.add(x, x)
+            return x
+
+    load_paddle_module_and_check(Net)
+
+def test_argmax():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.argmax(x, -1)
+            return x
+
+    load_paddle_module_and_check(Net)
+
+def test_bmm():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.bmm(x, x)
+            return x
+
+    load_paddle_module_and_check(Net, input_size=(3, 2, 2))
+
+def test_exp():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.exp(x)
+            return x
+
+    load_paddle_module_and_check(Net)
+
+def test_floor():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.floor(x)
+            return x
+    
+    load_paddle_module_and_check(Net)
+
+def test_hard_sigmoid():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.nn.functional. hardsigmoid(x)
+            return x
+    
+    load_paddle_module_and_check(Net)
+
+def test_hard_swish():
+    class Net(nn.Layer):
+        def forward(self, x):
+            x = paddle.nn.functional. hardswish(x)
+            return x
+    
+    load_paddle_module_and_check(Net)
+
+test_hard_swish()

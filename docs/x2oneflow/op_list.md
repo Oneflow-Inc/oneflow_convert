@@ -91,6 +91,18 @@
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
+| 1 | abs       | 2 |  acos              | 3 | add       | 4 |  argmax    |
+| 5 | batch_norm| 6 | ~~bilinear_interp~~| 7 | bmm       | 8 |  ~~cast~~  |
+| 9 | clip      | 10| concat             | 11| conv2d    | 12| ~~conv2d_transpose~~|
+| 13| ~~cumsum~~| 14| depthwise_conv2d   | 15| dropout   | 16| elementwise_add|
+| 17| elementwise_div| 18| elementwise_mul | 19| elementwise_min | 20| elementwise_max|
+| 21| elementwise_pow| 22| elementwise_sub | 23| exp     | 24| expand_as  |
+| 25| expand_dims|26| flatten            | 27| floor     | 28| gather     |
+| 29| hardsigmoid|30| hardswish          | 31| 
+
+
+| 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
+|------|------|------|------|------|------|------|------|
 | 1  | relu      | 2 |concatenate | 3  |   expand_dims   | 4 | transpose|
 | 5  | batchnorm | 6 |slice       | 7  |   gather        | 8 | clip_by_value|
 | 9  | conv2d    | 10| depthwiseconv2d| 11| flatten      | 12| add      |
