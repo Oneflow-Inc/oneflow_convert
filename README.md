@@ -13,6 +13,7 @@ onnx工具包含两个功能，一个是将OneFlow导出ONNX，另外一个是�
 - OneFlow2ONNX算子支持，目前稳定支持导出ONNX Opset10，部分OneFlow算子支持更低的ONNX Opset转换，详情可以参考[OneFlow2ONNX算子列表](docs/oneflow2onnx/op_list.md)。
 - X2OneFlow算子支持，目前稳定支持TensorFlow/Pytorch/PaddlePaddle中涵盖大部分CV场景的算子，详情可以参考[X2OneFlow算子列表](docs/x2oneflow/op_list.md)
 
+> 目前OneFlow2ONNX 支持80+的OneFlow OP导出为ONNX OP。X2OneFlow支持79个ONNX OP，50+个TensorFlow OP，80+个Pytorch OP，50+个PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。目前X2OneFlow已经成功转换了50+个TensorFlow/Pytorch/PaddlePaddle官方模型。欢迎体验此项目。
 
 #### 环境依赖
 
