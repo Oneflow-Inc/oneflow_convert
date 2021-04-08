@@ -26,7 +26,9 @@
 |53 | Range      | 54 | Greator         | 55 | Less          | 56 | Softplus  |
 |57 | Neg        | 58 | Ceil            | 59 | Where         | 60 | Equal     |
 |61 | Sign       | 62 | NonZero         | 63 | Acos          | 64 | Acosh     |
-|65 | ArgMin     | 66 | Asin            | 67 | Atan          |
+|65 | ArgMin     | 66 | Asin            | 67 | Atan          | 68 | Cos       |
+|69 | Elu        | 70 | Exp             | 
+
 
 ## TensorFlow
 
@@ -59,7 +61,19 @@
 | 5 | MaxPool2d | 6 |  adaptive_avg_pool2d | 7 | adaptive_max_pool2d | 8 | AvgPool2d |
 | 9 | abs       | 10|  absolute            | 11| acos                | 12 | add      |
 | 13| addmm     | 14|  arange              | 15| argmax              | 16 | argmin   |
-| 17| asin      | 18|  atan                | 19| baddbmm             | 
+| 17| asin      | 18|  atan                | 19| baddbmm             | 20 | cat      |
+| 21| ceil      | 22|  ~~celu~~            | 23| clamp               | 24 | clamp_max|
+| 25| clamp_min | 26| concat               | 27| cos                 | 28 | ~~cumsum~~|
+| 29| div       | 30| elu                  | 31| eq                  | 32 | erf      |
+| 33| exp       | 34| ~~expand~~           | 35| flatten             | 36 | floor    |
+| 37|floor_divide|38| full                 | 39| full_like           | 40 | gather   |
+| 41| ~~ge~~    | 42| gelu                 | 43| ~~GroupNorm~~       | 44 |~~hardswish~~|
+| 45| hardtanh  | 46| 
+
+- hardswish pytorch导出存在bug
+
+
+
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|

@@ -192,4 +192,91 @@ def test_baddbmm():
     
     load_pytorch_module_and_check(Net, input_size=(2, 2, 2))
 
-test_baddbmm()
+def test_and():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.baddbmm(x, x, x)
+    
+    load_pytorch_module_and_check(Net, input_size=(2, 2, 2))
+
+def test_ceil():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.ceil(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_cos():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.cos(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_elu():
+    class Net(nn.Module):
+        def forward(self, x):
+            m = nn.ELU()
+            return m(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_eq():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.eq(x, x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_exp():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.exp(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_floor():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.floor(x)
+    
+    load_pytorch_module_and_check(Net)
+
+
+def test_floor_divide():
+    class Net(nn.Module):
+        def forward(self, x):
+            a = torch.tensor([4.0, 3.0])
+            b = torch.tensor([2.0, 2.0])
+            return torch.floor_divide(a, b)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_full():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.full((2, 3), 1.5)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_full_like():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.full_like(x, 1.5)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_gelu():
+    class Net(nn.Module):
+        def forward(self, x):
+            m = nn.GELU()
+            return m(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_hardtanh():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.nn.functional.hardtanh(x)
+    
+    load_pytorch_module_and_check(Net)

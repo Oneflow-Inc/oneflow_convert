@@ -656,3 +656,49 @@ class Atan(BackendHandler):
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Cos")
+@flow_func(flow.math.cos)
+class Cos(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Elu")
+@flow_func(flow.nn.elu)
+class Elu(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("Exp")
+@flow_func(flow.math.exp)
+class Exp(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+

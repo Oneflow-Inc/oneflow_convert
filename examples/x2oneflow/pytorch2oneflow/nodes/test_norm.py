@@ -31,3 +31,13 @@ def test_bn():
             return x
 
     load_pytorch_module_and_check(Net)
+
+# def test_gn_v1():
+#     class Net(nn.Module):
+#         def forward(self, x):
+#             # Separate 6 channels into 3 groups
+#             m = nn.GroupNorm(6, 6)
+#             output = m(x)
+#             return output
+    
+#     load_pytorch_module_and_check(Net, input_size=(20, 6, 10, 10))
