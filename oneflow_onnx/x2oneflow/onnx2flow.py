@@ -128,25 +128,8 @@ def from_onnx(
         os.makedirs("/tmp")
     onnx.save(onnx_model, "/tmp/simp.onnx")
 
-    # to solve paddlepaddle2oneflow flatten bug
+    # to solve paddlepaddle2oneflow initializer rename bug
     if from_paddle == True:
-        # reshape_name = {}
-        # for i, node in enumerate(onnx_model.graph.node):
-        #     if node.op_type == "Reshape" and node.input[1][:6] == "Concat":
-        #         node_cp = node
-        #         onnx_model.graph.node.remove(node)
-        #         origin_shape_name = node_cp.input[1]
-        #         new_shape_name = "PaddleFlatten" + "_" + node_cp.input[1][6:]
-        #         node_cp.input[1] = new_shape_name
-        #         reshape_name[origin_shape_name] = new_shape_name
-        #         onnx_model.graph.node.insert(i, node_cp)
-        
-        # for x in onnx_model.graph.initializer:
-        #     if x.name in reshape_name:
-        #         x.name = reshape_name[x.name]
-        # for x in onnx_model.graph.input:
-        #     if x.name in reshape_name:
-        #         onnx_model.graph.input.remove(x)
         
         graph_input_name = {}
         graph_initializer_name = []

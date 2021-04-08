@@ -25,7 +25,8 @@
 |49 | Exp        | 50 | Reciprocal      | 51 | Floor         | 52 | ArgMax    |
 |53 | Range      | 54 | Greator         | 55 | Less          | 56 | Softplus  |
 |57 | Neg        | 58 | Ceil            | 59 | Where         | 60 | Equal     |
-|61 | Sign       | 62 | NonZero         | 
+|61 | Sign       | 62 | NonZero         | 63 | Acos          | 64 | Acosh     |
+|65 | ArgMin     | 66 | Asin            | 67 | Atan          |
 
 ## TensorFlow
 
@@ -54,7 +55,11 @@
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
-| 1 | BatchNorm | 2 |  
+| 1 | BatchNorm | 2 |  ConstantPad2d       | 3 | Conv2D              | 4 | Dropout   |
+| 5 | MaxPool2d | 6 |  adaptive_avg_pool2d | 7 | adaptive_max_pool2d | 8 | AvgPool2d |
+| 9 | abs       | 10|  absolute            | 11| acos                | 12 | add      |
+| 13| addmm     | 14|  arange              | 15| argmax              | 16 | argmin   |
+| 17| asin      | 18|  atan                | 19| baddbmm             | 
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|

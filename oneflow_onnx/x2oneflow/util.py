@@ -35,7 +35,7 @@ def load_pytorch_module_and_check(
     input_size=None,
     input_min_val=-10,
     input_max_val=10,
-    train_flag=True,
+    train_flag=False,
     flow_weight_dir="/tmp/oneflow",
 ):
     if input_size is None:

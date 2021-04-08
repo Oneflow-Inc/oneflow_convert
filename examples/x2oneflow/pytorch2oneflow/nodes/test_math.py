@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import torch
+import numpy as np
 from torch import nn
 import torch.nn.functional as F
 
@@ -117,3 +118,78 @@ def test_clip():
 #             return x
 
 #     load_pytorch_module_and_check(Net)
+
+def test_abs():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.abs(x)
+            return x
+    
+    load_pytorch_module_and_check(Net)
+
+def test_acos():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.acos(x)
+            return x
+    
+    load_pytorch_module_and_check(Net)
+
+def test_add_v2():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = torch.add(x, 0.5)
+            return x
+    
+    load_pytorch_module_and_check(Net)
+
+def test_addmm():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.addmm(x, x, x)
+    
+    load_pytorch_module_and_check(Net, input_size=(2, 2))
+
+def test_arange():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.arange(5)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_argmax():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.argmax(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_argmin():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.argmin(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_asin():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.asin(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_atan():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.atan(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_baddbmm():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.baddbmm(x, x, x)
+    
+    load_pytorch_module_and_check(Net, input_size=(2, 2, 2))
+
+test_baddbmm()
