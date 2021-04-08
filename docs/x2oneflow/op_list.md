@@ -98,19 +98,16 @@
 | 17| elementwise_div| 18| elementwise_mul | 19| elementwise_min | 20| elementwise_max|
 | 21| elementwise_pow| 22| elementwise_sub | 23| exp     | 24| expand_as  |
 | 25| expand_dims|26| flatten            | 27| floor     | 28| gather     |
-| 29| hardsigmoid|30| hardswish          | 31| 
+| 29| hardsigmoid|30| hardswish          | 31| leaky_relu| 32| log        |
+| 33| matmul    | 34|    mean            | 35| mul       | 36| ~~nearest_interp~~|
+| 37| pad2d     | 38| pow                | 39| ~~prelu~~ | 40| reduce_mean|
+| 41| reduce_max| 42| reduce_min         | 43| reduce_prod|44| reduce_sum |
+| 45| relu      | 46| relu6              | 47| reshape   | 48| softmax    |
+| 49| sigmoid   | 50| slice              | 51| scale     | 52| ~~split~   |
+| 53| squeeze   | 54| sqrt               | 55| square    | 56| stack      |
+| 57| stride_slice|58| sum               | 59| swish     | 60| tanh       |
+| 61| transpose | 62| unsqueeze| 
 
-
-| 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
-|------|------|------|------|------|------|------|------|
-| 1  | relu      | 2 |concatenate | 3  |   expand_dims   | 4 | transpose|
-| 5  | batchnorm | 6 |slice       | 7  |   gather        | 8 | clip_by_value|
-| 9  | conv2d    | 10| depthwiseconv2d| 11| flatten      | 12| add      |
-| 13 | sub       | 14| mul        | 15 | div             | 16| pow      |
-| 17 | sqrt      | 18| tanh       | 19 | sigmoid         | 20| ~~erf~~      |
-| 21 | cast      | 22| pad        | 23 | maxpool         | 24| avgpool  |
-| 25 | adaptiveavgpool| 26| ~~adptivemaxpool~~ | 27 | reduce_mean| 28| reshape |
-| 29 | softmax   |30 | relu6      | 
 
 相关issue：
 
