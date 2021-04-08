@@ -19,10 +19,6 @@ import torch.nn.functional as F
 
 from oneflow_onnx.x2oneflow.util import load_pytorch_module_and_check
 
-# from absl import app
-# from absl.testing import absltest
-
-
 def test_pad():
     class Net(nn.Module):
         def forward(self, x):
@@ -41,5 +37,13 @@ def test_pad_with_value():
     load_pytorch_module_and_check(Net)
 
 
-#  = absltest.TestCase
-# test_pad()
+def test_constant_pad2d():
+    class Net(nn.Module):
+        def forward(self, x):
+            m = nn.ConstantPad2d((3, 0, 2, 1), 3.5)
+            x = m(x)
+            return x
+
+    load_pytorch_module_and_check(Net)
+
+test_constant_pad2d()

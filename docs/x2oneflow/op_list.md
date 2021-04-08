@@ -1,6 +1,6 @@
 # X2OneFlow 支持的OP列表
 
-> 目前X2OneFlow 支持40+的ONNX OP，30+的Tensorflow/Pytorch/PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
+> 目前X2OneFlow 支持60+的ONNX OP，50+的Tensorflow/Pytorch/PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
 
 **注：** 目前，部分OP暂未支持，如您在转换过程中出现OP不支持的情况，可自行添加或反馈给我们。欢迎通过[ISSUE](https://github.com/Oneflow-Inc/oneflow_convert_tools/issues/new)反馈的方式告知我们(模型名，代码实现或模型获取方式)，我们会及时跟进：）
 
@@ -16,7 +16,7 @@
 | 13 | Slice     | 14 | Split           | 15 | Flatten       | 16 | Add       |
 | 17 | Sub       | 18 | Mul             | 19 | Div           | 20 |Sqrt       |
 | 21 |Pow        | 22 | Tanh            | 23 | Sigmoid       | 24 | Cast      |
-| 25 | Pad       | 26 | ReduceMean     | 27 | Reshape        | 28 | AdaptiveAvgPool  |
+| 25 | Pad       | 26 | ReduceMean      | 27 | Reshape       | 28 | AdaptiveAvgPool|
 |29 | Squeeze    | 30 | Expand          | 31 | Gather        | 32 | Slice   |
 |33 | Split      | 34 | Min             | 35 | Max           | 36 | Constant |
 |37 | HardSigmoid| 38 | Gemm            | 39 | MatMul        | 40 | Erf      |
@@ -25,7 +25,7 @@
 |49 | Exp        | 50 | Reciprocal      | 51 | Floor         | 52 | ArgMax    |
 |53 | Range      | 54 | Greator         | 55 | Less          | 56 | Softplus  |
 |57 | Neg        | 58 | Ceil            | 59 | Where         | 60 | Equal     |
-|61 | Sign       |
+|61 | Sign       | 62 | NonZero         | 
 
 ## TensorFlow
 
@@ -51,6 +51,10 @@
 
 
 ## Pytorch
+
+| 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
+|------|------|------|------|------|------|------|------|
+| 1 | BatchNorm | 2 |  
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
 |------|------|------|------|------|------|------|------|
