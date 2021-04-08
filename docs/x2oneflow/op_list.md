@@ -81,24 +81,10 @@
 | 77| rsqrt     | 78| ~~selu~~             | 79| sign                | 80 | sin      |
 | 81| softplus  | 82| split                | 83| squeeze             | 84 | sum      |
 | 85| tan       | 86| tanh                 | 87 | transpose          | 88 | unsqueeze|
-
+| 89| ~~upsample_nearest2d~~ |
 
 - hardswish pytorch导出存在bug
 - interpolate oneflow和pytorch的参数列表未完全对齐，只能转nearest和align_corners=False的情况，working
-
-
-
-
-| 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
-|------|------|------|------|------|------|------|------|
-| 1  | relu      | 2 |cat | 3  |   unsqueeze   | 4 | transpose|
-| 5  | batchnorm | 6 |slice       | 7  |   gather        | 8 | clamp|
-| 9  | conv2d    | 10| depthwiseconv2d| 11| flatten      | 12| add      |
-| 13 | sub       | 14| mul        | 15 | div             | 16| pow      |
-| 17 | sqrt      | 18| tanh       | 19 | sigmoid         | 20| erf      |
-| 21 | cast      | 22| pad        | 23 | maxpool         | 24| avgpool  |
-| 25 | globalavgpool| 26| globalmaxpool | 27 | reduce_mean| 28| reshape |
-| 29 | softmax   |30 | relu6      | 31 | CrossEntropyLoss |
 
 
 ## PaddlePaddle
