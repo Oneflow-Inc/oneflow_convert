@@ -280,3 +280,171 @@ def test_hardtanh():
             return torch.nn.functional.hardtanh(x)
     
     load_pytorch_module_and_check(Net)
+
+def test_leaky_relu():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.nn.functional.leaky_relu(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_log():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.log(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_log1p():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.log1p(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_log2():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.log2(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_log_softmax():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.nn.functional.log_softmax(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_logsumexp():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.logsumexp(x, dim=1)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_max():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.max(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_min():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.min(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_mean():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.mean(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_mm():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.mm(x, x)
+    
+    load_pytorch_module_and_check(Net, input_size=(2, 2))
+
+def test_neg():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.neg(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_norm():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.norm(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_permute():
+    class Net(nn.Module):
+        def forward(self, x):
+            x = x.permute(2, 0, 1)
+            return x
+    load_pytorch_module_and_check(Net, input_size=(2, 3, 5))
+
+def test_prod():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.prod(x)
+    
+    load_pytorch_module_and_check(Net, input_size=(3, ))
+
+def test_reshape_as():
+    class Net(nn.Module):
+        def forward(self, x):
+            return x.reshape_as(x)
+    load_pytorch_module_and_check(Net, input_size=(2, 3, 5))
+
+def test_round():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.round(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_rsqrt():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.rsqrt(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_rsqrt():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.rsqrt(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_sign():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.sign(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_sin():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.sin(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_softplus():
+    class Net(nn.Module):
+        def forward(self, x):
+            m = nn.Softplus()
+            return m(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_squeeze():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.squeeze(x)
+    
+    load_pytorch_module_and_check(Net, input_size=(2, 1, 2, 1))
+
+def test_tan():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.tan(x)
+    
+    load_pytorch_module_and_check(Net)
+
+def test_tanh():
+    class Net(nn.Module):
+        def forward(self, x):
+            return torch.tanh(x)
+    
+    load_pytorch_module_and_check(Net)

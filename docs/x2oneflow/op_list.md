@@ -27,7 +27,9 @@
 |57 | Neg        | 58 | Ceil            | 59 | Where         | 60 | Equal     |
 |61 | Sign       | 62 | NonZero         | 63 | Acos          | 64 | Acosh     |
 |65 | ArgMin     | 66 | Asin            | 67 | Atan          | 68 | Cos       |
-|69 | Elu        | 70 | Exp             | 
+|69 | Elu        | 70 | Exp             | 71 | Log           | 72 | LogSoftmax|
+|73 |ReduceLogSumExp|74| ReduceMin      | 75 | ReduceProd    | 76 | Round     |
+|77 | Sin        | 78 | Tanh            | 79 |Tan            |
 
 
 ## TensorFlow
@@ -68,9 +70,21 @@
 | 33| exp       | 34| ~~expand~~           | 35| flatten             | 36 | floor    |
 | 37|floor_divide|38| full                 | 39| full_like           | 40 | gather   |
 | 41| ~~ge~~    | 42| gelu                 | 43| ~~GroupNorm~~       | 44 |~~hardswish~~|
-| 45| hardtanh  | 46| 
+| 45| hardtanh  | 46| ~~instance_norm~~    | 47| ~~interpolate~~     | 48 | ~~layer_norm~~|
+| 49| leaky_relu| 50| log                  | 51| log1p               | 52 | log2     |
+| 53| log_softmax|54| logsumexp            | 55|  max                | 56 | min      |
+| 57| mean      |58 | mm                   | 59| mul                 | 60 | neg      |
+| 61| norm      | 62| ~~pixel_shuffle~~    | 63| pow                 | 64 | permute  |
+| 65| ~~prelu~~ | 66| relu                 | 67| reshape             | 68 | relu6    |
+| 69| softmax   | 70| slice                | 71| sub                 | 72 | sqrt     |
+| 73| sigmoid   | 74| prod                 | 75| reshape_as          | 76 | round    |
+| 77| rsqrt     | 78| ~~selu~~             | 79| sign                | 80 | sin      |
+| 81| softplus  | 82| split                | 83| squeeze             | 84 | sum      |
+| 85| tan       | 86| tanh                 | 87 | transpose          | 88 | unsqueeze|
+
 
 - hardswish pytorch导出存在bug
+- interpolate oneflow和pytorch的参数列表未完全对齐，只能转nearest和align_corners=False的情况，working
 
 
 

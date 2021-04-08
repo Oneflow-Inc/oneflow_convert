@@ -38,10 +38,6 @@ class ReduceMean(ReductionMixin, BackendHandler):
         return cls._common(node, tensor_dict, **kwargs)
     
     @classmethod
-    def version_12(cls, node, tensor_dict, **kwargs):
-        return cls._common(node, tensor_dict, **kwargs)
-    
-    @classmethod
     def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
 
@@ -71,4 +67,51 @@ class ReduceMax(BackendHandler):
     def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
 
+@onnx_op("ReduceMin")
+class ReduceMin(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
+        axes = node.attrs.get("axes")
+        keepdims = node.attrs.get("keepdims")
+        return flow.math.reduce_min(x, axis=axes, keepdims=bool(keepdims))
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
 
+    @classmethod
+    def version_11(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_12(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+
+
+@onnx_op("ReduceProd")
+@flow_func(flow.math.reduce_prod)
+class ReduceProd(BackendHandler):
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
+        axes = node.attrs.get("axes")
+        keepdims = node.attrs.get("keepdims")
+        return flow.math.reduce_prod(x, axis=axes, keepdims=bool(keepdims))
+    
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_11(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+    
+    @classmethod
+    def version_13(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
