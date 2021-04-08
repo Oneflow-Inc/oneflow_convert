@@ -1,6 +1,6 @@
 # X2OneFlow 支持的OP列表
 
-> 目前X2OneFlow 支持60+的ONNX OP，50+的Tensorflow/Pytorch/PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
+> 目前X2OneFlow 支持79个ONNX OP，50+个TensorFlow OP，80+个Pytorch OP，50+个PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
 
 **注：** 目前，部分OP暂未支持，如您在转换过程中出现OP不支持的情况，可自行添加或反馈给我们。欢迎通过[ISSUE](https://github.com/Oneflow-Inc/oneflow_convert_tools/issues/new)反馈的方式告知我们(模型名，代码实现或模型获取方式)，我们会及时跟进：）
 

@@ -1,6 +1,6 @@
 # OneFlow2ONNX 支持的OP列表
 
-> 目前OneFlow2ONNX 支持60+的ONNX OP，我们在下面的列表中列出了目前OneFlow支持导出的全部ONNX OP
+> 目前OneFlow2ONNX 支持60+的ONNX OP，我们在下面的列表中列出了目前OneFlow支持导出的全部ONNX OP。
 
 
 | 序号 | OP | 序号 | OP | 序号 | OP | 序号 | OP |
