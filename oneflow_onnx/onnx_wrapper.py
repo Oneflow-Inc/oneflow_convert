@@ -964,7 +964,6 @@ class Graph(object):
                     label_counter -= 1
 
         ret = [x for _, x in sorted(zip(label, ops))]
-        print(ret)
         self.ResetNodes(ret)
 
     def MakeGraph(
