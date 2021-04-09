@@ -222,17 +222,17 @@ def test_cast():
     generate_unary_op_test(flow.cast, dtype=flow.int32)
 
 
-def test_scalar_mul_int(test_cast):
+def test_scalar_mul_int():
     generate_unary_op_test(flow.math.multiply, 5)
 
 
-def test_scalar_mul_float(test_cast):
+def test_scalar_mul_float():
     generate_unary_op_test(flow.math.multiply, 5.1)
 
 
-def test_scalar_add_int(test_cast):
+def test_scalar_add_int():
     generate_unary_op_test(flow.math.add, 5)
 
 
-def test_scalar_add_float(test_cast):
+def test_scalar_add_float():
     generate_unary_op_test(flow.math.add, 5.1)
