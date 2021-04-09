@@ -116,5 +116,3 @@ def test_conv2d_k3s1_nchw_same_depthwise():
         )
 
     convert_to_onnx_and_check(conv2d)
-
-test_conv2d_k3s1_nchw_same_g2()
