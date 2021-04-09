@@ -41,9 +41,3 @@ def test_bn_withoutscale():
             return x
 
     load_tensorflow2_module_and_check(Net)
-
-from absl import app
-from absl.testing import absltest
-
- = absltest.TestCase
-test_bn_withoutscale()

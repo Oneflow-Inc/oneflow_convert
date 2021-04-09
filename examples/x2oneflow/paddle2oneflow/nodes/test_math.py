@@ -128,13 +128,6 @@ def test_abs():
 
     load_paddle_module_and_check(Net)
 
-def test_acos():
-    class Net(nn.Layer):
-        def forward(self, x):
-            x = paddle.acos(x)
-            return x
-
-    load_paddle_module_and_check(Net)
 
 def test_add_v2():
     class Net(nn.Layer):
@@ -300,8 +293,6 @@ def test_tanh():
             return x
     
     load_paddle_module_and_check(Net)
-
-
 
 
 

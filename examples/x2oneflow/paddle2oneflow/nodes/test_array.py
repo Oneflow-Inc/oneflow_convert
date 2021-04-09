@@ -73,7 +73,6 @@ def test_tensor_index():
 def test_split():
     class Net(nn.Layer):
         def forward(self, x):
-            x1, y1 =  paddle.split(x,  num_or_sections=2, axis=1)
+            x1, y1 =  paddle.split(x,  num_or_sections=[3, 3], axis=1)
             return x1
     load_paddle_module_and_check(Net, input_size=(1, 6, 3, 3))
-

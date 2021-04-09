@@ -98,3 +98,4 @@ def convert_to_onnx_and_check(
             if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
                 print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
     assert np.allclose(onnx_res, oneflow_res, rtol=rtol, atol=atol)
+    flow.clear_default_session()

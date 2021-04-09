@@ -33,7 +33,9 @@ oneflow>=0.3.4
 ```sh
 pytorch>=1.7.0
 paddlepaddle>=2.0.0
+paddle2onnx>=0.6
 tensorflow>=2.0.0
+tf2onnx>=1.8.4
 ```
 
 #### 安装

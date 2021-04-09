@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import tensorflow as tf
-
+import numpy as np
 from oneflow_onnx.x2oneflow.util import load_tensorflow2_module_and_check
 
 
@@ -154,14 +154,6 @@ def test_floordiv():
 
     load_tensorflow2_module_and_check(Net)
 
-def test_bias_add():
-    class Net(tf.keras.Model):
-       def call(self, x):
-           ipt1 = np.random.uniform(low=-10, high=10, size=(1, 1, 1, 5)).astype(np.float32)
-           bias = tf.constant(ipt1, dtype=tf.float32)
-           return tf.nn.bias_add(x, bias)
-
-    load_tensorflow2_module_and_check(Net)
 
 def test_squared_difference():
     class Net(tf.keras.Model):
@@ -198,12 +190,6 @@ def test_range():
 
     load_tensorflow2_module_and_check(Net)
 
-def test_greater_equal():
-    class Net(tf.keras.Model):
-       def call(self, x):
-           return tf.greater_equal(2*x, x)
-
-    load_tensorflow2_module_and_check(Net)
 
 def test_fill():
     class Net(tf.keras.Model):

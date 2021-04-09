@@ -74,7 +74,7 @@
 | 49| leaky_relu| 50| log                  | 51| log1p               | 52 | log2     |
 | 53| log_softmax|54| logsumexp            | 55|  max                | 56 | min      |
 | 57| mean      |58 | mm                   | 59| mul                 | 60 | neg      |
-| 61| norm      | 62| ~~pixel_shuffle~~    | 63| pow                 | 64 | permute  |
+| 61| ~~norm~~  | 62| ~~pixel_shuffle~~    | 63| pow                 | 64 | permute  |
 | 65| ~~prelu~~ | 66| relu                 | 67| reshape             | 68 | relu6    |
 | 69| softmax   | 70| slice                | 71| sub                 | 72 | sqrt     |
 | 73| sigmoid   | 74| prod                 | 75| reshape_as          | 76 | round    |

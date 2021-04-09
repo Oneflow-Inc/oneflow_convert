@@ -89,7 +89,6 @@ def load_pytorch_module_and_check(
     flow.train.CheckPoint().load(model_weight_save_dir)
     # flow.load_variables(flow.checkpoint.get(model_weight_save_dir))
 
-    pt_module = pt_module.to("cuda")
     if train_flag == False:
         pt_module.eval()
 
@@ -100,7 +99,7 @@ def load_pytorch_module_and_check(
         flow_res = job_train(ipt1)
     else:
         flow_res = job_eval(ipt1)
-    pytorch_res = pt_module(torch.tensor(ipt1).to("cuda")).cpu().detach().numpy()
+    pytorch_res = pt_module(torch.tensor(ipt1).to("cpu")).detach().numpy()
     print(flow_res)
     print("-------------")
     print(pytorch_res)
@@ -114,6 +113,7 @@ def load_pytorch_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
+    flow.clear_default_session()
 
 
 def load_paddle_module_and_check(
@@ -198,6 +198,7 @@ def load_paddle_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
+    flow.clear_default_session()
 
 
 def load_tensorflow2_module_and_check(
@@ -286,3 +287,5 @@ def load_tensorflow2_module_and_check(
         )
     )
     print("a[{}]={}, b[{}]={}".format(max_idx, a[max_idx], max_idx, b[max_idx]))
+    flow.clear_default_session()
+

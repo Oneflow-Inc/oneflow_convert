@@ -220,34 +220,6 @@ class Relu(BackendHandler):
     def version_14(cls, node, tensor_dict, **kwargs):
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
-@onnx_op("SoftmaxCrossEntropyLoss")
-@flow_func(nn_ops.sparse_softmax_cross_entropy_with_logits)
-class SoftmaxCrossEntropyLoss(BackendHandler):
-    @classmethod
-    def version_12(cls, node, tensor_dict, **kwargs):
-        if len(node.input_tensor_names) == 3:
-            raise NotImplementedError(
-                "SoftmaxCrossEntropyLoss with weight is not supported"
-            )
-        # Swap the inputs
-        node.input_tensor_names[0], node.input_tensor_names[1] = (
-            node.input_tensor_names[1],
-            node.input_tensor_names[0],
-        )
-        output = cls.run_onnx_node(node, tensor_dict, **kwargs)
-        reduction = node.attrs["reduction"]
-        if reduction == "mean":
-            output = reduce_mean.reduce_mean(output)
-        elif reduction == "sum":
-            output = reduce_ops.reduce_sum(output)
-        elif reduction == "none":
-            pass
-        else:
-            raise NotImplementedError(
-                'Unknown "reduction" value: "{}"'.format(reduction)
-            )
-        return output
-
 
 @onnx_op("Pad")
 @flow_func(pad.pad)

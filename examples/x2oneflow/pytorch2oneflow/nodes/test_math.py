@@ -358,13 +358,6 @@ def test_neg():
     
     load_pytorch_module_and_check(Net)
 
-def test_norm():
-    class Net(nn.Module):
-        def forward(self, x):
-            return torch.norm(x)
-    
-    load_pytorch_module_and_check(Net)
-
 def test_permute():
     class Net(nn.Module):
         def forward(self, x):
