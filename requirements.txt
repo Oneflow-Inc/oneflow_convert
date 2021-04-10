@@ -8,3 +8,4 @@ tensorflow_cpu==2.4.0
 torch==1.8.1+cpu
 torchvision==0.9.1+cpu
 paddle2onnx>=0.5
+oneflow_cu102==0.3.1
