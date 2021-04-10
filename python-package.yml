@@ -3,7 +3,6 @@
 
 name: OneFlow_Convert_Tools
 
-author: BBuf
 
 on:
   push:
