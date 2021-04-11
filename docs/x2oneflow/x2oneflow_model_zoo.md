@@ -6,6 +6,7 @@
 
 | 模型         | 是否支持 |
 | ------------ | -------- |
+| LeNet        | Yes      |
 | AlexNet      | Yes      |
 | VGGNet       | Yes      |
 | GoogleNet    | Yes      |
