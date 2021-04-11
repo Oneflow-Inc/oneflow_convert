@@ -22,6 +22,7 @@
 | ShuffleNetV1 | Yes      |
 | ShuffleNetV2 | Yes      |
 | SqueezeNet   | Yes      |
+| DPN          | Yes      |
 
 ## TensorFlow
 
