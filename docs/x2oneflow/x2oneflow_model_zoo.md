@@ -11,6 +11,7 @@
 | VGGNet       | Yes      |
 | GoogleNet    | Yes      |
 | ResNet       | Yes      |
+| PreActResNet | Yes      |
 | ResNext      | Yes      |
 | SENet        | Yes      |
 | MobileNetV1  | Yes      |
