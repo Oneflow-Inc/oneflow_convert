@@ -441,3 +441,11 @@ def test_tanh():
             return torch.tanh(x)
     
     load_pytorch_module_and_check(Net)
+
+def test_prelu():
+    class Net(nn.Module):
+        def forward(self, x):
+            m = nn.PReLU(num_parameters=4)
+            return m(x)
+    
+    load_pytorch_module_and_check(Net)

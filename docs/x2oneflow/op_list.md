@@ -1,6 +1,6 @@
 # X2OneFlow 支持的OP列表
 
-> 目前X2OneFlow 支持79个ONNX OP，50+个TensorFlow OP，80+个Pytorch OP，50+个PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
+> 目前X2OneFlow 支持80个ONNX OP，50+个TensorFlow OP，80+个Pytorch OP，50+个PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。
 
 **注：** 目前，部分OP暂未支持，如您在转换过程中出现OP不支持的情况，可自行添加或反馈给我们。欢迎通过[ISSUE](https://github.com/Oneflow-Inc/oneflow_convert_tools/issues/new)反馈的方式告知我们(模型名，代码实现或模型获取方式)，我们会及时跟进：）
 
@@ -29,7 +29,7 @@
 |65 | ArgMin     | 66 | Asin            | 67 | Atan          | 68 | Cos       |
 |69 | Elu        | 70 | Exp             | 71 | Log           | 72 | LogSoftmax|
 |73 |ReduceLogSumExp|74| ReduceMin      | 75 | ReduceProd    | 76 | Round     |
-|77 | Sin        | 78 | Tanh            | 79 |Tan            |
+|77 | Sin        | 78 | Tanh            | 79 |Tan            | 80 | PReLU     |
 
 
 ## TensorFlow
@@ -81,7 +81,7 @@
 | 77| rsqrt     | 78| ~~selu~~             | 79| sign                | 80 | sin      |
 | 81| softplus  | 82| split                | 83| squeeze             | 84 | sum      |
 | 85| tan       | 86| tanh                 | 87 | transpose          | 88 | unsqueeze|
-| 89| ~~upsample_nearest2d~~ |
+| 89| ~~upsample_nearest2d~~ | 90| prelu   |
 
 - hardswish pytorch导出存在bug
 - interpolate oneflow和pytorch的参数列表未完全对齐，只能转nearest和align_corners=False的情况，working
