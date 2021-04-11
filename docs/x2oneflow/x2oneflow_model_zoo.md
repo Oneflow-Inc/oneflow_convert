@@ -24,6 +24,7 @@
 | ShuffleNetV2 | Yes      |
 | SqueezeNet   | Yes      |
 | DPN          | Yes      |
+| PNASNet      | Yes      |
 
 ## TensorFlow
 
