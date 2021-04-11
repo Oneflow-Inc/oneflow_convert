@@ -25,6 +25,7 @@
 | SqueezeNet   | Yes      |
 | DPN          | Yes      |
 | PNASNet      | Yes      |
+| DLANet       | Yes      |
 
 ## TensorFlow
 
