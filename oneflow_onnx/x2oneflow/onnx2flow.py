@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 
 
 def from_onnx(
-    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False, from_pytorch=False
+    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False, from_pytorch=False, 
 ):
     input_names = [x.name for x in onnx_model.graph.input]
     if type(inputs) is not dict:
@@ -123,13 +123,8 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
-    # to save onnx model after onnx_simplifier
-    if not os.path.exists("/tmp"):
-        os.makedirs("/tmp")
-    onnx.save(onnx_model, "/tmp/simp.onnx")
-
     # to solve paddlepaddle2oneflow initializer rename bug
-    if from_paddle == True or from_pytorch == True:
+    if from_paddle == True:
         
         graph_input_name = {}
         graph_initializer_name = []
@@ -162,6 +157,25 @@ def from_onnx(
                     onnx_model.graph.input.remove(x)
         for x in extend_op:
             onnx_model.graph.initializer.extend([x])
+    
+    # for code gen
+    for x in onnx_model.graph.input:
+            x.name = x.name.replace('.', '_')
+    for i, node in enumerate(onnx_model.graph.node):
+        node.name = node.name.replace('.', '_')
+        for j in range(len(node.input)):
+            node.input[j] = node.input[j].replace('.', '_')
+        for j in range(len(node.output)):
+            node.output[j] = node.output[j].replace('.', '_').insert(0, 'x2oneflow_')
+    for x in onnx_model.graph.initializer:
+        x.name = x.name.replace('.', '_')
+    
+
+    # to save onnx model after onnx_simplifier
+    if not os.path.exists("/tmp"):
+        os.makedirs("/tmp")
+    onnx.save(onnx_model, "/tmp/simp.onnx")
+
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
     BackendHandler.WEIGHT_SAVE_DIR = model_weight_dir

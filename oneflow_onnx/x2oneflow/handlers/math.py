@@ -165,9 +165,35 @@ class Gemm(BackendHandler):
         x = tensor_dict[node.input_tensor_names[0]]
         y = tensor_dict[node.input_tensor_names[1]]
 
+        # code gen for gemm B
+        gemm_weight_shape = list(tensor_dict[node.input_tensor_names[1]].shape)
+        # code gen for gemm weight_initializer
+        func = 'gemm_initializer = flow.truncated_normal(0.1)\n'
+        oneflow_code_gen.append(func)
+        #code gen for gemm weight_regularizer
+        func = 'gemm_regularizer = flow.regularizers.l2(0.0005)\n'
+        oneflow_code_gen.append(func)
+        # code gen for gemm weight_shape
+        # code gen for gemm weights
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format(node.input_tensor_names[1])
+        func = func + 'shape={}, '.format(gemm_weight_shape)
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        oneflow_code_gen.append(func)
+
         if len(node.input_tensor_names) > 2:
             z = tensor_dict[node.input_tensor_names[2]]
             oneflow_blobname_map[z] = node.input_tensor_names[2]
+            # code gen for gemm bias
+            gemm_bias_shape = list(tensor_dict[node.input_tensor_names[2]].shape)
+            # code gen for gemm weights
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+            func = func + 'name={}, '.format(node.input_tensor_names[2])
+            func = func + 'shape={}, '.format(gemm_bias_shape)
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            oneflow_code_gen.append(func)
         else:
             z = 0
 

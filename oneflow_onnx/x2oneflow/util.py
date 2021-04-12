@@ -98,9 +98,12 @@ def load_pytorch_module_and_check(
     f.write('import numpy as np\n\n\n\n')
     f.write('@flow.global_function(type="predict")\n')
     f.write('def eval_job(\n')
-    f.write('   images: tp.Numpy.Placeholder(({}, {}, {}, {}), dtype=flow.float)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+    f.write('   x0: tp.Numpy.Placeholder(({}, {}, {}, {}), dtype=flow.float)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
     f.write(') -> tp.Numpy:\n')
     f.write('   with flow.scope.placement("gpu", "0:0"):\n')
+
+
+
     for x in oneflow_code_gen:
         f.write('     {}'.format(x))
     
