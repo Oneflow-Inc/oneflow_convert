@@ -20,7 +20,7 @@ import numpy as np
 import oneflow.python.framework.remote_blob as remote_blob_util
 from oneflow.python.ops import nn_ops
 from oneflow.python.ops import pad
-
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 class BroadcastMixin(object):
     @classmethod
@@ -147,12 +147,34 @@ class ConvMixin(BroadcastMixin):
             groups=group,
         )
 
+        # code gen for conv
+        oneflow_blobname_map[x] = node.input_tensor_names[0]
+        oneflow_blobname_map[weights] = node.input_tensor_names[1]
+        oneflow_blobname_map[conv] = node.output_tensor_names[0]
+        
+        func = '{} = '.format(node.output_tensor_names[0])
+        func = func + 'flow.nn.conv2d('
+        func = func + node.input_tensor_names[0] + ', '
+        func = func + node.input_tensor_names[1] + ', '
+        func = func + 'padding={}, '.format(pad_mode)
+        func = func + 'strides={}, '.format(strides)
+        func = func + 'data_format={}, '.format("'NCHW'")
+        func = func + 'groups={})\n'.format(group)
+        oneflow_code_gen.append(func)
+
         if len(node.input_tensor_names) == 2:
             output = conv
         else:
             bias = input_dict[node.input_tensor_names[2]]
             output = nn_ops.bias_add(conv, bias)
-
+            # code gen for bias_add
+            oneflow_blobname_map[bias] = node.input_tensor_names[2]
+            func = '{} = '.format(node.output_tensor_names[0])
+            func = func + 'flow.nn.bias_add('
+            func = func + node.output_tensor_names[0] + ', '
+            func = func + node.input_tensor_names[2] + ', '
+            func = func + 'data_format={})\n'.format("'NCHW'")
+            oneflow_code_gen.append(func)
         return [output]
 
 

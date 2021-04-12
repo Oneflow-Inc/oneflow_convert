@@ -24,7 +24,8 @@ import os
 import shutil
 
 from onnx import defs
-
+import oneflow as flow
+import oneflow_api
 
 class BackendHandler:
     """
@@ -38,6 +39,9 @@ class BackendHandler:
     SINCE_VERSION = 0
     PARTIAL_SUPPORT = False
     PS_DESCRIPTION = ""
+    ONEFLOW_BLOBNAME_MAP = {}
+    ONEFLOW_CODE_GEN = []
+    OP_OUTPUS = []
 
     @classmethod
     def check_cls(cls):
@@ -52,13 +56,13 @@ class BackendHandler:
     @classmethod
     def handle(cls, node, tensor_dict, **kwargs):
         """ Main method in handler. It will find corresponding versioned handle method,
-    whose name format is `version_%d`. So prefix `version_` is reserved in onnx-oneflow.
-    DON'T use it for other purpose.
+        whose name format is `version_%d`. So prefix `version_` is reserved in onnx-oneflow.
+        DON'T use it for other purpose.
 
-    :param node: NodeProto for backend.
-    :param kwargs: Other args.
-    :return: OneFlowNode for backend.
-    """
+        :param node: NodeProto for backend.
+        :param kwargs: Other args.
+        :return: OneFlowNode for backend.
+        """
         ver_handle = getattr(cls, "version_{}".format(cls.SINCE_VERSION), None)
         if ver_handle:
             return ver_handle(node, tensor_dict, **kwargs)
@@ -173,14 +177,14 @@ class BackendHandler:
     ):
         """ Helper method to make tensor.
 
-    :param node: OnnxNode object.
-    :param flow_func: Callable OneFlow function. Default is cls.FLOW_FUNC.
-    :param inputs: Inputs tensor. Default is got from node.inputs.
-    :param attrs: Attributes. Default is node.attrs.
-    :param name: Node name.
-    :param kwargs: Other args.
-    :return: Tensor.
-    """
+        :param node: OnnxNode object.
+        :param flow_func: Callable OneFlow function. Default is cls.FLOW_FUNC.
+        :param inputs: Inputs tensor. Default is got from node.inputs.
+        :param attrs: Attributes. Default is node.attrs.
+        :param name: Node name.
+        :param kwargs: Other args.
+        :return: Tensor.
+        """
         if flow_func is None:
             flow_func = cls.FLOW_FUNC
         if inputs is None:
@@ -189,19 +193,24 @@ class BackendHandler:
             attrs = copy.deepcopy(node.attrs)
         if name != "":
             attrs["name"] = name
-
+        for inp in node.input_tensor_names:
+            if tensor_dict[inp] not in cls.ONEFLOW_BLOBNAME_MAP:
+                cls.ONEFLOW_BLOBNAME_MAP[tensor_dict[inp]] = inp
+        cls.OP_OUTPUS = []
+        for oup in node.output_tensor_names:
+            cls.OP_OUTPUS.append(oup)
         return cls._run_flow_func(flow_func, inputs, attrs)
 
     @classmethod
     def _run_flow_func(cls, flow_func, inputs, attrs):
         """ Run Oneflow function.
-    Use only acceptable attributes of function from attrs.
+        Use only acceptable attributes of function from attrs.
 
-    :param flow_func: Tensorflow function.
-    :param inputs: Inputs.
-    :param attrs: Attributes.
-    :return: Tensor.
-    """
+        :param flow_func: OneFlow function.
+        :param inputs: Inputs.
+        :param attrs: Attributes.
+        :return: Tensor.
+        """
         params = list(inspect.signature(flow_func).parameters.keys())
 
         attrs = cls._process_attrs(attrs)
@@ -211,9 +220,56 @@ class BackendHandler:
             kwargs.get(p) is not None and v is not None for p, v in attrs.items()
         )
         if ambiguous_arguments:
-            raise TypeError("Ambiguous arguments for {}()".format(flow_func.__name__))
+            raise TypeError("Ambiguous arguments for {}()".format(flow_func.__name__))            
         kwargs.update((p, v) for p, v in attrs.items() if v is not None)
+        pre_name = ''
+        if len(cls.OP_OUTPUS) == 1:
+            pre_name = cls.OP_OUTPUS[0] + ' = '
+        else:
+            for i in range(len(cls.OP_OUTPUS) - 1):
+                pre_name = pre_name + '{}, '.format(cls.OP_OUTPUS[i])
+            pre_name = pre_name + '{} = '.format(cls.OP_OUTPUS[len(cls.OP_OUTPUS) - 1])    
+        cls.ONEFLOW_CODE_GEN.append(pre_name + cls.code_gen(flow_func, kwargs))
         return flow_func(**kwargs)
+    
+    @classmethod
+    def code_gen(cls, flow_fun, kwargs):
+        def import_func(func):
+            flag = 0
+            if hasattr(flow, func):
+                flag = 1
+            elif hasattr(flow.math, func):
+                flag = 2
+            elif hasattr(flow.layers, func):
+                flag = 3
+            elif hasattr(flow.nn, func):
+                flag = 4
+            
+            if flag == 0:
+                raise NotImplementedError("can not import this func:{} from oneflow".format(func))
+            elif flag == 1:
+                return str("flow." + func)
+            elif flag == 2:
+                return str("flow.math." + func)
+            elif flag == 3:
+                return str("flow.layers." + func)
+            elif flag == 4:
+                return str("flow.nn." + func)
+        
+        func = str(flow_fun).split()
+        func = func[1]
+        func = import_func(func)
+
+        func += '('
+        for k, v in kwargs.items():
+            func += str(k) + '='
+            if type(v) == oneflow_api.LazyConsistentBlob:
+                v = cls.ONEFLOW_BLOBNAME_MAP[v]
+            func += str(v) + ', '
+        func += ')\n'
+
+        return func
+
 
 
 domain = BackendHandler.domain
@@ -221,3 +277,5 @@ onnx_op = BackendHandler.onnx_op
 flow_func = BackendHandler.flow_func
 partial_support = BackendHandler.partial_support
 ps_description = BackendHandler.ps_description
+oneflow_blobname_map = BackendHandler.ONEFLOW_BLOBNAME_MAP
+oneflow_code_gen = BackendHandler.ONEFLOW_CODE_GEN

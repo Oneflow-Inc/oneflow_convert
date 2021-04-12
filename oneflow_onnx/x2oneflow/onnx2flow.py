@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 
 
 def from_onnx(
-    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False,
+    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False, from_pytorch=False
 ):
     input_names = [x.name for x in onnx_model.graph.input]
     if type(inputs) is not dict:
@@ -129,7 +129,7 @@ def from_onnx(
     onnx.save(onnx_model, "/tmp/simp.onnx")
 
     # to solve paddlepaddle2oneflow initializer rename bug
-    if from_paddle == True:
+    if from_paddle == True or from_pytorch == True:
         
         graph_input_name = {}
         graph_initializer_name = []
@@ -230,6 +230,7 @@ def from_pytorch(
         dict(zip(input_names, inputs)),
         model_weight_dir=model_weight_dir,
         do_onnxsim=do_onnxsim,
+        from_pytorch=True,
     )
 
 

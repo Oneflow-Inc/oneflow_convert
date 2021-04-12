@@ -24,7 +24,7 @@ from oneflow.python.ops import array_ops
 from oneflow.python.ops import linalg
 from oneflow_onnx.x2oneflow.handlers.common import ArithmeticMixin, BasicMathMixin
 from oneflow_onnx import util as onnx_util
-
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 @onnx_op("Add")
 @flow_func(math_ops.add)
@@ -167,6 +167,7 @@ class Gemm(BackendHandler):
 
         if len(node.input_tensor_names) > 2:
             z = tensor_dict[node.input_tensor_names[2]]
+            oneflow_blobname_map[z] = node.input_tensor_names[2]
         else:
             z = 0
 
@@ -174,6 +175,24 @@ class Gemm(BackendHandler):
         transB = False if node.attrs.get("transB", 0) == 0 else True
         alpha = node.attrs.get("alpha", 1.0)
         beta = node.attrs.get("beta", 1.0)
+
+        #code gen for gemm
+        oneflow_blobname_map[x] = node.input_tensor_names[0]
+        oneflow_blobname_map[y] = node.input_tensor_names[1]
+        func = '{} = '.format(node.output_tensor_names[0])
+        func = func + '{} * '.format(alpha)
+        func = func + 'flow.linalg.matmul('
+        func = func + node.input_tensor_names[0] + ', '
+        func = func + node.input_tensor_names[1] + ', '
+        func = func + 'transpose_a={}, '.format(transA)
+        func = func + 'transpose_b={}) '.format(transB)
+
+        if oneflow_blobname_map[z] != node.input_tensor_names[2]:
+            func = func + ' + {} * {}\n'.format(beta, z)
+        else:
+            func = func + ' + {} * {}\n'.format(beta, node.input_tensor_names[2])
+        
+        oneflow_code_gen.append(func)
 
         return [
             alpha * linalg.matmul(x, y, transpose_a=transA, transpose_b=transB)
