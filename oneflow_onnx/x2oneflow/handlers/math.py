@@ -169,10 +169,12 @@ class Gemm(BackendHandler):
         gemm_weight_shape = list(tensor_dict[node.input_tensor_names[1]].shape)
         # code gen for gemm weight_initializer
         func = 'gemm_initializer = flow.truncated_normal(0.1)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
         #code gen for gemm weight_regularizer
         func = 'gemm_regularizer = flow.regularizers.l2(0.0005)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
         # code gen for gemm weight_shape
         # code gen for gemm weights
         func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
@@ -180,7 +182,8 @@ class Gemm(BackendHandler):
         func = func + 'shape={}, '.format(gemm_weight_shape)
         func = func + 'initializer=weight_initializer, '
         func = func + 'regularizer=weight_regularizer)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         if len(node.input_tensor_names) > 2:
             z = tensor_dict[node.input_tensor_names[2]]
@@ -193,7 +196,8 @@ class Gemm(BackendHandler):
             func = func + 'shape={}, '.format(gemm_bias_shape)
             func = func + 'initializer=weight_initializer, '
             func = func + 'regularizer=weight_regularizer)\n'
-            oneflow_code_gen.append(func)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         else:
             z = 0
 
@@ -218,7 +222,8 @@ class Gemm(BackendHandler):
         else:
             func = func + ' + {} * {}\n'.format(beta, node.input_tensor_names[2])
         
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         return [
             alpha * linalg.matmul(x, y, transpose_a=transA, transpose_b=transB)

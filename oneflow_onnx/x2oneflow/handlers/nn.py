@@ -131,6 +131,10 @@ class PoolMixin(object):
                     (pads[3][0], pads[3][1]),
                 ),
             )
+            func = '{} = flow.pad({}, paddings=(({}, {}), ({}, {}), ({}, {}), ({}, {})))\n'.format(node.input_tensor_names[0], node.input_tensor_names[0], pads[0][0],
+                    pads[0][1], pads[1][0], pads[1][1], pads[2][0], pads[2][1], pads[3][0], pads[3][1])
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
             pads = [[0, 0], [0, 0], [0, 0], [0, 0]]
             # raise ValueError("count_include_pad != 0 is not supported")
         
@@ -154,12 +158,15 @@ class PoolMixin(object):
         oneflow_blobname_map[x] = node.input_tensor_names[0]
         
         func = '{} = '.format(node.output_tensor_names[0])
+        func = func + pool_type
         func = func + node.input_tensor_names[0] + ', '
         func = func + 'ksize={}, '.format(kernel_shape)
         func = func + 'strides={}, '.format(strides)
-        func = func + 'padding={}, '.format(pads)
+        func = func + 'padding=(({}, {}), ({}, {}), ({}, {}), ({}, {})), '.format(pads[0][0],
+                    pads[0][1], pads[1][0], pads[1][1], pads[2][0], pads[2][1], pads[3][0], pads[3][1])
         func = func + 'data_format={})\n'.format("'NCHW'")
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         return op(
             x, ksize=kernel_shape, strides=strides, padding=pads, data_format="NCHW"
@@ -299,6 +306,9 @@ class GlobalAverageMaxPool(BackendHandler):
     def version_1(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         spatial_dims = list(range(2, len(x.shape)))
+        func = '{} = flow.math.reduce_mean({}, axis={})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
         return reduce_mean.reduce_mean(x, spatial_dims, keepdims=True)
 
 

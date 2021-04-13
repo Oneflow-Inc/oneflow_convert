@@ -94,10 +94,12 @@ class ConvMixin(BroadcastMixin):
 
         # code gen for conv weight_initializer
         func = 'weight_initializer = flow.truncated_normal(0.1)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
         #code gen for conv weight_regularizer
         func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         weights_rank = len(in_weights_shape)
         if transpose:
@@ -124,18 +126,30 @@ class ConvMixin(BroadcastMixin):
         func = func + 'shape={}, '.format(in_weights_shape)
         func = func + 'initializer=weight_initializer, '
         func = func + 'regularizer=weight_regularizer)\n'
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         dilations = node.attrs.get("dilations", [1] * spatial_size)
         strides = node.attrs.get("strides", [1] * spatial_size)
 
         pads = node.attrs.get("pads", [0, 0] * spatial_size)
-
+        pad_flag = 0
         # Check auto_pad nonexistent or NOTSET first
         if "auto_pad" not in node.attrs or node.attrs["auto_pad"] == "NOTSET":
             if not transpose:
                 if pads != [0, 0] * spatial_size:
                     x = PadMixin.get_padding_as_op(x, pads)
+
+                    num_dim = int(len(pads) / 2)
+                    flow_pads = (
+                        np.transpose(np.array(pads).reshape([2, num_dim])).astype(np.int32).tolist()
+                    )
+                    # flow_pads = [0, 0, 0, 0] + flow_pads.flatten().tolist()
+                    flow_pads = [(0, 0), (0, 0)] + flow_pads
+                    func = 'tmp_conv_x = flow.pad({}, paddings={})\n'.format(node.input_tensor_names[0], flow_pads)
+                    pad_flag = 1
+                    if func not in oneflow_code_gen:
+                        oneflow_code_gen.append(func)
                 pad_mode = "VALID"
             else:
                 pad_mode = "NOTSET"
@@ -170,13 +184,17 @@ class ConvMixin(BroadcastMixin):
         
         func = '{} = '.format(node.output_tensor_names[0])
         func = func + 'flow.nn.conv2d('
-        func = func + node.input_tensor_names[0] + ', '
+        if pad_flag == 0:
+            func = func + node.input_tensor_names[0] + ', '
+        else:
+            func = func + 'tmp_conv_x' + ', '
         func = func + node.input_tensor_names[1] + ', '
-        func = func + 'padding={}, '.format(pad_mode)
+        func = func + 'padding={}, '.format("'"+pad_mode+"'")
         func = func + 'strides={}, '.format(strides)
         func = func + 'data_format={}, '.format("'NCHW'")
         func = func + 'groups={})\n'.format(group)
-        oneflow_code_gen.append(func)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         if len(node.input_tensor_names) == 2:
             output = conv
@@ -189,6 +207,8 @@ class ConvMixin(BroadcastMixin):
             func = func + 'shape={}, '.format(list(bias.shape))
             func = func + 'initializer=weight_initializer, '
             func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
 
             oneflow_blobname_map[bias] = node.input_tensor_names[2]
             func = '{} = '.format(node.output_tensor_names[0])
@@ -196,7 +216,8 @@ class ConvMixin(BroadcastMixin):
             func = func + node.output_tensor_names[0] + ', '
             func = func + node.input_tensor_names[2] + ', '
             func = func + 'data_format={})\n'.format("'NCHW'")
-            oneflow_code_gen.append(func)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return [output]
 
 
