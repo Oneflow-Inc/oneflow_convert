@@ -1,5 +1,5 @@
-## oneflow_onnx 使用示例
+[简体中文](README_zh.md) | English
 
-目前OneFlow2ONNX 支持80+的OneFlow OP导出为ONNX OP。X2OneFlow支持79个ONNX OP，50+个TensorFlow OP，80+个Pytorch OP，50+个PaddlePaddle OP，覆盖了大部分CV分类模型常用的操作。注意我们支持的OP和模型均为动态图API下的OP和模型，要求PaddlePaddle的版本>=2.0.0，TensorFlow>=2.0.0，Pytorch无明确版本要求。目前X2OneFlow已经成功转换了50+个TensorFlow/Pytorch/PaddlePaddle官方模型.我们分别在`oneflow2onnx`和`x2oneflow`文件夹下提供了所有的测试示例，需导出ONNX或者转换自定义的TensorFlow/Pytorch/PaddlePaddle网络可以对应修改使用。
+## oneflow_onnx samples
 
-
+At present, oneflow2onnx supports the export of 80 + ONEFLOW OP to onnx Op. X2oneflow supports 79 onnx OP's, 50 + TensorFlow OP's, 80 + Pytorch OP's and 50 + PaddlePaddle OP's, covering most common operations of CV classification model. Note that the OP and model we support are all OP and model under the dynamic graph API, which requires that the version of PaddlePaddle > = 2.0.0, TensorFlow > = 2.0.0, and there is no explicit version requirement for Pytorch. At present, x2oneflow has successfully converted 50 + TensorFlow/Pytorch/PaddlePaddle official models. We provide all the test examples in the 'oneflow2onnx' and 'x2oneflow' folders respectively. If you want to export onnx or convert the custom TensorFlow/Pytorch/PaddlePaddle network, you can modify it accordingly.

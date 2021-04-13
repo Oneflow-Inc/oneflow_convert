@@ -32,7 +32,7 @@ from oneflow.python.ops import layers
 from oneflow.python.ops import reduce_mean
 from oneflow.python.ops import reduce_ops
 from oneflow.python.ops import pad
-
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 @onnx_op("Conv")
 class Conv(ConvMixin, BackendHandler):
@@ -133,10 +133,15 @@ class PoolMixin(object):
             )
             pads = [[0, 0], [0, 0], [0, 0], [0, 0]]
             # raise ValueError("count_include_pad != 0 is not supported")
+        
+        pool_type = ''
+
         if pooling_type == "AVG":
             op = nn_ops.avg_pool2d
+            pool_type = 'flow.nn.avg_pool2d('
         elif pooling_type == "MAX":
             op = nn_ops.max_pool2d
+            pool_type = 'flow.nn.max_pool2d('
         elif pooling_type == "MAX_WITH_ARGMAX":
             raise ValueError("maxpooling with argmax is not supported")
 
@@ -144,6 +149,17 @@ class PoolMixin(object):
             raise ValueError("non-2d pooling is not supported")
         if node.attrs.get("storage_order", 0) != 0:
             raise ValueError("storage_order != 0 is not supported")
+
+        # code gen for avgpool2d and maxpool2d pool
+        oneflow_blobname_map[x] = node.input_tensor_names[0]
+        
+        func = '{} = '.format(node.output_tensor_names[0])
+        func = func + node.input_tensor_names[0] + ', '
+        func = func + 'ksize={}, '.format(kernel_shape)
+        func = func + 'strides={}, '.format(strides)
+        func = func + 'padding={}, '.format(pads)
+        func = func + 'data_format={})\n'.format("'NCHW'")
+        oneflow_code_gen.append(func)
 
         return op(
             x, ksize=kernel_shape, strides=strides, padding=pads, data_format="NCHW"
@@ -326,4 +342,35 @@ class LeakyRelu(BackendHandler):
 
     @classmethod
     def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("PRelu")
+@flow_func(flow.layers.prelu)
+class PRelu(BackendHandler):
+
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        name = node.input_tensor_names[0]
+
+        cls.copy_variable_file(node.input_tensor_names[1], name + "-alpha")
+        node.input_tensor_names = node.input_tensor_names[:1]
+
+        return [
+            cls.run_onnx_node(node, tensor_dict, name=name, **kwargs, attrs={"shared_axes": [2, 3]})
+        ]
+
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_9(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)

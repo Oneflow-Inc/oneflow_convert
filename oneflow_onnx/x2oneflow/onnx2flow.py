@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 
 
 def from_onnx(
-    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False,
+    onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False, from_pytorch=False, 
 ):
     input_names = [x.name for x in onnx_model.graph.input]
     if type(inputs) is not dict:
@@ -123,11 +123,6 @@ def from_onnx(
             if x.name in delete_node_name:
                 onnx_model.graph.input.remove(x)
 
-    # to save onnx model after onnx_simplifier
-    if not os.path.exists("/tmp"):
-        os.makedirs("/tmp")
-    onnx.save(onnx_model, "/tmp/simp.onnx")
-
     # to solve paddlepaddle2oneflow initializer rename bug
     if from_paddle == True:
         
@@ -162,6 +157,87 @@ def from_onnx(
                     onnx_model.graph.input.remove(x)
         for x in extend_op:
             onnx_model.graph.initializer.extend([x])
+    
+    # for code gen
+    for x in onnx_model.graph.input:
+            x.name = x.name.replace('.', '_')
+            x.name = x.name.replace('/', '_')
+            x.name = x.name.replace(':', '_')
+    for i, node in enumerate(onnx_model.graph.node):
+        node.name = node.name.replace('.', '_')
+        node.name = node.name.replace('/', '_')
+        node.name = node.name.replace(':', '_')
+        for j in range(len(node.input)):
+            node.input[j] = node.input[j].replace('.', '_')
+            node.input[j] = node.input[j].replace('/', '_')
+            node.input[j] = node.input[j].replace(':', '_')
+        for j in range(len(node.output)):
+            node.output[j] = node.output[j].replace('.', '_')
+            node.output[j] = node.output[j].replace('/', '_')
+            node.output[j] = node.output[j].replace(':', '_')
+    for x in onnx_model.graph.initializer:
+        x.name = x.name.replace('.', '_')
+        x.name = x.name.replace('/', '_')
+        x.name = x.name.replace(':', '_')
+    for x in onnx_model.graph.output:
+        x.name = x.name.replace('.', '_')
+        x.name = x.name.replace('/', '_')
+        x.name = x.name.replace(':', '_')
+    
+    graph_initializer_name = []
+    for x in onnx_model.graph.initializer:
+        graph_initializer_name.append(x.name)
+    graph_name_dict = {}
+    rename_set = []
+    for i, node in enumerate(onnx_model.graph.node):
+        # node_cp = node
+        node_cp = copy.deepcopy(node)
+        if node.name == '':
+            cnt = 0
+            while True:
+                node.name = node.op_type + '_{}'.format(cnt)
+                if node.name in rename_set:
+                    pass
+                else:
+                    rename_set.append(node.name)
+                    break
+                cnt = cnt + 1
+        for j in range(len(node.input)):
+            if node.input[j] == 'x_0':
+                node_cp.input[j] = node.input[j]
+            elif node.input[j] in graph_name_dict:
+                node_cp.input[j] = graph_name_dict[node.input[j]]
+            else:
+                if node.op_type == "Clip" and (node.input[j] not in graph_initializer_name):
+                    pass
+                else:
+                    node_cp.input[j] = node.name.lower() + '_input_{}'.format(j)
+                    graph_name_dict[node.input[j]] = node_cp.input[j]
+        for j in range(len(node.output)):
+            if node.output[j] in graph_name_dict:
+                node_cp.output[j] = graph_name_dict[node.output[j]]
+            else:
+                node_cp.output[j] = node.name.lower() + '_output_{}'.format(j)
+                graph_name_dict[node.output[j]] = node_cp.output[j]
+        
+        onnx_model.graph.node.remove(node)
+        onnx_model.graph.node.insert(i, node_cp)
+
+    for x in onnx_model.graph.input:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    for x in onnx_model.graph.output:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    for x in onnx_model.graph.initializer:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    
+    # to save onnx model after onnx_simplifier
+    if not os.path.exists("/tmp"):
+        os.makedirs("/tmp")
+    onnx.save(onnx_model, "/tmp/simp.onnx")
+
     if os.path.exists(model_weight_dir):
         shutil.rmtree(model_weight_dir)
     BackendHandler.WEIGHT_SAVE_DIR = model_weight_dir
@@ -230,6 +306,7 @@ def from_pytorch(
         dict(zip(input_names, inputs)),
         model_weight_dir=model_weight_dir,
         do_onnxsim=do_onnxsim,
+        from_pytorch=True,
     )
 
 

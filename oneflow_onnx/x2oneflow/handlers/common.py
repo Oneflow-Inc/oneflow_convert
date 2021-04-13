@@ -20,7 +20,7 @@ import numpy as np
 import oneflow.python.framework.remote_blob as remote_blob_util
 from oneflow.python.ops import nn_ops
 from oneflow.python.ops import pad
-
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 class BroadcastMixin(object):
     @classmethod
@@ -76,14 +76,14 @@ class ConvMixin(BroadcastMixin):
     @classmethod
     def conv(cls, node, input_dict, transpose=False):
         """ Convolution method for both conv and transposed conv
-    For transposed conv,
-      Attr pads is not used for input, but declares how much output is padded.
-      Here, output means output from transposed conv which already pad output_padding if set.
-      So the pseudo explanation for output should be:
-        output = conv_transpose_output + output_padding - pads
-      And conv_transpose_output shape should be:
-        conv_transpose_output_shape[i] = strides[i] * (input_shape[i] - 1) + kernel_shape[i]
-    """
+        For transposed conv,
+        Attr pads is not used for input, but declares how much output is padded.
+        Here, output means output from transposed conv which already pad output_padding if set.
+        So the pseudo explanation for output should be:
+            output = conv_transpose_output + output_padding - pads
+        And conv_transpose_output shape should be:
+            conv_transpose_output_shape[i] = strides[i] * (input_shape[i] - 1) + kernel_shape[i]
+        """
         x = input_dict[node.input_tensor_names[0]]
         x_shape = list(x.shape)
         x_rank = len(x_shape)
@@ -91,6 +91,14 @@ class ConvMixin(BroadcastMixin):
 
         in_weights = input_dict[node.input_tensor_names[1]]
         in_weights_shape = list(in_weights.shape)
+
+        # code gen for conv weight_initializer
+        func = 'weight_initializer = flow.truncated_normal(0.1)\n'
+        oneflow_code_gen.append(func)
+        #code gen for conv weight_regularizer
+        func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
+        oneflow_code_gen.append(func)
+
         weights_rank = len(in_weights_shape)
         if transpose:
             # Translate weights from (C x M x KH x KW) to (KH x KW X M X C)
@@ -110,6 +118,14 @@ class ConvMixin(BroadcastMixin):
             kernel_shape = in_weights_shape[2:]
 
         weights = in_weights
+        # code gen for conv weights
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+        func = func + 'shape={}, '.format(in_weights_shape)
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        oneflow_code_gen.append(func)
+
         dilations = node.attrs.get("dilations", [1] * spatial_size)
         strides = node.attrs.get("strides", [1] * spatial_size)
 
@@ -147,12 +163,40 @@ class ConvMixin(BroadcastMixin):
             groups=group,
         )
 
+        # code gen for conv
+        oneflow_blobname_map[x] = node.input_tensor_names[0]
+        oneflow_blobname_map[weights] = node.input_tensor_names[1]
+        oneflow_blobname_map[conv] = node.output_tensor_names[0]
+        
+        func = '{} = '.format(node.output_tensor_names[0])
+        func = func + 'flow.nn.conv2d('
+        func = func + node.input_tensor_names[0] + ', '
+        func = func + node.input_tensor_names[1] + ', '
+        func = func + 'padding={}, '.format(pad_mode)
+        func = func + 'strides={}, '.format(strides)
+        func = func + 'data_format={}, '.format("'NCHW'")
+        func = func + 'groups={})\n'.format(group)
+        oneflow_code_gen.append(func)
+
         if len(node.input_tensor_names) == 2:
             output = conv
         else:
             bias = input_dict[node.input_tensor_names[2]]
             output = nn_ops.bias_add(conv, bias)
+            # code gen for bias_add
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")
+            func = func + 'shape={}, '.format(list(bias.shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
 
+            oneflow_blobname_map[bias] = node.input_tensor_names[2]
+            func = '{} = '.format(node.output_tensor_names[0])
+            func = func + 'flow.nn.bias_add('
+            func = func + node.output_tensor_names[0] + ', '
+            func = func + node.input_tensor_names[2] + ', '
+            func = func + 'data_format={})\n'.format("'NCHW'")
+            oneflow_code_gen.append(func)
         return [output]
 
 

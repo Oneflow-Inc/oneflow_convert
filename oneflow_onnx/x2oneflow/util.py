@@ -27,6 +27,7 @@ import tensorflow as tf
 
 import oneflow as flow
 import oneflow.typing as tp
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 from oneflow_onnx.x2oneflow.onnx2flow import from_onnx, from_pytorch, from_paddle, from_tensorflow2
 
 
@@ -37,6 +38,7 @@ def load_pytorch_module_and_check(
     input_max_val=10,
     train_flag=False,
     flow_weight_dir="/tmp/oneflow",
+    oneflow_code_gen_flag=False,
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)
@@ -87,7 +89,35 @@ def load_pytorch_module_and_check(
             return y
 
     flow.train.CheckPoint().load(model_weight_save_dir)
-    # flow.load_variables(flow.checkpoint.get(model_weight_save_dir))
+    # flow.load_variables(flow.checkpoint.get(model _weight_save_dir))
+
+    if oneflow_code_gen_flag == True and len(input_size) == 4:
+
+        oneflow_python_file = "/tmp/oneflow_code.py"
+        f = open(oneflow_python_file, 'w')
+
+        f.write('import oneflow as flow\n')
+        f.write('import oneflow.typing as tp\n')
+        f.write('import numpy as np\n\n\n\n')
+        f.write('@flow.global_function(type="predict")\n')
+        f.write('def eval_job(\n')
+        f.write('   x0: tp.Numpy.Placeholder(({}, {}, {}, {}), dtype=flow.float)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+        f.write(') -> tp.Numpy:\n')
+        f.write('   with flow.scope.placement("gpu", "0:0"):\n')
+
+
+
+        for x in oneflow_code_gen:
+            f.write('     {}'.format(x))
+        
+        res = oneflow_code_gen[len(oneflow_code_gen)-1].split()[0]
+        f.write('     return {}'.format(res))
+
+        f.write('\n\n\n\n')
+        
+        f.write('x = np.random.randn({}, {}, {}, {}).astype(np.float32)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+        f.write('out = eval_job(x)\n')
+        f.write('print out.shape\n')
 
     if train_flag == False:
         pt_module.eval()
@@ -123,6 +153,7 @@ def load_paddle_module_and_check(
     input_max_val=10,
     train_flag=False,
     flow_weight_dir="/tmp/oneflow",
+    oneflow_code_gen_flag = False, 
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)
@@ -208,6 +239,7 @@ def load_tensorflow2_module_and_check(
     input_max_val=10,
     train_flag=False,
     flow_weight_dir="/tmp/oneflow",
+    oneflow_code_gen_flag = False, 
 ):
     if input_size is None:
         input_size = (2, 4, 3, 5)

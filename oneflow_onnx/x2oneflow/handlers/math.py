@@ -24,7 +24,7 @@ from oneflow.python.ops import array_ops
 from oneflow.python.ops import linalg
 from oneflow_onnx.x2oneflow.handlers.common import ArithmeticMixin, BasicMathMixin
 from oneflow_onnx import util as onnx_util
-
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 @onnx_op("Add")
 @flow_func(math_ops.add)
@@ -165,8 +165,35 @@ class Gemm(BackendHandler):
         x = tensor_dict[node.input_tensor_names[0]]
         y = tensor_dict[node.input_tensor_names[1]]
 
+        # code gen for gemm B
+        gemm_weight_shape = list(tensor_dict[node.input_tensor_names[1]].shape)
+        # code gen for gemm weight_initializer
+        func = 'gemm_initializer = flow.truncated_normal(0.1)\n'
+        oneflow_code_gen.append(func)
+        #code gen for gemm weight_regularizer
+        func = 'gemm_regularizer = flow.regularizers.l2(0.0005)\n'
+        oneflow_code_gen.append(func)
+        # code gen for gemm weight_shape
+        # code gen for gemm weights
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'" + node.input_tensor_names[1] + "'")
+        func = func + 'shape={}, '.format(gemm_weight_shape)
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        oneflow_code_gen.append(func)
+
         if len(node.input_tensor_names) > 2:
             z = tensor_dict[node.input_tensor_names[2]]
+            oneflow_blobname_map[z] = node.input_tensor_names[2]
+            # code gen for gemm bias
+            gemm_bias_shape = list(tensor_dict[node.input_tensor_names[2]].shape)
+            # code gen for gemm weights
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+            func = func + 'name={}, '.format("'" + node.input_tensor_names[2] + "'")
+            func = func + 'shape={}, '.format(gemm_bias_shape)
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            oneflow_code_gen.append(func)
         else:
             z = 0
 
@@ -174,6 +201,24 @@ class Gemm(BackendHandler):
         transB = False if node.attrs.get("transB", 0) == 0 else True
         alpha = node.attrs.get("alpha", 1.0)
         beta = node.attrs.get("beta", 1.0)
+
+        #code gen for gemm
+        oneflow_blobname_map[x] = node.input_tensor_names[0]
+        oneflow_blobname_map[y] = node.input_tensor_names[1]
+        func = '{} = '.format(node.output_tensor_names[0])
+        func = func + '{} * '.format(alpha)
+        func = func + 'flow.linalg.matmul('
+        func = func + node.input_tensor_names[0] + ', '
+        func = func + node.input_tensor_names[1] + ', '
+        func = func + 'transpose_a={}, '.format(transA)
+        func = func + 'transpose_b={}) '.format(transB)
+
+        if z not in oneflow_blobname_map:
+            func = func + ' + {} * {}\n'.format(beta, z)
+        else:
+            func = func + ' + {} * {}\n'.format(beta, node.input_tensor_names[2])
+        
+        oneflow_code_gen.append(func)
 
         return [
             alpha * linalg.matmul(x, y, transpose_a=transA, transpose_b=transB)
