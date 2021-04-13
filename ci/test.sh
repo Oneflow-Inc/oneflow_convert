@@ -1,5 +1,5 @@
 set -ex
-python3 -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+python3 -m pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
 python3 -m pip install --user --upgrade pip
 python3 -m pip install --user flake8 pytest
 if [ -f requirements.txt ]; then pip install --user -r requirements.txt; fi
