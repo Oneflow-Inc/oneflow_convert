@@ -233,6 +233,8 @@ def from_onnx(
         if x.name in graph_name_dict:
             x.name = graph_name_dict[x.name]
     
+    onnx_model = onnx.shape_inference.infer_shapes(onnx_model)
+    
     # to save onnx model after onnx_simplifier
     if not os.path.exists("/tmp"):
         os.makedirs("/tmp")

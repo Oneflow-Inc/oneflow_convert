@@ -24,6 +24,7 @@ from oneflow_onnx.x2oneflow.handler import onnx_op
 from oneflow_onnx.x2oneflow.handler import flow_func
 from oneflow.python.ops import array_ops
 import oneflow.typing as tp
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 
 @onnx_op("Identity")
@@ -83,6 +84,9 @@ class Flatten(BackendHandler):
             )
             # cal_shape = (tf.reduce_prod(shape[0:axis]),
             # tf.reduce_prod(shape[axis:tf.size(shape)]))
+        func = '{} = flow.reshape({}, shape={})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], cal_shape)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
         return array_ops.reshape(x, cal_shape)
 
     @classmethod
