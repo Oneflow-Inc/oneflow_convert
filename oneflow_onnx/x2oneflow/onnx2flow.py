@@ -161,16 +161,78 @@ def from_onnx(
     # for code gen
     for x in onnx_model.graph.input:
             x.name = x.name.replace('.', '_')
+            x.name = x.name.replace('/', '_')
+            x.name = x.name.replace(':', '_')
     for i, node in enumerate(onnx_model.graph.node):
         node.name = node.name.replace('.', '_')
+        node.name = node.name.replace('/', '_')
+        node.name = node.name.replace(':', '_')
         for j in range(len(node.input)):
             node.input[j] = node.input[j].replace('.', '_')
+            node.input[j] = node.input[j].replace('/', '_')
+            node.input[j] = node.input[j].replace(':', '_')
         for j in range(len(node.output)):
-            node.output[j] = node.output[j].replace('.', '_').insert(0, 'x2oneflow_')
+            node.output[j] = node.output[j].replace('.', '_')
+            node.output[j] = node.output[j].replace('/', '_')
+            node.output[j] = node.output[j].replace(':', '_')
     for x in onnx_model.graph.initializer:
         x.name = x.name.replace('.', '_')
+        x.name = x.name.replace('/', '_')
+        x.name = x.name.replace(':', '_')
+    for x in onnx_model.graph.output:
+        x.name = x.name.replace('.', '_')
+        x.name = x.name.replace('/', '_')
+        x.name = x.name.replace(':', '_')
     
+    graph_initializer_name = []
+    for x in onnx_model.graph.initializer:
+        graph_initializer_name.append(x.name)
+    graph_name_dict = {}
+    rename_set = []
+    for i, node in enumerate(onnx_model.graph.node):
+        # node_cp = node
+        node_cp = copy.deepcopy(node)
+        if node.name == '':
+            cnt = 0
+            while True:
+                node.name = node.op_type + '_{}'.format(cnt)
+                if node.name in rename_set:
+                    pass
+                else:
+                    rename_set.append(node.name)
+                    break
+                cnt = cnt + 1
+        for j in range(len(node.input)):
+            if node.input[j] == 'x_0':
+                node_cp.input[j] = node.input[j]
+            elif node.input[j] in graph_name_dict:
+                node_cp.input[j] = graph_name_dict[node.input[j]]
+            else:
+                if node.op_type == "Clip" and (node.input[j] not in graph_initializer_name):
+                    pass
+                else:
+                    node_cp.input[j] = node.name.lower() + '_input_{}'.format(j)
+                    graph_name_dict[node.input[j]] = node_cp.input[j]
+        for j in range(len(node.output)):
+            if node.output[j] in graph_name_dict:
+                node_cp.output[j] = graph_name_dict[node.output[j]]
+            else:
+                node_cp.output[j] = node.name.lower() + '_output_{}'.format(j)
+                graph_name_dict[node.output[j]] = node_cp.output[j]
+        
+        onnx_model.graph.node.remove(node)
+        onnx_model.graph.node.insert(i, node_cp)
 
+    for x in onnx_model.graph.input:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    for x in onnx_model.graph.output:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    for x in onnx_model.graph.initializer:
+        if x.name in graph_name_dict:
+            x.name = graph_name_dict[x.name]
+    
     # to save onnx model after onnx_simplifier
     if not os.path.exists("/tmp"):
         os.makedirs("/tmp")

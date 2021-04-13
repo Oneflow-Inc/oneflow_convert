@@ -176,7 +176,7 @@ class Gemm(BackendHandler):
         # code gen for gemm weight_shape
         # code gen for gemm weights
         func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
-        func = func + 'name={}, '.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'" + node.input_tensor_names[1] + "'")
         func = func + 'shape={}, '.format(gemm_weight_shape)
         func = func + 'initializer=weight_initializer, '
         func = func + 'regularizer=weight_regularizer)\n'
@@ -189,7 +189,7 @@ class Gemm(BackendHandler):
             gemm_bias_shape = list(tensor_dict[node.input_tensor_names[2]].shape)
             # code gen for gemm weights
             func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
-            func = func + 'name={}, '.format(node.input_tensor_names[2])
+            func = func + 'name={}, '.format("'" + node.input_tensor_names[2] + "'")
             func = func + 'shape={}, '.format(gemm_bias_shape)
             func = func + 'initializer=weight_initializer, '
             func = func + 'regularizer=weight_regularizer)\n'
@@ -213,7 +213,7 @@ class Gemm(BackendHandler):
         func = func + 'transpose_a={}, '.format(transA)
         func = func + 'transpose_b={}) '.format(transB)
 
-        if oneflow_blobname_map[z] != node.input_tensor_names[2]:
+        if z not in oneflow_blobname_map:
             func = func + ' + {} * {}\n'.format(beta, z)
         else:
             func = func + ' + {} * {}\n'.format(beta, node.input_tensor_names[2])

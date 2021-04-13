@@ -26,6 +26,7 @@ import shutil
 from onnx import defs
 import oneflow as flow
 import oneflow_api
+import oneflow
 
 class BackendHandler:
     """
@@ -244,7 +245,9 @@ class BackendHandler:
                 flag = 3
             elif hasattr(flow.nn, func):
                 flag = 4
-            
+            elif func == "api_get_variable":
+                return str("flow.get_variable")
+
             if flag == 0:
                 raise NotImplementedError("can not import this func:{} from oneflow".format(func))
             elif flag == 1:

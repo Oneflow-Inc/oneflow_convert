@@ -154,7 +154,6 @@ class PoolMixin(object):
         oneflow_blobname_map[x] = node.input_tensor_names[0]
         
         func = '{} = '.format(node.output_tensor_names[0])
-        func = func + pool_type + ', '
         func = func + node.input_tensor_names[0] + ', '
         func = func + 'ksize={}, '.format(kernel_shape)
         func = func + 'strides={}, '.format(strides)

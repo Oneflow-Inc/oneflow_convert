@@ -120,7 +120,7 @@ class ConvMixin(BroadcastMixin):
         weights = in_weights
         # code gen for conv weights
         func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
-        func = func + 'name={}, '.format(str(node.input_tensor_names[1]))
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
         func = func + 'shape={}, '.format(in_weights_shape)
         func = func + 'initializer=weight_initializer, '
         func = func + 'regularizer=weight_regularizer)\n'
@@ -184,6 +184,12 @@ class ConvMixin(BroadcastMixin):
             bias = input_dict[node.input_tensor_names[2]]
             output = nn_ops.bias_add(conv, bias)
             # code gen for bias_add
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")
+            func = func + 'shape={}, '.format(list(bias.shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+
             oneflow_blobname_map[bias] = node.input_tensor_names[2]
             func = '{} = '.format(node.output_tensor_names[0])
             func = func + 'flow.nn.bias_add('

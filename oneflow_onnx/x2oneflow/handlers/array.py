@@ -287,6 +287,11 @@ class Split(BackendHandler):
         split = node.attrs.get("split")
         index = 0
         ans = []
+        if(split == None):
+            split = []
+            x_shape = list(x.shape)
+            for i in range(len(node.output_tensor_names)):
+                split.append(x_shape[axis] // len(node.output_tensor_names))
         for i in range(len(split)):
             if axis == 1:
                 tmp = flow.experimental.logical_slice(
