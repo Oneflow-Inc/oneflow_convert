@@ -23,6 +23,7 @@ jobs:
           container_name=onnx-pr-${{ github.event.pull_request.number }}-run-id-${{ github.run_id }}-${test_suite}-test
           extra_docker_args+=" --name ${container_name}"
           extra_docker_args+=" --shm-size=8g --rm -w $PWD -v $PWD:$PWD"
+          echo "extra_docker_args=${extra_docker_args}" >> $GITHUB_ENV
           echo "container_name=${container_name}" >> $GITHUB_ENV
       - name: Test
         run: |
