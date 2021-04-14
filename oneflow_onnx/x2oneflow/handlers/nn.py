@@ -49,23 +49,61 @@ class BatchNormalization(BackendHandler):
 
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
-        def randomString(stringLength=8):
-            letters = string.ascii_lowercase
-            return "".join(random.choice(letters) for i in range(stringLength))
+        x = tensor_dict[node.input_tensor_names[0]]
 
-        name = "bn_" + randomString()
+        # code gen for batchnorm
+        func = 'weight_initializer = flow.truncated_normal(0.1)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
-        # update oneflow flow.layers.batch_normalization to avoid this
-        # it does not work on model with mulitple bn
-        cls.copy_variable_file(node.input_tensor_names[1], name + "-gamma")
-        cls.copy_variable_file(node.input_tensor_names[2], name + "-beta")
-        cls.copy_variable_file(node.input_tensor_names[3], name + "-moving_mean")
-        cls.copy_variable_file(node.input_tensor_names[4], name + "-moving_variance")
-        node.input_tensor_names = node.input_tensor_names[:1]
+        scale = tensor_dict[node.input_tensor_names[1]]
+        offset = tensor_dict[node.input_tensor_names[2]]
+        mean = tensor_dict[node.input_tensor_names[3]]
+        variance = tensor_dict[node.input_tensor_names[4]]
+        epsilon = node.attrs.get("epsilon", 1e-5)
 
-        return [
-            cls.run_onnx_node(node, tensor_dict, name=name, **kwargs, attrs={"axis": 1})
-        ]
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+        func = func + 'shape={}, '.format(list(scale.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")
+        func = func + 'shape={}, '.format(list(offset.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[3])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[3]+"'")
+        func = func + 'shape={}, '.format(list(mean.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[4])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[4]+"'")
+        func = func + 'shape={}, '.format(list(variance.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.nn.batch_normalization('.format(node.output_tensor_names[0])
+        func = func + 'x={}, mean={}, variance={}, offset={}, scale={}, axis=1, variance_epsilon={})\n'.format(node.input_tensor_names[0], node.input_tensor_names[3],
+                                                                                                        node.input_tensor_names[4], node.input_tensor_names[2], node.input_tensor_names[1], epsilon)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        return flow.nn.batch_normalization(x, mean=mean, variance=variance, offset=offset, scale=scale, axis=1, variance_epsilon=epsilon)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

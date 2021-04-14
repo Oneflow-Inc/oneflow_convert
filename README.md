@@ -25,8 +25,9 @@ onnx>=1.8.0
 onnx-simplifier>=0.3.3
 onnxoptimizer>=0.2.5
 onnxruntime>=1.6.0
-oneflow>=0.3.4
+oneflow (https://github.com/Oneflow-Inc/oneflow#install-with-pip-package)
 ```
+
 
 如果你想使用X2OneFlow（X代表TensorFlow/Pytorch/PaddlePaddle）需要安装对应的深度学习框架，需要安装对应的深度学习框架，依赖如下：
 

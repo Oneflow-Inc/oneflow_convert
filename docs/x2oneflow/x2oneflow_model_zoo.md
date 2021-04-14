@@ -4,7 +4,7 @@
 
 ## Pytorch
 
-| 模型         | 是否支持 |
+| 模型         | 是否支持  |
 | ------------ | -------- |
 | LeNet        | Yes      |
 | AlexNet      | Yes      |
@@ -30,7 +30,7 @@
 
 ## TensorFlow
 
-| 模型         | 是否支持 |
+| 模型         | 是否支持  |
 | ------------ | -------- |
 | VGGNet       | Yes      |
 | ResNet       | Yes      |
@@ -45,32 +45,32 @@
 
 ## PaddlePaddle
 
-| 模型               | 是否支持                                                     |
-| ------------------ | ------------------------------------------------------------ |
-| AlexNet            | Yes                                                          |
-| VGGNet             | Yes                                                          |
-| GoogleNet          | Yes                                                          |
-| ResNet             | Yes                                                          |
-| ResNext            | Yes                                                          |
-| SE_ResNext         | Yes                                                          |
-| SENet              | Yes                                                          |
-| MobileNetV1        | Yes                                                          |
-| MobileNetV2        | Yes                                                          |
-| MobileNetV3        | Yes                                                          |
-| RegNet             | Yes                                                          |
-| DenseNet           | Yes                                                          |
-| EfficientNet       | Yes                                                          |
-| InceptionNet       | Yes                                                          |
-| ShuffleNetV2       | Yes                                                          |
-| SqueezeNet         | Yes                                                          |
-| DPNNet             | Yes                                                          |
-| DarkNet            | Yes                                                          |
-| GhostNet           | Yes                                                          |
-| RepVGG             | Yes                                                          |
-| XceptionNet        | Yes                                                          |
-| Xception_DeepLab   | Yes                                                          |
-| Vision_Transformer | Yes                                                          |
-| Res2Net            | Yes                                                          |
+| 模型               | 是否支持  |
+| ------------------ | -------- |
+| AlexNet            | Yes      |
+| VGGNet             | Yes      |
+| GoogleNet          | Yes      |
+| ResNet             | Yes      |
+| ResNext            | Yes      |
+| SE_ResNext         | Yes      |
+| SENet              | Yes      |
+| MobileNetV1        | Yes      |
+| MobileNetV2        | Yes      |
+| MobileNetV3        | Yes      |
+| RegNet             | Yes      |
+| DenseNet           | Yes      |
+| EfficientNet       | Yes      |
+| InceptionNet       | Yes      |
+| ShuffleNetV2       | Yes      |
+| SqueezeNet         | Yes      |
+| DPNNet             | Yes      |
+| DarkNet            | Yes      |
+| GhostNet           | Yes      |
+| RepVGG             | Yes      |
+| XceptionNet        | Yes      |
+| Xception_DeepLab   | Yes      |
+| Vision_Transformer | Yes      |
+| Res2Net            | Yes      |
 
 
 - 模型的测试代码均可以在本工程的examples中找到

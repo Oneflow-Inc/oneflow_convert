@@ -106,6 +106,9 @@ class Flatten(BackendHandler):
 class Concat(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
+        for x in node.input_tensor_names:
+            if tensor_dict[x] not in oneflow_blobname_map:
+                oneflow_blobname_map[tensor_dict[x]] = x
         inputs = [tensor_dict[inp] for inp in node.input_tensor_names]
         return cls.run_onnx_node(node, tensor_dict, inputs=[inputs])
 
