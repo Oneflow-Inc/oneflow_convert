@@ -34,7 +34,6 @@ import onnx
 from onnx import helper, onnx_pb, defs, numpy_helper
 import six
 
-from oneflow.python.framework import id_util
 from oneflow_onnx import constants
 import oneflow
 import oneflow_api
@@ -138,7 +137,7 @@ def MakeOnnxShape(shape):
     """shape with -1 is not valid in onnx ... make it a name."""
     if shape:
         # don't do this if input is a scalar
-        return [id_util.UniqueStr("unk") if i == -1 else i for i in shape]
+        return [oneflow.util.unique_str("unk") if i == -1 else i for i in shape]
     return shape
 
 
@@ -219,7 +218,7 @@ def TensorProtoFromNumpy(
     arr: np.ndarray, name=None, external_data=False, export_path=None
 ):
     if name is None:
-        name = id_util.UniqueStr("tensor_")
+        name = oneflow.util.unique_str("tensor_")
     tp = numpy_helper.from_array(arr, name)
     # value with size < 1024 bytes will remain in .onnx file
     # (like what pytorch does)

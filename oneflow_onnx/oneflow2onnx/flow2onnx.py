@@ -36,9 +36,6 @@ import numpy as np
 from onnx import helper, onnx_pb
 
 import oneflow
-import oneflow.python.framework.c_api_util as c_api_util
-import oneflow.python.framework.session_context as session_ctx
-from oneflow.python.oneflow_export import oneflow_export
 import oneflow_onnx
 from oneflow_onnx import constants, schemas, util
 from oneflow_onnx.oneflow2onnx import handler, optimizer
@@ -60,8 +57,8 @@ def FlowToOnnxNaive(graph, shape_override):
     for lbn in graph.helper.lbn2logical_blob_desc:
         lbd = graph.helper.lbn2logical_blob_desc[lbn]
         if lbn not in shape_override:
-            shape_override[lbn] = list(lbd.body.shape.dim)
-        dtypes[lbn] = util.Flow2OnnxDtype(lbd.body.data_type)
+            shape_override[lbn] = list(lbd.shape.dim)
+        dtypes[lbn] = util.Flow2OnnxDtype(lbd.data_type)
 
     # some stats
     op_cnt = collections.Counter()
@@ -248,7 +245,7 @@ def Export(
     """
     assert os.getenv("ENABLE_USER_OP") != "False"
     assert os.path.isdir(model_save_dir)
-    job_set = c_api_util.GetJobSet()
+    job_set = oneflow.experimental.get_job_set()
     job_name = job_func.__name__
     for job in job_set.job:
         # TODO(OYY) Modify the interface before modifying it

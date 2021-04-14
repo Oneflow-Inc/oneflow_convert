@@ -22,12 +22,11 @@ from oneflow_onnx.x2oneflow.handler import BackendHandler
 from oneflow_onnx.x2oneflow.handler import onnx_op
 from oneflow_onnx.x2oneflow.handler import flow_func
 from oneflow_onnx.x2oneflow.handlers.common import ReductionMixin
-from oneflow.python.ops import reduce_mean
 import oneflow as flow
 
 
 @onnx_op("ReduceMean")
-@flow_func(reduce_mean.reduce_mean)
+@flow_func(flow.math.reduce_mean)
 class ReduceMean(ReductionMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

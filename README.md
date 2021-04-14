@@ -76,3 +76,4 @@ python3 setup.py install
 ### 项目进展
 
 - 2021/4/13 支持ResNet18代码自动生成，量化OP转换失败暂时移除c测试脚本，发布0.2.2 wheel包。
+- 2021/4/14 修复CI错误，发布0.2.3 whell包。

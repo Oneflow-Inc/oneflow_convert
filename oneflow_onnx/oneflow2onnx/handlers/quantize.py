@@ -21,10 +21,11 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import oneflow
 import logging
 import numpy as np
 from typing import Optional, Callable
-from oneflow.python.framework import id_util
+
 from oneflow_onnx.onnx_wrapper import Graph, Node
 from oneflow_onnx.oneflow2onnx.handler import flow_op
 
@@ -162,7 +163,7 @@ class FakeQuantization:
         dequant_node = ctx.InsertNewNodeOnOutput(
             "DequantizeLinear",
             node.output_tensor_names[0],
-            name=id_util.UniqueStr(node.name),
+            name=oneflow.util.unique_str(node.name),
         )
         if opset < 13:
             scale_shape = ctx.get_shape(node.input_tensor_names[1])

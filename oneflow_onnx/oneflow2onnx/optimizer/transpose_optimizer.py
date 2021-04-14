@@ -23,7 +23,8 @@ from collections import defaultdict
 
 import numpy as np
 import onnx
-from oneflow.python.framework import id_util
+import oneflow
+
 from oneflow_onnx.constants import NCHW_TO_NHWC, NHWC_TO_NCHW
 from oneflow_onnx import util
 from .optimizer_base import GraphOptimizerBase
@@ -119,7 +120,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                         input_shape[1],
                     ]
                 return graph.MakeConst(
-                    id_util.UniqueStr("new_shape"), np.array(new_shape, dtype=np.int64)
+                    oneflow.util.unique_str("new_shape"), np.array(new_shape, dtype=np.int64)
                 ).output_tensor_names[0]
 
             # reshape requires tha output shape can only contain one -1, if not some extra op needed.
@@ -128,11 +129,11 @@ class TransposeOptimizer(GraphOptimizerBase):
             ).output_tensor_names[0]
             if IsNchwTranspose(op):
                 indice = graph.MakeConst(
-                    id_util.UniqueStr("indice"), np.array(NHWC_TO_NCHW)
+                    oneflow.util.unique_str("indice"), np.array(NHWC_TO_NCHW)
                 ).output_tensor_names[0]
             else:
                 indice = graph.MakeConst(
-                    id_util.UniqueStr("indice"), np.array(NCHW_TO_NHWC)
+                    oneflow.util.unique_str("indice"), np.array(NCHW_TO_NHWC)
                 ).output_tensor_names[0]
 
             return graph.MakeNode("Gather", [input_shape, indice]).output_tensor_names[
@@ -448,7 +449,7 @@ class TransposeOptimizer(GraphOptimizerBase):
             # for example shape of n is [x, y], then output shape of reshape will be [1, 1, x, y]
             if shape is None:
                 const_4 = self._g.MakeConst(
-                    id_util.UniqueStr("const_4"), np.array([4], np.int64)
+                    oneflow.util.unique_str("const_4"), np.array([4], np.int64)
                 ).output_tensor_names[0]
                 tensor_1 = onnx.helper.make_tensor(
                     "value", onnx.TensorProto.INT64, [1], [1]
@@ -479,7 +480,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                 if shape_4d is None:
                     return False
                 const = self._g.MakeConst(
-                    id_util.UniqueStr("reshape_shape"), np.array(shape_4d, np.int64)
+                    oneflow.util.unique_str("reshape_shape"), np.array(shape_4d, np.int64)
                 ).output_tensor_names[0]
                 reshape = self._g.MakeNode(
                     "Reshape", [input_id, const]
@@ -541,7 +542,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                 ]
                 conv_node = self._g.MakeNode(t_p.op_type, conv_inputs, attr=t_p.attrs)
                 ops = self._g.get_nodes()
-                trans.input_tensor_names[0] = id_util.UniqueStr(conv_node.name)
+                trans.input_tensor_names[0] = oneflow.util.unique_str(conv_node.name)
                 self._g.ReplaceAllInputs(
                     ops, node.output_tensor_names[0], trans.output_tensor_names[0]
                 )
@@ -770,7 +771,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                         node.input_nodes[3].set_tensor_value(new_axes)
                     else:
                         new_axes_const = self._g.MakeConst(
-                            id_util.UniqueStr(node.input_nodes[3].name), new_axes
+                            oneflow.util.unique_str(node.input_nodes[3].name), new_axes
                         )
                         self._g.ReplaceAllInputs(
                             node,
@@ -794,7 +795,7 @@ class TransposeOptimizer(GraphOptimizerBase):
         self._g.RemoveNode(node.name)
         shape_node = self._g.MakeNode("Shape", [trans.input_tensor_names[0]])
         const_node = self._g.MakeConst(
-            id_util.UniqueStr("Const"), np.array(trans.attrs["perm"])
+            oneflow.util.unique_str("Const"), np.array(trans.attrs["perm"])
         )
         gather_node = self._g.MakeNode(
             "Gather",

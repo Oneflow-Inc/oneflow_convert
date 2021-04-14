@@ -33,7 +33,6 @@ from onnx.helper import make_opsetid
 import oneflow as flow
 
 from oneflow_onnx import util
-from oneflow.python.oneflow_export import oneflow_export
 from oneflow_onnx.x2oneflow.handler import BackendHandler
 
 from oneflow_onnx.x2oneflow.handlers import *

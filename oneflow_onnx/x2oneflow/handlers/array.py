@@ -22,13 +22,12 @@ import oneflow as flow
 from oneflow_onnx.x2oneflow.handler import BackendHandler
 from oneflow_onnx.x2oneflow.handler import onnx_op
 from oneflow_onnx.x2oneflow.handler import flow_func
-from oneflow.python.ops import array_ops
 import oneflow.typing as tp
 from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 
 @onnx_op("Identity")
-@flow_func(array_ops.identity)
+@flow_func(flow.identity)
 class Identity(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -36,7 +35,7 @@ class Identity(BackendHandler):
 
 
 @onnx_op("Reshape")
-@flow_func(array_ops.reshape)
+@flow_func(flow.reshape)
 class Reshape(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -87,7 +86,7 @@ class Flatten(BackendHandler):
         func = '{} = flow.reshape({}, shape={})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], cal_shape)
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
-        return array_ops.reshape(x, cal_shape)
+        return flow.reshape(x, cal_shape)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -103,7 +102,7 @@ class Flatten(BackendHandler):
 
 
 @onnx_op("Concat")
-@flow_func(array_ops.concat)
+@flow_func(flow.concat)
 class Concat(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -124,7 +123,7 @@ class Concat(BackendHandler):
 
 
 @onnx_op("Unsqueeze")
-@flow_func(array_ops.expand_dims)
+@flow_func(flow.expand_dims)
 class Unsqueeze(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -132,7 +131,7 @@ class Unsqueeze(BackendHandler):
         if len(axes) != 1:
             x = tensor_dict[node.input_tensor_names[0]]
             for axis in sorted(axes):
-                x = array_ops.expand_dims(x, axis=axis)
+                x = flow.expand_dims(x, axis=axis)
             return x
         node.attrs["axis"] = axes[0]
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
@@ -147,7 +146,7 @@ class Unsqueeze(BackendHandler):
 
 
 @onnx_op("Squeeze")
-@flow_func(array_ops.squeeze)
+@flow_func(flow.squeeze)
 class Squeeze(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -172,7 +171,7 @@ class Squeeze(BackendHandler):
 # This is a temporary solution of senet
 
 @onnx_op("Expand")
-@flow_func(array_ops.broadcast_like)
+@flow_func(flow.broadcast_like)
 class Expand(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -186,7 +185,7 @@ class Expand(BackendHandler):
             dtype=flow.float32,
             shape=(shape[0], shape[1], shape[2], shape[3]),
         )
-        return array_ops.broadcast_like(x, like=like_tensor, broadcast_axes=(2, 3))
+        return flow.broadcast_like(x, like=like_tensor, broadcast_axes=(2, 3))
 
     @classmethod
     def version_8(cls, node, tensor_dict, **kwargs):
@@ -198,7 +197,7 @@ class Expand(BackendHandler):
 
 
 @onnx_op("Transpose")
-@flow_func(array_ops.transpose)
+@flow_func(flow.transpose)
 class Transpose(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -209,7 +208,7 @@ class Transpose(BackendHandler):
 
 
 @onnx_op("Gather")
-@flow_func(array_ops.gather)
+@flow_func(flow.gather)
 class Gather(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -224,12 +223,12 @@ class Gather(BackendHandler):
             return output
         else:
             if len(init_dict[node.input_tensor_names[1]].shape) == 0:
-                output = array_ops.squeeze(output, axis=[node.attrs["axis"]])
+                output = flow.squeeze(output, axis=[node.attrs["axis"]])
             return output
 
 
 @onnx_op("Slice")
-@flow_func(array_ops.slice_v2)
+@flow_func(flow.slice_v2)
 class Slice(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

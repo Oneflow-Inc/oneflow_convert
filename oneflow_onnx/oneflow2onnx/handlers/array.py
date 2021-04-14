@@ -29,8 +29,8 @@ from onnx import numpy_helper
 from onnx import onnx_pb
 from onnx.onnx_pb import TensorProto
 
+import oneflow
 import oneflow_onnx
-from oneflow.python.framework import id_util
 from oneflow_onnx import constants, util
 from oneflow_onnx.oneflow2onnx.graph_builder import GraphBuilder
 from oneflow_onnx.oneflow2onnx.handler import flow_op
@@ -69,7 +69,7 @@ def _WrapConcatWithCast(ctx, node):
         next_nodes = ctx.FindOutputConsumers(node.output_tensor_names[0])
         # cast output back to dtype unless the next op is a cast
         if next_nodes[0].op_type != "Cast":
-            op_name = id_util.UniqueStr(node.name)
+            op_name = oneflow.util.unique_str(node.name)
             output_cast = ctx.InsertNewNodeOnOutput("Cast", output_name, name=op_name)
             output_cast.attrs["to"] = dtype
             ctx.set_dtype(output_cast.output_tensor_names[0], dtype)
@@ -87,7 +87,7 @@ class Reshape:
             onnx_pb.TensorProto.INT64,
         ]
         shape_node = ctx.MakeConst(
-            id_util.UniqueStr("shape"), np.array(node.attrs.get("shape"), None)
+            oneflow.util.unique_str("shape"), np.array(node.attrs.get("shape"), None)
         )
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
@@ -102,7 +102,7 @@ class Reshape:
         # if the next node is already a cast we don't need to insert another one
         next_nodes = ctx.FindOutputConsumers(node.output_tensor_names[0])
         if len(next_nodes) != 1 or next_nodes[0].op_type != "Cast":
-            op_name = id_util.UniqueStr(node.name)
+            op_name = oneflow.util.unique_str(node.name)
             output_cast = ctx.InsertNewNodeOnOutput(
                 "Cast", node.output_tensor_names[0], name=op_name
             )
