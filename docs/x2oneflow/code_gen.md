@@ -14,9 +14,9 @@
 | PreActResNet | Yes      |
 | ResNext      | Yes      |
 | SENet        | Yes      |
-| MobileNetV1  |       |
-| MobileNetV2  |       |
-| MobileNetV3  |       |
+| MobileNetV1  | Yes      |
+| MobileNetV2  | Yes      |
+| MobileNetV3  | Yes      |
 | RegNet       |       |
 | DenseNet     |       |
 | EfficientNet |       |

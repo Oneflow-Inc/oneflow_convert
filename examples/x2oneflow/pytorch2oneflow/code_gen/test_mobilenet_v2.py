@@ -25,5 +25,6 @@ def test_mobilenet_v2():
         input_min_val=0,
         input_max_val=1,
         train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
+        flow_weight_dir="/tmp/oneflow",
+        oneflow_code_gen_flag=True, 
     )

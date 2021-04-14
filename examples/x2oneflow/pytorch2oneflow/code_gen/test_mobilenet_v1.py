@@ -160,5 +160,5 @@ class MobileNetV1(nn.Module):
 
 def test_mobilenet_v1():
     load_pytorch_module_and_check(
-        MobileNetV1, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
+        MobileNetV1, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True, 
     )

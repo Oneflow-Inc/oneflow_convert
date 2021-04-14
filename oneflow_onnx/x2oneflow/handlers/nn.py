@@ -337,7 +337,7 @@ class GlobalAverageMaxPool(BackendHandler):
     def version_1(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         spatial_dims = list(range(2, len(x.shape)))
-        func = '{} = flow.math.reduce_mean({}, axis={})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
+        func = '{} = flow.math.reduce_mean({}, axis={}, keepdims=True)\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
         return flow.math.reduce_mean(x, spatial_dims, keepdims=True)

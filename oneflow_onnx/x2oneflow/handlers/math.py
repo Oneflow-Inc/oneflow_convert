@@ -34,6 +34,15 @@ class Add(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
@@ -50,6 +59,15 @@ class Sub(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
@@ -66,6 +84,15 @@ class Mul(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
@@ -82,6 +109,15 @@ class Div(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
@@ -311,6 +347,12 @@ class Clip(BackendHandler):
                 if len(node.input_tensor_names) > 2 and node.input_tensor_names[2] != ""
                 else None
             )
+
+        if x not in oneflow_blobname_map:
+            oneflow_blobname_map[x] = node.input_tensor_names[0]
+        func = '{} = flow.math.clip_by_value({}, {}, {})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], clip_value_min, clip_value_max)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
         y = flow.math.clip_by_value(x, clip_value_min, clip_value_max)
 
