@@ -109,5 +109,5 @@ def DPN92():
 
 def test_dpn():
     load_pytorch_module_and_check(
-        DPN26, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow"
+        DPN26, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True, 
     )

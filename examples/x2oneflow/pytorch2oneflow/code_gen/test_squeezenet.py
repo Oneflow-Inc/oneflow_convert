@@ -23,23 +23,6 @@ def test_squeezenet():
         torchvision.models.SqueezeNet,
         input_size=(1, 3, 224, 224),
         train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
-    )
-
-
-def test_squeezenet1_0():
-    load_pytorch_module_and_check(
-        torchvision.models.squeezenet1_0,
-        input_size=(1, 3, 224, 224),
-        train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
-    )
-
-
-def test_squeezenet1_1():
-    load_pytorch_module_and_check(
-        torchvision.models.squeezenet1_1,
-        input_size=(1, 3, 224, 224),
-        train_flag=False,
-        flow_weight_dir="/tmp/oneflow" 
+        flow_weight_dir="/tmp/oneflow",
+        oneflow_code_gen_flag=True,
     )

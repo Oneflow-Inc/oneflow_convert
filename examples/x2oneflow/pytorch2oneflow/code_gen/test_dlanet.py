@@ -142,5 +142,5 @@ class DLA(nn.Module):
 
 def test_dlanet():
     load_pytorch_module_and_check(
-        DLA, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow"
+        DLA, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True
     )

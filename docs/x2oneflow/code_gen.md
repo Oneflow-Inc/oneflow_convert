@@ -17,16 +17,16 @@
 | MobileNetV1  | Yes      |
 | MobileNetV2  | Yes      |
 | MobileNetV3  | Yes      |
-| RegNet       |       |
-| DenseNet     |       |
-| EfficientNet |       |
-| InceptionNet |       |
-| ShuffleNetV1 |       |
-| ShuffleNetV2 |       |
-| SqueezeNet   |       |
-| DPN          |       |
-| PNASNet      |       |
-| DLANet       |       |
+| RegNet       | Yes      |
+| DenseNet     | Yes      |
+| EfficientNet | Yes      |
+| InceptionNet | Yes      |
+| ShuffleNetV1 | Yes      |
+| ShuffleNetV2 | Yes      |
+| SqueezeNet   | Yes      |
+| DPN          | Yes      |
+| PNASNet      | Yes      |
+| DLANet       | Yes      |
 
 ## TensorFlow
 

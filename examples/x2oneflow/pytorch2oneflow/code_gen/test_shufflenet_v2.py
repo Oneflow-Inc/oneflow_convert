@@ -179,5 +179,5 @@ configs = {
 
 def test_shufflenet_v2():
     load_pytorch_module_and_check(
-        ShuffleNetV2, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
+        ShuffleNetV2, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True
     )
