@@ -262,13 +262,29 @@ class MatMul(BackendHandler):
             constant_for_broadcast = flow.constant(
                 value=0, dtype=flow.float32, shape=broadcast_shape
             )
+            func = 'constant_for_broadcast = flow.constant(value=0, dtype=flow.float32, shape={})\n'.format(broadcast_shape)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            func = 'x = flow.math.broadcast_to_compatible_with(x, [constant_for_broadcast])\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
             x = flow.math.broadcast_to_compatible_with(x, [constant_for_broadcast])
+            if x not in oneflow_blobname_map:
+                oneflow_blobname_map[x] = node.input_tensor_names[0]
         elif len(x.shape) > len(y.shape):
             broadcast_shape = x.shape[:-2] + y.shape[-2:]
             constant_for_broadcast = flow.constant(
                 value=0, dtype=flow.float32, shape=broadcast_shape
             )
+            func = 'constant_for_broadcast = flow.constant(value=0, dtype=flow.float32, shape={})\n'.format(broadcast_shape)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            func = 'y = flow.math.broadcast_to_compatible_with(y, [constant_for_broadcast])\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
             y = flow.math.broadcast_to_compatible_with(y, [constant_for_broadcast])
+            if y not in oneflow_blobname_map:
+                oneflow_blobname_map[y] = node.input_tensor_names[1]
         return cls.run_onnx_node(node, tensor_dict, inputs=(x, y), **kwargs)
 
 

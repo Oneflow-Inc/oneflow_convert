@@ -30,6 +30,58 @@ import oneflow.typing as tp
 from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 from oneflow_onnx.x2oneflow.onnx2flow import from_onnx, from_pytorch, from_paddle, from_tensorflow2
 
+def oneflow_code_gen_func(input_size, model_weight_save_dir):
+    oneflow_python_file = "/tmp/oneflow_code.py"
+    onnx_file = '/tmp/simp.onnx'
+    f = open(oneflow_python_file, 'w')
+
+    f.write('import oneflow as flow\n')
+    f.write('import oneflow.typing as tp\n')
+    f.write('import numpy as np\n')
+    f.write('import onnxruntime as ort\n')
+    f.write('from collections import OrderedDict\n\n')
+
+    f.write('@flow.global_function(type="predict")\n')
+    f.write('def eval_job(\n')
+    f.write('   x_0: tp.Numpy.Placeholder(({}, {}, {}, {}), dtype=flow.float)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+    f.write(') -> tp.Numpy:\n')
+    f.write('   with flow.scope.placement("gpu", "0:0"):\n')
+
+
+
+    for x in oneflow_code_gen:
+        f.write('     {}'.format(x))
+    
+    res = oneflow_code_gen[len(oneflow_code_gen)-1].split()[0]
+    f.write('     return {}'.format(res))
+
+    f.write('\n\n')
+    
+    f.write('def main():\n')
+    f.write('   x = np.random.randn({}, {}, {}, {}).astype(np.float32)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+    f.write('   flow.train.CheckPoint().load({})\n'.format("'"+model_weight_save_dir+"'"))
+    f.write('   oneflow_res = eval_job(x)\n\n')
+    f.write('   ort_sess_opt = ort.SessionOptions()\n')
+    f.write('   ort_sess_opt.graph_optimization_level = (\n')
+    f.write('     ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED\n')
+    f.write('   )\n\n')
+    f.write('   sess = ort.InferenceSession({}, sess_options=ort_sess_opt)\n'.format("'"+onnx_file+"'"))
+    f.write('   assert len(sess.get_outputs()) == 1\n')
+    f.write('   assert len(sess.get_inputs()) <= 1\n')
+    f.write('   ipt_dict = OrderedDict()\n')
+    f.write('   for ipt in sess.get_inputs():\n')
+    f.write('     ipt_dict[ipt.name] = x\n\n')
+    f.write('   onnx_res = sess.run([], ipt_dict)[0]\n')
+    f.write('   rtol, atol = 1e-2, 1e-5\n')
+    f.write('   a = onnx_res.flatten()\n')
+    f.write('   b = oneflow_res.flatten()\n')
+    f.write('   for i in range(len(a)):\n')
+    f.write('     if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):\n')
+    f.write('        print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))\n\n')
+    f.write('   assert np.allclose(onnx_res, oneflow_res, rtol=rtol, atol=atol)\n\n')
+    
+    f.write('if __name__ == "__main__":\n')
+    f.write('   main()\n')
 
 def load_pytorch_module_and_check(
     pt_module_class,
@@ -92,58 +144,8 @@ def load_pytorch_module_and_check(
     # flow.load_variables(flow.checkpoint.get(model _weight_save_dir))
 
     if oneflow_code_gen_flag == True and len(input_size) == 4:
-
-        oneflow_python_file = "/tmp/oneflow_code.py"
-        onnx_file = '/tmp/simp.onnx'
-        f = open(oneflow_python_file, 'w')
-
-        f.write('import oneflow as flow\n')
-        f.write('import oneflow.typing as tp\n')
-        f.write('import numpy as np\n')
-        f.write('import onnxruntime as ort\n')
-        f.write('from collections import OrderedDict\n\n')
-
-        f.write('@flow.global_function(type="predict")\n')
-        f.write('def eval_job(\n')
-        f.write('   x_0: tp.Numpy.Placeholder(({}, {}, {}, {}), dtype=flow.float)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
-        f.write(') -> tp.Numpy:\n')
-        f.write('   with flow.scope.placement("gpu", "0:0"):\n')
-
-
-
-        for x in oneflow_code_gen:
-            f.write('     {}'.format(x))
+        oneflow_code_gen_func(input_size, model_weight_save_dir)
         
-        res = oneflow_code_gen[len(oneflow_code_gen)-1].split()[0]
-        f.write('     return {}'.format(res))
-
-        f.write('\n\n')
-        
-        f.write('def main():\n')
-        f.write('   x = np.random.randn({}, {}, {}, {}).astype(np.float32)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
-        f.write('   flow.train.CheckPoint().load({})\n'.format("'"+model_weight_save_dir+"'"))
-        f.write('   oneflow_res = eval_job(x)\n\n')
-        f.write('   ort_sess_opt = ort.SessionOptions()\n')
-        f.write('   ort_sess_opt.graph_optimization_level = (\n')
-        f.write('     ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED\n')
-        f.write('   )\n\n')
-        f.write('   sess = ort.InferenceSession({}, sess_options=ort_sess_opt)\n'.format("'"+onnx_file+"'"))
-        f.write('   assert len(sess.get_outputs()) == 1\n')
-        f.write('   assert len(sess.get_inputs()) <= 1\n')
-        f.write('   ipt_dict = OrderedDict()\n')
-        f.write('   for ipt in sess.get_inputs():\n')
-        f.write('     ipt_dict[ipt.name] = x\n\n')
-        f.write('   onnx_res = sess.run([], ipt_dict)[0]\n')
-        f.write('   rtol, atol = 1e-2, 1e-5\n')
-        f.write('   a = onnx_res.flatten()\n')
-        f.write('   b = oneflow_res.flatten()\n')
-        f.write('   for i in range(len(a)):\n')
-        f.write('     if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):\n')
-        f.write('        print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))\n\n')
-        f.write('   assert np.allclose(onnx_res, oneflow_res, rtol=rtol, atol=atol)\n\n')
-        
-        f.write('if __name__ == "__main__":\n')
-        f.write('   main()\n')
     if train_flag == False:
         pt_module.eval()
     
@@ -231,6 +233,9 @@ def load_paddle_module_and_check(
 
     flow.train.CheckPoint().load(model_weight_save_dir)
 
+    if oneflow_code_gen_flag == True and len(input_size) == 4:
+        oneflow_code_gen_func(input_size, model_weight_save_dir)
+    
     if train_flag == False:
         pd_module.eval()
 
@@ -322,6 +327,10 @@ def load_tensorflow2_module_and_check(
     ipt1 = np.random.uniform(
         low=input_min_val, high=input_max_val, size=input_size
     ).astype(np.float32)
+
+    if oneflow_code_gen_flag == True and len(input_size) == 4:
+        oneflow_code_gen_func(input_size, model_weight_save_dir)
+    
     if train_flag == True:
         flow_res = job_train(ipt1)
     else:
