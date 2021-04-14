@@ -128,5 +128,5 @@ def ResNeXt29_32x4d():
 
 def test_resnext():
     load_pytorch_module_and_check(
-        ResNeXt29_2x64d, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow" 
+        ResNeXt29_2x64d, input_size=(1, 3, 32, 32), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True
     )

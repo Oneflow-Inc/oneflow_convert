@@ -12,8 +12,8 @@
 | GoogleNet    | Yes      |
 | ResNet       | Yes      |
 | PreActResNet | Yes      |
-| ResNext      |       |
-| SENet        |       |
+| ResNext      | Yes      |
+| SENet        | Yes      |
 | MobileNetV1  |       |
 | MobileNetV2  |       |
 | MobileNetV3  |       |
