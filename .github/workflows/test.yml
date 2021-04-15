@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: [self-hosted, linux, gpu]
     steps:
-      - uses: actions/checkout@v2
       - name: Fix permissions
         run: |
           docker run --rm -v $PWD:/p -w /p busybox chmod -R o+w .
+      - uses: actions/checkout@v2
       - name: Set environment variables
         env:
           test_suite: ${{matrix.test_suite }}
