@@ -25,13 +25,6 @@ from oneflow_onnx.x2oneflow.handler import BackendHandler
 from oneflow_onnx.x2oneflow.handler import flow_func
 from oneflow_onnx.x2oneflow.handler import onnx_op
 from oneflow_onnx.x2oneflow.handlers.common import ConvMixin
-from oneflow.python.ops import array_ops
-from oneflow.python.ops import nn_ops
-from oneflow.python.ops import math_ops
-from oneflow.python.ops import layers
-from oneflow.python.ops import reduce_mean
-from oneflow.python.ops import reduce_ops
-from oneflow.python.ops import pad
 from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 @onnx_op("Conv")
@@ -46,7 +39,7 @@ class Conv(ConvMixin, BackendHandler):
 
 
 @onnx_op("BatchNormalization")
-@flow_func(layers.batch_normalization)
+@flow_func(flow.layers.batch_normalization)
 class BatchNormalization(BackendHandler):
     @classmethod
     def get_attrs_processor_param(cls):
@@ -56,23 +49,61 @@ class BatchNormalization(BackendHandler):
 
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
-        def randomString(stringLength=8):
-            letters = string.ascii_lowercase
-            return "".join(random.choice(letters) for i in range(stringLength))
+        x = tensor_dict[node.input_tensor_names[0]]
 
-        name = "bn_" + randomString()
+        # code gen for batchnorm
+        func = 'weight_initializer = flow.truncated_normal(0.1)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
 
-        # update oneflow layers.batch_normalization to avoid this
-        # it does not work on model with mulitple bn
-        cls.copy_variable_file(node.input_tensor_names[1], name + "-gamma")
-        cls.copy_variable_file(node.input_tensor_names[2], name + "-beta")
-        cls.copy_variable_file(node.input_tensor_names[3], name + "-moving_mean")
-        cls.copy_variable_file(node.input_tensor_names[4], name + "-moving_variance")
-        node.input_tensor_names = node.input_tensor_names[:1]
+        scale = tensor_dict[node.input_tensor_names[1]]
+        offset = tensor_dict[node.input_tensor_names[2]]
+        mean = tensor_dict[node.input_tensor_names[3]]
+        variance = tensor_dict[node.input_tensor_names[4]]
+        epsilon = node.attrs.get("epsilon", 1e-5)
 
-        return [
-            cls.run_onnx_node(node, tensor_dict, name=name, **kwargs, attrs={"axis": 1})
-        ]
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+        func = func + 'shape={}, '.format(list(scale.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")
+        func = func + 'shape={}, '.format(list(offset.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[3])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[3]+"'")
+        func = func + 'shape={}, '.format(list(mean.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[4])
+        func = func + 'name={}, '.format("'"+node.input_tensor_names[4]+"'")
+        func = func + 'shape={}, '.format(list(variance.shape))
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        func = '{} = flow.nn.batch_normalization('.format(node.output_tensor_names[0])
+        func = func + 'x={}, mean={}, variance={}, offset={}, scale={}, axis=1, variance_epsilon={})\n'.format(node.input_tensor_names[0], node.input_tensor_names[3],
+                                                                                                        node.input_tensor_names[4], node.input_tensor_names[2], node.input_tensor_names[1], epsilon)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        
+        return flow.nn.batch_normalization(x, mean=mean, variance=variance, offset=offset, scale=scale, axis=1, variance_epsilon=epsilon)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -141,10 +172,10 @@ class PoolMixin(object):
         pool_type = ''
 
         if pooling_type == "AVG":
-            op = nn_ops.avg_pool2d
+            op = flow.nn.avg_pool2d
             pool_type = 'flow.nn.avg_pool2d('
         elif pooling_type == "MAX":
-            op = nn_ops.max_pool2d
+            op = flow.nn.max_pool2d
             pool_type = 'flow.nn.max_pool2d('
         elif pooling_type == "MAX_WITH_ARGMAX":
             raise ValueError("maxpooling with argmax is not supported")
@@ -225,7 +256,7 @@ class MaxPool(PoolMixin, BackendHandler):
 
 
 @onnx_op("Relu")
-@flow_func(math_ops.relu)
+@flow_func(flow.math.relu)
 class Relu(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -245,7 +276,7 @@ class Relu(BackendHandler):
 
 
 @onnx_op("Pad")
-@flow_func(pad.pad)
+@flow_func(flow.pad)
 class Pad(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -297,7 +328,7 @@ class GlobalMaxPool(BackendHandler):
     def version_1(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         spatial_dims = list(range(2, len(x.shape)))
-        return reduce_ops.reduce_max(x, spatial_dims, keepdims=True)
+        return flow.math.reduce_max(x, spatial_dims, keepdims=True)
 
 
 @onnx_op("GlobalAveragePool")
@@ -306,10 +337,10 @@ class GlobalAverageMaxPool(BackendHandler):
     def version_1(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         spatial_dims = list(range(2, len(x.shape)))
-        func = '{} = flow.math.reduce_mean({}, axis={})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
+        func = '{} = flow.math.reduce_mean({}, axis={}, keepdims=True)\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
-        return reduce_mean.reduce_mean(x, spatial_dims, keepdims=True)
+        return flow.math.reduce_mean(x, spatial_dims, keepdims=True)
 
 
 @onnx_op("Softmax")
@@ -321,16 +352,16 @@ class Softmax(BackendHandler):
         axis = axis if axis >= 0 else len(np.shape(x)) + axis
 
         if axis == len(np.shape(x)) - 1:
-            return nn_ops.softmax(x)
+            return flow.nn.softmax(x)
 
         shape = x.shape
         cal_shape = (
             reduce(operator.mul, shape[0:axis], 1),
             reduce(operator.mul, shape[axis : len(shape)], 1),
         )
-        x = array_ops.reshape(x, cal_shape)
+        x = flow.reshape(x, cal_shape)
 
-        return array_ops.reshape(nn_ops.softmax(x), shape)
+        return flow.reshape(flow.nn.softmax(x), shape)
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):

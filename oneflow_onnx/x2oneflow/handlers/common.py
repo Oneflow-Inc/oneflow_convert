@@ -14,35 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import copy
-
+import oneflow
 import numpy as np
 
-import oneflow.python.framework.remote_blob as remote_blob_util
-from oneflow.python.ops import nn_ops
-from oneflow.python.ops import pad
 from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 class BroadcastMixin(object):
     @classmethod
     def explicit_broadcast(cls, inputs, axis=None, tensor_dict=None):
-        x = (
-            inputs[0]
-            if isinstance(inputs[0], remote_blob_util.BlobDef)
-            else tensor_dict[inputs[0]]
-        )
-        y = (
-            inputs[1]
-            if isinstance(inputs[1], remote_blob_util.BlobDeftf.Tensor)
-            else tensor_dict[inputs[1]]
-        )
+        x = tensor_dict[inputs[0]]
+        y = tensor_dict[inputs[1]]
 
         if np.prod(y.shape) == 1:
             return y
-
-        if not isinstance(x, remote_blob_util.BlobDef) or not isinstance(
-            y, remote_blob_util.BlobDef
-        ):
-            raise ValueError("Targets for explicit broadcasting need to be Tensor.")
 
         if axis is None:
             return y
@@ -167,7 +151,7 @@ class ConvMixin(BroadcastMixin):
 
         group = node.attrs.get("group", 1)
 
-        conv = nn_ops.conv2d(
+        conv = oneflow.nn.conv2d(
             x,
             weights,
             padding=pad_mode,
@@ -200,7 +184,7 @@ class ConvMixin(BroadcastMixin):
             output = conv
         else:
             bias = input_dict[node.input_tensor_names[2]]
-            output = nn_ops.bias_add(conv, bias)
+            output = oneflow.nn.bias_add(conv, bias)
             # code gen for bias_add
             func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
             func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")
@@ -232,7 +216,7 @@ class PadMixin(object):
         # flow_pads = [0, 0, 0, 0] + flow_pads.flatten().tolist()
         flow_pads = [(0, 0), (0, 0)] + flow_pads
 
-        return pad.pad(x, flow_pads)
+        return oneflow.pad(x, flow_pads)
 
 
 class BasicMathMixin(BroadcastMixin):

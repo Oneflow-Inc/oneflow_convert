@@ -229,8 +229,9 @@ class BackendHandler:
         else:
             for i in range(len(cls.OP_OUTPUS) - 1):
                 pre_name = pre_name + '{}, '.format(cls.OP_OUTPUS[i])
-            pre_name = pre_name + '{} = '.format(cls.OP_OUTPUS[len(cls.OP_OUTPUS) - 1])    
-        cls.ONEFLOW_CODE_GEN.append(pre_name + cls.code_gen(flow_func, kwargs))
+            pre_name = pre_name + '{} = '.format(cls.OP_OUTPUS[len(cls.OP_OUTPUS) - 1])
+        if (pre_name + cls.code_gen(flow_func, kwargs)) not in cls.ONEFLOW_CODE_GEN: 
+            cls.ONEFLOW_CODE_GEN.append(pre_name + cls.code_gen(flow_func, kwargs))
         return flow_func(**kwargs)
     
     @classmethod
@@ -266,9 +267,23 @@ class BackendHandler:
         func += '('
         for k, v in kwargs.items():
             func += str(k) + '='
-            if type(v) == oneflow_api.LazyConsistentBlob:
+            if type(v) == list:
+                new_v = []
+                for x in v:
+                    if type(x) ==  oneflow_api.LazyConsistentBlob:
+                        new_v.append(cls.ONEFLOW_BLOBNAME_MAP[x])
+                    else:
+                        new_v.append(x)
+                v = new_v
+                func += '['
+                for x in v:
+                    func += str(x) + ', '
+                func += '], '
+            elif type(v) == oneflow_api.LazyConsistentBlob:
                 v = cls.ONEFLOW_BLOBNAME_MAP[v]
-            func += str(v) + ', '
+                func += str(v) + ', '
+            else:
+                func += str(v) + ', '
         func += ')\n'
 
         return func

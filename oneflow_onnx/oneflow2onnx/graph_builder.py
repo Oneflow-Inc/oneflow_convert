@@ -25,9 +25,8 @@ from __future__ import absolute_import
 
 import numpy as np
 import logging
-from oneflow.python.framework import id_util
 from oneflow_onnx import util
-
+import oneflow
 
 # pylint: disable=missing-docstring
 
@@ -125,7 +124,7 @@ class GraphBuilder(object):
         res = tensor
         if isinstance(tensor, list):
             res = self.graph.MakeConst(
-                id_util.UniqueStr("const_slice"), np.array(tensor, dtype)
+                oneflow.util.unique_str("const_slice"), np.array(tensor, dtype)
             ).output[0]
 
         util.MakeSure(

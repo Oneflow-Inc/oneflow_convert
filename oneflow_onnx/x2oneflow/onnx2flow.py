@@ -33,11 +33,11 @@ from onnx.helper import make_opsetid
 import oneflow as flow
 
 from oneflow_onnx import util
-from oneflow.python.oneflow_export import oneflow_export
 from oneflow_onnx.x2oneflow.handler import BackendHandler
 
 from oneflow_onnx.x2oneflow.handlers import *
 from oneflow_onnx.onnx_wrapper import Node as OnnxNode
+from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 import io
 import tempfile
 import os
@@ -64,6 +64,8 @@ logger = logging.getLogger(__name__)
 def from_onnx(
     onnx_model: onnx.ModelProto, inputs, model_weight_dir="/tmp/tmp", do_onnxsim=True, from_tf2=False, from_paddle=False, from_pytorch=False, 
 ):
+    oneflow_code_gen = []
+    oneflow_blobname_map = dict()
     input_names = [x.name for x in onnx_model.graph.input]
     if type(inputs) is not dict:
         assert (

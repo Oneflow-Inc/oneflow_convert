@@ -17,17 +17,12 @@ import oneflow as flow
 from oneflow_onnx.x2oneflow.handler import BackendHandler
 from oneflow_onnx.x2oneflow.handler import onnx_op
 from oneflow_onnx.x2oneflow.handler import flow_func
-from oneflow.python.ops import math_unary_elementwise_ops
-from oneflow.python.ops import math_binary_elementwise_ops
-from oneflow.python.ops import math_ops
-from oneflow.python.ops import array_ops
-from oneflow.python.ops import linalg
 from oneflow_onnx.x2oneflow.handlers.common import ArithmeticMixin, BasicMathMixin
 from oneflow_onnx import util as onnx_util
 from oneflow_onnx.x2oneflow.handler import oneflow_code_gen, oneflow_blobname_map
 
 @onnx_op("Add")
-@flow_func(math_ops.add)
+@flow_func(flow.math.add)
 class Add(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -39,11 +34,20 @@ class Add(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
 @onnx_op("Sub")
-@flow_func(math_ops.subtract)
+@flow_func(flow.math.subtract)
 class Sub(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -55,11 +59,20 @@ class Sub(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
 @onnx_op("Mul")
-@flow_func(math_ops.multiply)
+@flow_func(flow.math.multiply)
 class Mul(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -71,11 +84,20 @@ class Mul(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
 @onnx_op("Div")
-@flow_func(math_ops.divide)
+@flow_func(flow.math.divide)
 class Div(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -87,21 +109,30 @@ class Div(ArithmeticMixin, BackendHandler):
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
+        if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
+            func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+            func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
+            func = func + 'shape={}, '.format(list(tensor_dict[node.input_tensor_names[1]].shape))
+            func = func + 'initializer=weight_initializer, '
+            func = func + 'regularizer=weight_regularizer)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
         return cls.run_onnx_node(node, tensor_dict, **kwargs)
 
 
 @onnx_op("Pow")
-@flow_func(math_binary_elementwise_ops.pow)
+@flow_func(flow.math.pow)
 class Pow(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         y = tensor_dict[node.input_tensor_names[1]]
         if len(y.shape) > len(x.shape):
-            x = math_ops.broadcast_to_compatible_with(x, [y])
+            x = flow.math.broadcast_to_compatible_with(x, [y])
         elif len(x.shape) > len(y.shape):
-            y = math_ops.broadcast_to_compatible_with(y, [x])
-        return math_binary_elementwise_ops.pow(x, y)
+            y = flow.math.broadcast_to_compatible_with(y, [x])
+        return flow.math.pow(x, y)
 
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
@@ -113,7 +144,7 @@ class Pow(ArithmeticMixin, BackendHandler):
 
 
 @onnx_op("Tanh")
-@flow_func(math_unary_elementwise_ops.tanh_v2)
+@flow_func(flow.math.tanh_v2)
 class Tanh(BasicMathMixin, BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -125,7 +156,7 @@ class Tanh(BasicMathMixin, BackendHandler):
 
 
 @onnx_op("Sigmoid")
-@flow_func(math_ops.sigmoid)
+@flow_func(flow.math.sigmoid)
 class Sigmoid(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -226,7 +257,7 @@ class Gemm(BackendHandler):
             oneflow_code_gen.append(func)
 
         return [
-            alpha * linalg.matmul(x, y, transpose_a=transA, transpose_b=transB)
+            alpha * flow.linalg.matmul(x, y, transpose_a=transA, transpose_b=transB)
             + beta * z
         ]
 
@@ -252,7 +283,7 @@ class Gemm(BackendHandler):
 
 
 @onnx_op("MatMul")
-@flow_func(linalg.matmul)
+@flow_func(flow.linalg.matmul)
 class MatMul(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -267,13 +298,29 @@ class MatMul(BackendHandler):
             constant_for_broadcast = flow.constant(
                 value=0, dtype=flow.float32, shape=broadcast_shape
             )
-            x = math_ops.broadcast_to_compatible_with(x, [constant_for_broadcast])
+            func = 'constant_for_broadcast = flow.constant(value=0, dtype=flow.float32, shape={})\n'.format(broadcast_shape)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            func = 'x = flow.math.broadcast_to_compatible_with(x, [constant_for_broadcast])\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            x = flow.math.broadcast_to_compatible_with(x, [constant_for_broadcast])
+            if x not in oneflow_blobname_map:
+                oneflow_blobname_map[x] = node.input_tensor_names[0]
         elif len(x.shape) > len(y.shape):
             broadcast_shape = x.shape[:-2] + y.shape[-2:]
             constant_for_broadcast = flow.constant(
                 value=0, dtype=flow.float32, shape=broadcast_shape
             )
-            y = math_ops.broadcast_to_compatible_with(y, [constant_for_broadcast])
+            func = 'constant_for_broadcast = flow.constant(value=0, dtype=flow.float32, shape={})\n'.format(broadcast_shape)
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            func = 'y = flow.math.broadcast_to_compatible_with(y, [constant_for_broadcast])\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            y = flow.math.broadcast_to_compatible_with(y, [constant_for_broadcast])
+            if y not in oneflow_blobname_map:
+                oneflow_blobname_map[y] = node.input_tensor_names[1]
         return cls.run_onnx_node(node, tensor_dict, inputs=(x, y), **kwargs)
 
 
@@ -301,7 +348,13 @@ class Clip(BackendHandler):
                 else None
             )
 
-        y = math_ops.clip_by_value(x, clip_value_min, clip_value_max)
+        if x not in oneflow_blobname_map:
+            oneflow_blobname_map[x] = node.input_tensor_names[0]
+        func = '{} = flow.math.clip_by_value({}, {}, {})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], clip_value_min, clip_value_max)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+
+        y = flow.math.clip_by_value(x, clip_value_min, clip_value_max)
 
         return y
 
@@ -327,7 +380,7 @@ class Clip(BackendHandler):
 
 
 @onnx_op("Sqrt")
-@flow_func(math_unary_elementwise_ops.sqrt)
+@flow_func(flow.math.sqrt)
 class Sqrt(BackendHandler):
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -339,7 +392,7 @@ class Sqrt(BackendHandler):
 
 
 @onnx_op("Erf")
-@flow_func(math_unary_elementwise_ops.erf)
+@flow_func(flow.math.erf)
 class Erf(BackendHandler):
     @classmethod
     def version_9(cls, node, tensor_dict, **kwargs):
@@ -347,7 +400,7 @@ class Erf(BackendHandler):
 
 
 @onnx_op("Cast")
-@flow_func(math_ops.cast)
+@flow_func(flow.cast)
 class Cast(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -493,7 +546,7 @@ class ArgMin(BackendHandler):
         return cls._common(node, tensor_dict, **kwargs)
 
 @onnx_op("Range")
-@flow_func(math_ops.range)
+@flow_func(flow.range)
 class Range(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -504,7 +557,7 @@ class Range(BackendHandler):
         return cls._common(node, tensor_dict, **kwargs)
 
 @onnx_op("Greater")
-@flow_func(math_ops.greater)
+@flow_func(flow.math.greater)
 class Greater(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
@@ -527,7 +580,7 @@ class Greater(BackendHandler):
         return cls._common(node, tensor_dict, **kwargs)
 
 @onnx_op("Less")
-@flow_func(math_ops.less)
+@flow_func(flow.math.less)
 class Less(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):

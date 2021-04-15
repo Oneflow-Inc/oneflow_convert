@@ -18,7 +18,6 @@ import numpy as np
 from onnx import numpy_helper
 
 import oneflow as flow
-from oneflow.python.ops import get_variable
 from oneflow_onnx import util
 from oneflow_onnx.x2oneflow.handler import BackendHandler
 from oneflow_onnx.x2oneflow.handler import onnx_op
@@ -28,7 +27,7 @@ import os
 
 
 @onnx_op("Constant")
-@flow_func(get_variable.api_get_variable)
+@flow_func(flow.get_variable)
 class Constant(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):

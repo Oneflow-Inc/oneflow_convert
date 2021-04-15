@@ -23,10 +23,10 @@ from __future__ import absolute_import
 
 import logging
 
+import oneflow
 import numpy as np
 from onnx import onnx_pb
 from onnx import TensorProto
-from oneflow.python.framework import id_util
 from oneflow_onnx import constants, util
 from oneflow_onnx.oneflow2onnx.handler import flow_op
 from oneflow_onnx.oneflow2onnx.handlers import common
@@ -57,7 +57,7 @@ class ScalarBinaryOp:
         )
         np_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
         scalar_node = ctx.MakeConst(
-            id_util.UniqueStr("scalar"), np.array([scalar_val]).astype(np_dtype)
+            oneflow.util.unique_str("scalar"), np.array([scalar_val]).astype(np_dtype)
         )
         node.input_tensor_names.append(scalar_node.output_tensor_names[0])
 
@@ -188,7 +188,7 @@ def _MakeMinOrMaxOp(
         if output_dtypes is not None:
             origin_dtype = output_dtypes[0]
         ctx.set_dtype(node.output_tensor_names[0], target_dtype)
-        cast_name = id_util.UniqueStr(node.name)
+        cast_name = oneflow.util.unique_str(node.name)
         cast_node = ctx.InsertNewNodeOnOutput(
             "Cast", node.output_tensor_names[0], name=cast_name, to=origin_dtype
         )
@@ -271,7 +271,7 @@ class ClipOps:
         np_dtype = util.ONNX_2_NUMPY_DTYPE[onnx_dtype]
         if min_val is not None:
             clip_min = ctx.MakeConst(
-                id_util.UniqueStr("{}_min".format(node.name)),
+                oneflow.util.unique_str("{}_min".format(node.name)),
                 np.array(min_val, dtype=np_dtype),
             )
             node.input_tensor_names.append(clip_min.output_tensor_names[0])
@@ -279,7 +279,7 @@ class ClipOps:
             node.input_tensor_names.append("")
         if max_val is not None:
             clip_max = ctx.MakeConst(
-                id_util.UniqueStr("{}_max".format(node.name)),
+                oneflow.util.unique_str("{}_max".format(node.name)),
                 np.array(max_val, dtype=np_dtype),
             )
             node.input_tensor_names.append(clip_max.output_tensor_names[0])
@@ -337,7 +337,7 @@ class Rsqrt:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         node.op_type = "Sqrt"
-        op_name = id_util.UniqueStr(node.name)
+        op_name = oneflow.util.unique_str(node.name)
         reciprocal = ctx.InsertNewNodeOnOutput(
             "Reciprocal", node.output_tensor_names[0], name=op_name
         )
@@ -349,7 +349,7 @@ class SquaredDifference:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         node.op_type = "Sub"
-        op_name = id_util.UniqueStr(node.name)
+        op_name = oneflow.util.unique_str(node.name)
         mul = ctx.InsertNewNodeOnOutput(
             "Mul", node.output_tensor_names[0], name=op_name
         )
@@ -371,7 +371,7 @@ class Sign:
             raise ValueError(
                 "dtype " + str(node_dtype) + " is not supported in onnx for now"
             )
-        zero_name = id_util.UniqueStr("{}_zero".format(node.name))
+        zero_name = oneflow.util.unique_str("{}_zero".format(node.name))
         ctx.MakeConst(zero_name, np.array(0, dtype=np.float32))
         if node_dtype not in [
             onnx_pb.TensorProto.FLOAT16,
@@ -715,7 +715,7 @@ def _AddCastToOutput(graph, node):
     # oneflow logical ops produce int8 tensor while onnx logical ops produce bool tensor
     output = node.output_tensor_names[0]
     cast_node = graph.InsertNewNodeOnOutput(
-        "Cast", output, id_util.UniqueStr("cast"), to=graph.get_dtype(output)
+        "Cast", output, oneflow.util.unique_str("cast"), to=graph.get_dtype(output)
     )
     graph.CopyShape(output, node.output_tensor_names[0])
     graph.set_dtype(node.output_tensor_names[0], TensorProto.BOOL)
@@ -764,7 +764,7 @@ class Equal:
             node.op_type = "Equal"
             output_name = node.output_tensor_names[0]
             not_node = ctx.InsertNewNodeOnOutput(
-                "Not", output_name, name=id_util.UniqueStr(node.name)
+                "Not", output_name, name=oneflow.util.unique_str(node.name)
             )
             ctx.CopyShape(output_name, not_node.output_tensor_names[0])
             ctx.CopyDtype(output_name, not_node.output_tensor_names[0])
@@ -778,7 +778,7 @@ class Equal:
             node.op_type = "Equal"
             output_name = node.output_tensor_names[0]
             not_node = ctx.InsertNewNodeOnOutput(
-                "Not", output_name, name=id_util.UniqueStr(node.name)
+                "Not", output_name, name=oneflow.util.unique_str(node.name)
             )
             ctx.CopyShape(output_name, not_node.output_tensor_names[0])
             ctx.CopyDtype(output_name, not_node.output_tensor_names[0])
@@ -808,7 +808,7 @@ class GreaterLessEqual:
         GreaterLess.Version_7(ctx, node, **kwargs)
         output_name = node.output_tensor_names[0]
         new_node = ctx.InsertNewNodeOnOutput(
-            "Not", output_name, name=id_util.UniqueStr(node.name)
+            "Not", output_name, name=oneflow.util.unique_str(node.name)
         )
         ctx.CopyShape(output_name, new_node.output_tensor_names[0])
         ctx.set_dtype(new_node.output_tensor_names[0], ctx.get_dtype(output_name))

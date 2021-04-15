@@ -28,6 +28,7 @@ import copy
 import logging
 import six
 import numpy as np
+import oneflow
 from os.path import join as pathjoin
 
 from onnx import (
@@ -40,7 +41,6 @@ from onnx import (
     onnx_pb,
 )
 
-from oneflow.python.framework import id_util
 from oneflow_onnx import util
 from oneflow_onnx.oneflow2onnx import optimizer
 from oneflow_onnx.schemas import get_schema, InferOnnxShapeDtype
@@ -427,7 +427,7 @@ class Graph(object):
         # add identity node after each output, in case it is renamed during conversion.
         for o in self.outputs:
             n = self.get_node_by_output_in_current_graph(o)
-            new_output_name = id_util.UniqueStr(n.name + "_raw_output")
+            new_output_name = oneflow.util.unique_str(n.name + "_raw_output")
             n_shapes = n.output_shapes
             n_dtypes = n.output_dtypes
             body_graphs = n.graph.contained_graphs.pop(n.name, None)
@@ -530,7 +530,7 @@ class Graph(object):
             dtypes = []
 
         if name is None:
-            name = id_util.UniqueStr(op_type)
+            name = oneflow.util.unique_str(op_type)
 
         if op_name_scope:
             name = "_".join([op_name_scope, name])
@@ -1112,7 +1112,7 @@ class Graph(object):
                 space,
                 node.op_type,
                 node.name,
-                self.get_shape(id_util.UniqueStr(node.name)),
+                self.get_shape(oneflow.util.unique_str(node.name)),
             )
         )
         space += "    "
@@ -1167,8 +1167,8 @@ class Graph(object):
             node that was inserted
         """
         if name is None:
-            name = id_util.UniqueStr(node.name)
-        new_output = id_util.UniqueStr(name)
+            name = oneflow.util.unique_str(node.name)
+        new_output = oneflow.util.unique_str(name)
         if not isinstance(input_name, list):
             input_name = [input_name]
 
@@ -1208,7 +1208,7 @@ class Graph(object):
             type(op_type),
         )
 
-        new_output = id_util.UniqueStr(name)
+        new_output = oneflow.util.unique_str(name)
         new_node = self.MakeNode(
             op_type,
             [output_name],

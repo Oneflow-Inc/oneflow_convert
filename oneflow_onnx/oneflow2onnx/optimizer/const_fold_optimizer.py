@@ -20,7 +20,8 @@ limitations under the License.
 # if op's inputs are all const then do op computation when building the graph to improve performance
 # for example, input of transpose node is const then we can do transpose statically instead of at runtime
 
-from oneflow.python.framework import id_util
+import oneflow
+
 from oneflow_onnx import util
 from oneflow_onnx.oneflow2onnx.optimizer.optimizer_base import GraphOptimizerBase
 
@@ -110,7 +111,7 @@ class ConstFoldOptimizer(GraphOptimizerBase):
             "length of node outputs and const vals should be same",
         )
         for old_input, val in zip(node.output_tensor_names, vals):
-            const_node = graph.MakeConst(id_util.UniqueStr("const_fold_opt"), val)
+            const_node = graph.MakeConst(oneflow.util.unique_str("const_fold_opt"), val)
             graph.set_dtype(
                 const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype)
             )
