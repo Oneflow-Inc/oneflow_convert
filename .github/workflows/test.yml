@@ -1,13 +1,19 @@
 name: OneFlow_Convert_Tools
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    types: [review_requested]
+    branches:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      placeholder:
+        description: "placeholder, no effect"
+        required: false
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false && github.base_ref == 'main' && contains(github.event.pull_request.requested_reviewers.*.login, 'oneflow-ci-bot')
     runs-on: [self-hosted, linux, gpu]
     steps:
       - name: Fix permissions
