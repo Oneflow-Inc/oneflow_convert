@@ -61,57 +61,57 @@ def generate_moving_average_min_max_observer_test(
     )
 
 
-def test_moving_average_min_max_observer_symmetric(test_case):
+def test_moving_average_min_max_observer_symmetric():
     generate_moving_average_min_max_observer_test(0, "google", "symmetric")
 
 
-def test_moving_average_min_max_observer_symmetric_zero_point(test_case):
+def test_moving_average_min_max_observer_symmetric_zero_point():
     generate_moving_average_min_max_observer_test(1, "google", "symmetric")
 
 
-def test_moving_average_min_max_observer_affine(test_case):
+def test_moving_average_min_max_observer_affine():
     generate_moving_average_min_max_observer_test(0, "google", "affine")
 
 
-def test_moving_average_min_max_observer_affine_zero_point(test_case):
+def test_moving_average_min_max_observer_affine_zero_point():
     generate_moving_average_min_max_observer_test(1, "google", "affine")
 
 
-def test_moving_average_min_max_observer_cambricon(test_case):
+def test_moving_average_min_max_observer_cambricon():
     generate_moving_average_min_max_observer_test(0, "cambricon")
 
 
-def test_moving_average_min_max_observer_cambricon_zero_point(test_case):
+def test_moving_average_min_max_observer_cambricon_zero_point():
     generate_moving_average_min_max_observer_test(1, "cambricon")
 
 
-def test_moving_average_min_max_observer_symmetric_gpu(test_case):
+def test_moving_average_min_max_observer_symmetric_gpu():
     generate_moving_average_min_max_observer_test(
         0, "google", "symmetric", device_type="gpu"
     )
 
 
-def test_moving_average_min_max_observer_symmetric_zero_point_gpu(test_case):
+def test_moving_average_min_max_observer_symmetric_zero_point_gpu():
     generate_moving_average_min_max_observer_test(
         1, "google", "symmetric", device_type="gpu"
     )
 
 
-def test_moving_average_min_max_observer_affine_gpu(test_case):
+def test_moving_average_min_max_observer_affine_gpu():
     generate_moving_average_min_max_observer_test(
         0, "google", "affine", device_type="gpu"
     )
 
 
-def test_moving_average_min_max_observer_affine_zero_point_gpu(test_case):
+def test_moving_average_min_max_observer_affine_zero_point_gpu():
     generate_moving_average_min_max_observer_test(
         1, "google", "affine", device_type="gpu"
     )
 
 
-def test_moving_average_min_max_observer_cambricon_gpu(test_case):
+def test_moving_average_min_max_observer_cambricon_gpu():
     generate_moving_average_min_max_observer_test(0, "cambricon", device_type="gpu")
 
 
-def test_moving_average_min_max_observer_cambricon_zero_point_gpu(test_case):
+def test_moving_average_min_max_observer_cambricon_zero_point_gpu():
     generate_moving_average_min_max_observer_test(1, "cambricon", device_type="gpu")

@@ -88,56 +88,56 @@ def generate_fake_quantization_test_moving_average(
 
 
 # min_max_observer
-def test_fake_quantization_symmetric(test_case):
+def test_fake_quantization_symmetric():
     generate_fake_quantization_test(per_layer=True, scheme="symmetric")
 
 
-def test_fake_quantization_symmetric_per_channel(test_case):
+def test_fake_quantization_symmetric_per_channel():
     generate_fake_quantization_test(per_layer=False, scheme="symmetric")
 
 
-def test_fake_quantization_affine(test_case):
+def test_fake_quantization_affine():
     generate_fake_quantization_test(per_layer=True, scheme="affine")
 
 
-def test_fake_quantization_affine_per_channel(test_case):
+def test_fake_quantization_affine_per_channel():
     generate_fake_quantization_test(per_layer=False, scheme="affine")
 
 
-def test_fake_quantization_symmetric_gpu(test_case):
+def test_fake_quantization_symmetric_gpu():
     generate_fake_quantization_test(
         per_layer=True, scheme="symmetric", device_type="gpu"
     )
 
 
-def test_fake_quantization_symmetric_per_channel_gpu(test_case):
+def test_fake_quantization_symmetric_per_channel_gpu():
     generate_fake_quantization_test(
         per_layer=False, scheme="symmetric", device_type="gpu"
     )
 
 
-def test_fake_quantization_affine_gpu(test_case):
+def test_fake_quantization_affine_gpu():
     generate_fake_quantization_test(per_layer=True, scheme="affine", device_type="gpu")
 
 
-def test_fake_quantization_affine_per_channel_gpu(test_case):
+def test_fake_quantization_affine_per_channel_gpu():
     generate_fake_quantization_test(per_layer=False, scheme="affine", device_type="gpu")
 
 
 # moving_average_min_max_observer
-def test_fake_quantization_symmetric_moving_average(test_case):
+def test_fake_quantization_symmetric_moving_average():
     generate_fake_quantization_test_moving_average(scheme="symmetric")
 
 
-def test_fake_quantization_affine_moving_average(test_case):
+def test_fake_quantization_affine_moving_average():
     generate_fake_quantization_test_moving_average(scheme="affine")
 
 
-def test_fake_quantization_symmetric_gpu_moving_average(test_case):
+def test_fake_quantization_symmetric_gpu_moving_average():
     generate_fake_quantization_test_moving_average(
         scheme="symmetric", device_type="gpu"
     )
 
 
-def test_fake_quantization_affine_gpu_moving_average(test_case):
+def test_fake_quantization_affine_gpu_moving_average():
     generate_fake_quantization_test_moving_average(scheme="affine", device_type="gpu")

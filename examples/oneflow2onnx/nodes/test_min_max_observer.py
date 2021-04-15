@@ -44,89 +44,89 @@ def generate_min_max_observer_test(
     convert_to_onnx_and_check(min_max_observer, opset=opset)
 
 
-def test_min_max_observer_symmetric(test_case):
+def test_min_max_observer_symmetric():
     generate_min_max_observer_test(0, True, "google", "symmetric")
 
 
-def test_min_max_observer_symmetric_zero_point(test_case):
+def test_min_max_observer_symmetric_zero_point():
     generate_min_max_observer_test(1, True, "google", "symmetric")
 
 
-def test_min_max_observer_affine(test_case):
+def test_min_max_observer_affine():
     generate_min_max_observer_test(0, True, "google", "affine")
 
 
-def test_min_max_observer_affine_zero_point(test_case):
+def test_min_max_observer_affine_zero_point():
     generate_min_max_observer_test(1, True, "google", "affine")
 
 
-def test_min_max_observer_symmetric_per_channel(test_case):
+def test_min_max_observer_symmetric_per_channel():
     generate_min_max_observer_test(0, False, "google", "symmetric", opset=13)
 
 
-def test_min_max_observer_symmetric_per_channel_zero_point(test_case):
+def test_min_max_observer_symmetric_per_channel_zero_point():
     generate_min_max_observer_test(1, False, "google", "symmetric", opset=13)
 
 
-def test_min_max_observer_affine_per_channel(test_case):
+def test_min_max_observer_affine_per_channel():
     generate_min_max_observer_test(0, False, "google", "affine", opset=13)
 
 
-def test_min_max_observer_affine_per_channel_zero_point(test_case):
+def test_min_max_observer_affine_per_channel_zero_point():
     generate_min_max_observer_test(1, False, "google", "affine", opset=13)
 
 
-def test_min_max_observer_cambricon(test_case):
+def test_min_max_observer_cambricon():
     generate_min_max_observer_test(0, True, "cambricon", "symmetric")
 
 
-def test_min_max_observer_cambricon_zero_point(test_case):
+def test_min_max_observer_cambricon_zero_point():
     generate_min_max_observer_test(1, True, "cambricon", "symmetric")
 
 
-def test_min_max_observer_symmetric_gpu(test_case):
+def test_min_max_observer_symmetric_gpu():
     generate_min_max_observer_test(0, True, "google", "symmetric", device_type="gpu")
 
 
-def test_min_max_observer_symmetric_zero_point_gpu(test_case):
+def test_min_max_observer_symmetric_zero_point_gpu():
     generate_min_max_observer_test(1, True, "google", "symmetric", device_type="gpu")
 
 
-def test_min_max_observer_affine_gpu(test_case):
+def test_min_max_observer_affine_gpu():
     generate_min_max_observer_test(0, True, "google", "affine", device_type="gpu")
 
 
-def test_min_max_observer_affine_zero_point_gpu(test_case):
+def test_min_max_observer_affine_zero_point_gpu():
     generate_min_max_observer_test(1, True, "google", "affine", device_type="gpu")
 
 
-def test_min_max_observer_symmetric_per_channel_gpu(test_case):
+def test_min_max_observer_symmetric_per_channel_gpu():
     generate_min_max_observer_test(
         0, False, "google", "symmetric", device_type="gpu", opset=13
     )
 
 
-def test_min_max_observer_symmetric_per_channel_zero_point_gpu(test_case):
+def test_min_max_observer_symmetric_per_channel_zero_point_gpu():
     generate_min_max_observer_test(
         1, False, "google", "symmetric", device_type="gpu", opset=13
     )
 
 
-def test_min_max_observer_affine_per_channel_gpu(test_case):
+def test_min_max_observer_affine_per_channel_gpu():
     generate_min_max_observer_test(
         0, False, "google", "affine", device_type="gpu", opset=13
     )
 
 
-def test_min_max_observer_affine_per_channel_zero_point_gpu(test_case):
+def test_min_max_observer_affine_per_channel_zero_point_gpu():
     generate_min_max_observer_test(
         1, False, "google", "affine", device_type="gpu", opset=13
     )
 
 
-def test_min_max_observer_cambricon_gpu(test_case):
+def test_min_max_observer_cambricon_gpu():
     generate_min_max_observer_test(0, True, "cambricon", "symmetric", device_type="gpu")
 
 
-def test_min_max_observer_cambricon_zero_point_gpu(test_case):
+def test_min_max_observer_cambricon_zero_point_gpu():
     generate_min_max_observer_test(1, True, "cambricon", "symmetric", device_type="gpu")
