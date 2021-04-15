@@ -1,0 +1,38 @@
+name: OneFlow_Convert_Tools
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, gpu]
+    steps:
+      - name: Fix permissions
+        run: |
+          docker run --rm -v $PWD:/p -w /p busybox chmod -R o+w .
+      - uses: actions/checkout@v2
+      - name: Set environment variables
+        env:
+          test_suite: ${{matrix.test_suite }}
+        run: |
+          set -x
+          extra_docker_args=""
+          container_name=onnx-pr-${{ github.event.pull_request.number }}-run-id-${{ github.run_id }}-${test_suite}-test
+          extra_docker_args+=" --name ${container_name}"
+          extra_docker_args+=" --shm-size=8g --rm -w $PWD -v $PWD:$PWD"
+          extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/local-bin:/root/.local/bin"
+          extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/site-packages36:/root/.local/lib/python3.6/site-packages"
+          echo "extra_docker_args=${extra_docker_args}" >> $GITHUB_ENV
+          echo "container_name=${container_name}" >> $GITHUB_ENV
+      - name: Test
+        run: |
+          docker run $extra_docker_args \
+            oneflow-test:$USER \
+            bash ci/test.sh
+      - name: Remove container
+        if: always()
+        run: |
+          docker rm -f ${container_name} || true
