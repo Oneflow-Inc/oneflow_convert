@@ -26,4 +26,4 @@ def test_InceptionV3():
             x = self.InceptionV3(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net, input_size=(1, 299, 299, 3), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True)

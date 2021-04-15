@@ -32,16 +32,16 @@
 
 | 模型         | 是否支持  |
 | ------------ | -------- |
-| VGGNet       |       |
-| ResNet       |       |
-| ResNetV2     |       |
-| XceptionNet  |       |
-| MobileNetV1  |       |
-| MobileNetV2  |       |
-| MobileNetV3  |       |
-| DenseNet     |       |
-| EfficientNet |       |
-| InceptionNet |       |
+| VGGNet       | Yes      |
+| ResNet       | Yes      |
+| ResNetV2     | Yes      |
+| XceptionNet  | Yes      |
+| MobileNetV1  | Yes      |
+| MobileNetV2  | Yes      |
+| MobileNetV3  | Yes      |
+| DenseNet     | Yes      |
+| EfficientNet | Yes      |
+| InceptionNet | Yes      |
 
 ## PaddlePaddle
 
