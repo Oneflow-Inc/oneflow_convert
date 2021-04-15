@@ -11,4 +11,4 @@ python3 -m pytest examples/x2oneflow/pytorch2oneflow/models
 python3 -m pytest examples/x2oneflow/tensorflow2oneflow/nodes
 python3 -m pytest examples/x2oneflow/tensorflow2oneflow/models
 python3 -m pytest examples/x2oneflow/paddle2oneflow/nodes
-sh test.sh
+./test.sh
