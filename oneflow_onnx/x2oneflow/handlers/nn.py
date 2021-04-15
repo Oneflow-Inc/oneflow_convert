@@ -351,7 +351,13 @@ class Softmax(BackendHandler):
         axis = node.attrs.get("axis", 1)
         axis = axis if axis >= 0 else len(np.shape(x)) + axis
 
+        if x not in oneflow_blobname_map:
+            oneflow_blobname_map[x] = node.input_tensor_names[0]
+
         if axis == len(np.shape(x)) - 1:
+            func = '{} = flow.nn.softmax({})\n'.format(node.output_tensor_names[0], node.input_tensor_names[0])
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
             return flow.nn.softmax(x)
 
         shape = x.shape
@@ -359,6 +365,13 @@ class Softmax(BackendHandler):
             reduce(operator.mul, shape[0:axis], 1),
             reduce(operator.mul, shape[axis : len(shape)], 1),
         )
+        func = '{} = flow.reshape({}, {})\n'.format(node.input_tensor_names[0], node.input_tensor_names[0], cal_shape)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        func = '{} = flow.reshape(flow.nn.softmax({}), {})'.format(node.output_tensor_names[0], node.input_tensor_names[0], shape)
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+
         x = flow.reshape(x, cal_shape)
 
         return flow.reshape(flow.nn.softmax(x), shape)

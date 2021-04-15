@@ -27,15 +27,4 @@ def test_resnet50():
             x = self.resnet50(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
-
-def test_resnet101():
-    class Net(tf.keras.Model):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.resnet101 = ResNet101(weights=None)
-        def call(self, x):
-            x = self.resnet101(x)
-            return x
-
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True)

@@ -85,6 +85,15 @@ class Mul(ArithmeticMixin, BackendHandler):
     @classmethod
     def version_7(cls, node, tensor_dict, **kwargs):
         if list(tensor_dict[node.input_tensor_names[1]].shape) < list(tensor_dict[node.input_tensor_names[0]].shape):
+            # code gen for conv weight_initializer
+            func = 'weight_initializer = flow.truncated_normal(0.1)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+            #code gen for conv weight_regularizer
+            func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
+            if func not in oneflow_code_gen:
+                oneflow_code_gen.append(func)
+
             oneflow_blobname_map[tensor_dict[node.input_tensor_names[1]]] = node.input_tensor_names[1]
             func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
             func = func + 'name={}, '.format("'"+node.input_tensor_names[1]+"'")
@@ -293,6 +302,28 @@ class MatMul(BackendHandler):
     def version_9(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
         y = tensor_dict[node.input_tensor_names[1]]
+
+         # code gen for matmul B
+        matmul_weight_shape = list(tensor_dict[node.input_tensor_names[1]].shape)
+        # code gen for matmul weight_initializer
+        func = 'matmul_initializer = flow.truncated_normal(0.1)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        #code gen for matmul weight_regularizer
+        func = 'matmul_regularizer = flow.regularizers.l2(0.0005)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+        # code gen for matmul weight_shape
+        # code gen for matmul weights
+        func = '{} = flow.get_variable('.format(node.input_tensor_names[1])
+        func = func + 'name={}, '.format("'" + node.input_tensor_names[1] + "'")
+        func = func + 'shape={}, '.format(matmul_weight_shape)
+        func = func + 'initializer=weight_initializer, '
+        func = func + 'regularizer=weight_regularizer)\n'
+        if func not in oneflow_code_gen:
+            oneflow_code_gen.append(func)
+
+        # TODO BBuf: add broadcast code_gen
         if len(y.shape) > len(x.shape):
             broadcast_shape = y.shape[:-2] + x.shape[-2:]
             constant_for_broadcast = flow.constant(

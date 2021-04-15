@@ -28,15 +28,5 @@ def test_vgg16():
             x = self.vgg(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True)
 
-def test_vgg19():
-    class Net(tf.keras.Model):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.vgg = VGG19(weights=None)
-        def call(self, x):
-            x = self.vgg(x)
-            return x
-
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
