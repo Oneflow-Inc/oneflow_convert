@@ -23,5 +23,5 @@ check_suffix()
     fi    
 }
  
-path="examples"
+path="examples/x2oneflow/paddle2oneflow/models"
 read_dir $path
