@@ -75,7 +75,7 @@ class ConvMixin(BroadcastMixin):
 
         in_weights = input_dict[node.input_tensor_names[1]]
         in_weights_shape = list(in_weights.shape)
-
+        
         # code gen for conv weight_initializer
         func = 'weight_initializer = flow.truncated_normal(0.1)\n'
         if func not in oneflow_code_gen:
@@ -130,7 +130,7 @@ class ConvMixin(BroadcastMixin):
                     )
                     # flow_pads = [0, 0, 0, 0] + flow_pads.flatten().tolist()
                     flow_pads = [(0, 0), (0, 0)] + flow_pads
-                    func = 'tmp_conv_x = flow.pad({}, paddings={})\n'.format(node.input_tensor_names[0], flow_pads)
+                    func = '{}_tmp_conv_pad = flow.pad({}, paddings={})\n'.format(node.input_tensor_names[0], node.input_tensor_names[0], flow_pads)
                     pad_flag = 1
                     if func not in oneflow_code_gen:
                         oneflow_code_gen.append(func)
@@ -171,7 +171,7 @@ class ConvMixin(BroadcastMixin):
         if pad_flag == 0:
             func = func + node.input_tensor_names[0] + ', '
         else:
-            func = func + 'tmp_conv_x' + ', '
+            func = func + '{}_tmp_conv_pad'.format(node.input_tensor_names[0]) + ', '
         func = func + node.input_tensor_names[1] + ', '
         func = func + 'padding={}, '.format("'"+pad_mode+"'")
         func = func + 'strides={}, '.format(strides)
@@ -185,6 +185,7 @@ class ConvMixin(BroadcastMixin):
         else:
             bias = input_dict[node.input_tensor_names[2]]
             output = oneflow.nn.bias_add(conv, bias)
+            oneflow_blobname_map[output] = node.output_tensor_names[0]
             # code gen for bias_add
             func = '{} = flow.get_variable('.format(node.input_tensor_names[2])
             func = func + 'name={}, '.format("'"+node.input_tensor_names[2]+"'")

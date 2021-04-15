@@ -102,8 +102,12 @@ class BatchNormalization(BackendHandler):
                                                                                                         node.input_tensor_names[4], node.input_tensor_names[2], node.input_tensor_names[1], epsilon)
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
+        y = flow.nn.batch_normalization(x, mean=mean, variance=variance, offset=offset, scale=scale, axis=1, variance_epsilon=epsilon)
         
-        return flow.nn.batch_normalization(x, mean=mean, variance=variance, offset=offset, scale=scale, axis=1, variance_epsilon=epsilon)
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+
+        return y
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -199,9 +203,12 @@ class PoolMixin(object):
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
 
-        return op(
+        y =  op(
             x, ksize=kernel_shape, strides=strides, padding=pads, data_format="NCHW"
         )
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+        return y
 
 
 @onnx_op("AveragePool")
@@ -340,7 +347,10 @@ class GlobalAverageMaxPool(BackendHandler):
         func = '{} = flow.math.reduce_mean({}, axis={}, keepdims=True)\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], spatial_dims)
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
-        return flow.math.reduce_mean(x, spatial_dims, keepdims=True)
+        y = flow.math.reduce_mean(x, spatial_dims, keepdims=True)
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+        return y
 
 
 @onnx_op("Softmax")

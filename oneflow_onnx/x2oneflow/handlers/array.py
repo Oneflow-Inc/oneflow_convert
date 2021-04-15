@@ -108,6 +108,21 @@ class Concat(BackendHandler):
     def _common(cls, node, tensor_dict, **kwargs):
         for x in node.input_tensor_names:
             if tensor_dict[x] not in oneflow_blobname_map:
+                
+                func = 'weight_initializer = flow.truncated_normal(0.1)\n'
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+                func = 'weight_regularizer = flow.regularizers.l2(0.0005)\n'
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+                func = '{} = flow.get_variable('.format(x)
+                func = func + 'name={}, '.format("'"+x+"'")
+                func = func + 'shape={}, '.format(list(tensor_dict[x].shape))
+                func = func + 'initializer=weight_initializer, '
+                func = func + 'regularizer=weight_regularizer)\n'
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+
                 oneflow_blobname_map[tensor_dict[x]] = x
         inputs = [tensor_dict[inp] for inp in node.input_tensor_names]
         return cls.run_onnx_node(node, tensor_dict, inputs=[inputs])
@@ -130,14 +145,27 @@ class Concat(BackendHandler):
 class Unsqueeze(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
+        x = tensor_dict[node.input_tensor_names[0]]
         axes = node.attrs.pop("axes")
         if len(axes) != 1:
             x = tensor_dict[node.input_tensor_names[0]]
             for axis in sorted(axes):
                 x = flow.expand_dims(x, axis=axis)
+                func = '{} = flow.expand_dims({}, axis={})\n'.format(node.input_tensor_names[0], node.input_tensor_names[0], axis)
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+
+            func = '{} = {}\n'.format(node.output_tensor_names[0], node.input_tensor_names[0])
+            if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+            if x not in oneflow_blobname_map:
+                oneflow_blobname_map[x] = node.output_tensor_names[0]
             return x
         node.attrs["axis"] = axes[0]
-        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+        y =  cls.run_onnx_node(node, tensor_dict, **kwargs)
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+        return y
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -156,7 +184,10 @@ class Squeeze(BackendHandler):
         if node.attrs.get("axes"):
             axes = node.attrs.pop("axes")
             node.attrs["axis"] = axes
-        return cls.run_onnx_node(node, tensor_dict, **kwargs)
+        y =  cls.run_onnx_node(node, tensor_dict, **kwargs)
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+        return y
 
     @classmethod
     def version_1(cls, node, tensor_dict, **kwargs):
@@ -197,7 +228,10 @@ class Expand(BackendHandler):
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
         
-        return flow.broadcast_like(x, like=like_tensor, broadcast_axes=(2, 3))
+        y =  flow.broadcast_like(x, like=like_tensor, broadcast_axes=(2, 3))
+        if y not in oneflow_blobname_map:
+            oneflow_blobname_map[y] = node.output_tensor_names[0]
+        return y
 
     @classmethod
     def version_8(cls, node, tensor_dict, **kwargs):
@@ -298,6 +332,10 @@ class Split(BackendHandler):
     @classmethod
     def _common(cls, node, tensor_dict, **kwargs):
         x = tensor_dict[node.input_tensor_names[0]]
+        # for code gen
+        if x not in oneflow_blobname_map:
+            oneflow_blobname_map[x] = node.input_tensor_names[0]
+        
         axis = node.attrs.get("axis")
         split = node.attrs.get("split")
         index = 0
@@ -318,6 +356,11 @@ class Split(BackendHandler):
                         [None, None, None],
                     ],
                 )
+                func = '{} = flow.experimental.logical_slice({}, [[None, None, None], [{}, {} + {}, 1], [None, None, None], [None, None, None], ], )\n'.format(
+                        node.output_tensor_names[i], node.input_tensor_names[0], index, index, split[i])
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
+                
             elif axis == 3:
                 tmp = flow.experimental.logical_slice(
                     x,
@@ -328,10 +371,17 @@ class Split(BackendHandler):
                         [index, index + split[i], 1],
                     ],
                 )
+                func = '{} = flow.experimental.logical_slice({}, [[None, None, None], [None, None, None], [None, None, None], [{}, {} + {}, 1], ], )\n'.format(
+                        node.output_tensor_names[i], node.input_tensor_names[0], index, index, split[i])
+                if func not in oneflow_code_gen:
+                    oneflow_code_gen.append(func)
             else:
                 raise ValueError("axis != 0 or 3 is not supported")
             index += split[i]
             ans.append(tmp)
+        for i in range(len(ans)):
+            if ans[i] not in oneflow_blobname_map:
+                oneflow_blobname_map[ans[i]] = node.output_tensor_names[i]
         return ans
 
     @classmethod

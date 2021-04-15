@@ -200,7 +200,15 @@ class BackendHandler:
         cls.OP_OUTPUS = []
         for oup in node.output_tensor_names:
             cls.OP_OUTPUS.append(oup)
-        return cls._run_flow_func(flow_func, inputs, attrs)
+        y = cls._run_flow_func(flow_func, inputs, attrs)
+        if type(y) == list():
+            for x in cls.OP_OUTPUS:
+                if y[x] not in cls.ONEFLOW_BLOBNAME_MAP:
+                    cls.ONEFLOW_BLOBNAME_MAP[y[x]] = x
+        else:
+            if y not in cls.ONEFLOW_BLOBNAME_MAP:
+                cls.ONEFLOW_BLOBNAME_MAP[y] = cls.OP_OUTPUS[0]
+        return y
 
     @classmethod
     def _run_flow_func(cls, flow_func, inputs, attrs):
@@ -230,7 +238,7 @@ class BackendHandler:
             for i in range(len(cls.OP_OUTPUS) - 1):
                 pre_name = pre_name + '{}, '.format(cls.OP_OUTPUS[i])
             pre_name = pre_name + '{} = '.format(cls.OP_OUTPUS[len(cls.OP_OUTPUS) - 1])
-        if (pre_name + cls.code_gen(flow_func, kwargs)) not in cls.ONEFLOW_CODE_GEN: 
+        if str(flow_func).split()[1] != 'api_get_variable' and (pre_name + cls.code_gen(flow_func, kwargs)) not in cls.ONEFLOW_CODE_GEN: 
             cls.ONEFLOW_CODE_GEN.append(pre_name + cls.code_gen(flow_func, kwargs))
         return flow_func(**kwargs)
     

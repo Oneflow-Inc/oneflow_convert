@@ -19,9 +19,14 @@ check_suffix()
     file=$1
     
     if [ "${file##*.}"x = "py"x ];then
-        pytest $file
+        pytest $file -v -s
+        python3 /tmp/oneflow_code.py
     fi    
 }
  
-path="examples/x2oneflow/paddle2oneflow/models"
+path="examples/x2oneflow/pytorch2oneflow/code_gen"
+read_dir $path
+path="examples/x2oneflow/tensorflow2oneflow/code_gen"
+read_dir $path
+path="examples/x2oneflow/paddle2oneflow/code_gen"
 read_dir $path
