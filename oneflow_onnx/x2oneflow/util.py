@@ -58,7 +58,7 @@ def oneflow_code_gen_func(input_size, model_weight_save_dir):
     f.write('\n\n')
     
     f.write('def main():\n')
-    f.write('   x = np.random.randn({}, {}, {}, {}).astype(np.float32)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
+    f.write('   x = np.random.uniform(low=-1.0, high=1.0, size=({}, {}, {}, {})).astype(np.float32)\n'.format(input_size[0], input_size[1], input_size[2], input_size[3]))
     f.write('   flow.train.CheckPoint().load({})\n'.format("'"+model_weight_save_dir+"'"))
     f.write('   oneflow_res = eval_job(x)\n\n')
     f.write('   ort_sess_opt = ort.SessionOptions()\n')
@@ -82,6 +82,7 @@ def oneflow_code_gen_func(input_size, model_weight_save_dir):
     
     f.write('if __name__ == "__main__":\n')
     f.write('   main()\n')
+    f.close()
 
 def load_pytorch_module_and_check(
     pt_module_class,

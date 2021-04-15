@@ -47,27 +47,27 @@
 
 | 模型               | 是否支持  |
 | ------------------ | -------- |
-| AlexNet            |       |
-| VGGNet             |       |
-| GoogleNet          |       |
-| ResNet             |       |
-| ResNext            |       |
-| SE_ResNext         |       |
-| SENet              |       |
-| MobileNetV1        |       |
-| MobileNetV2        |       |
-| MobileNetV3        |       |
-| RegNet             |       |
-| DenseNet           |       |
-| EfficientNet       |       |
-| InceptionNet       |       |
-| ShuffleNetV2       |       |
-| SqueezeNet         |       |
-| DPNNet             |       |
-| DarkNet            |       |
-| GhostNet           |       |
-| RepVGG             |       |
-| XceptionNet        |       |
-| Xception_DeepLab   |       |
-| Vision_Transformer |       |
-| Res2Net            |       |
+| AlexNet            | Yes      |
+| VGGNet             | Yes      |
+| GoogleNet          | Yes      |
+| ResNet             | Yes      |
+| ResNext            | Yes      |
+| SE_ResNext         | Yes      |
+| SENet              | Yes      |
+| MobileNetV1        | Yes      |
+| MobileNetV2        | Yes      |
+| MobileNetV3        | Yes      |
+| RegNet             | Yes      |
+| DenseNet           | Yes      |
+| EfficientNet       | Yes      |
+| InceptionNet       | Yes      |
+| ShuffleNetV2       | Yes      |
+| SqueezeNet         | Yes      |
+| DPNNet             | Yes      |
+| DarkNet            | Yes      |
+| GhostNet           | Yes      |
+| RepVGG             | Yes      |
+| XceptionNet        | Yes      |
+| Xception_DeepLab   | Yes      |
+| Vision_Transformer | Yes      |
+| Res2Net            | Yes      |
