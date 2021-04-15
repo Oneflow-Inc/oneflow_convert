@@ -26,4 +26,4 @@ def test_EfficientNetB0():
             x = self.EfficientNetB0(x)
             return x
 
-    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow")
+    load_tensorflow2_module_and_check(Net, input_size=(1, 224, 224, 3), train_flag=False, flow_weight_dir="/tmp/oneflow", oneflow_code_gen_flag=True)
