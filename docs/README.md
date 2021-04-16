@@ -7,3 +7,4 @@
 
 1. op_list.md：当前转换各个框架支持的op
 2. x2oneflow_model_zoo.md：测试过的模型列表
+3. code_gen.md： 当前自动生成OneFlow代码支持的模型列表
