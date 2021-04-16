@@ -80,6 +80,12 @@ python3 setup.py install
 本工具的功能是将OneFlow训练的NCHW排布的权重转换为NHWC排布，使用方法[在这里](nchw2nhwc_tool/README.md)
 
 
+### save_serving_tool
+
+#### 简介
+本工具的目的是将OneFlow训练的模型转换为Serving端可用的模型，使用方法[在这里](save_serving_tool/README.md)
+
+
 ### 项目进展
 
 - 2021/4/13 支持ResNet18代码自动生成，量化OP转换失败暂时移除c测试脚本，发布0.2.2 wheel包。
