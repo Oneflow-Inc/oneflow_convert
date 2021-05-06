@@ -25,7 +25,6 @@ import shutil
 
 from onnx import defs
 import oneflow as flow
-import oneflow_api
 import oneflow
 
 class BackendHandler:
@@ -278,7 +277,7 @@ class BackendHandler:
             if type(v) == list:
                 new_v = []
                 for x in v:
-                    if type(x) ==  oneflow_api.LazyConsistentBlob:
+                    if type(x) ==  oneflow._oneflow_internal.LazyConsistentBlob:
                         new_v.append(cls.ONEFLOW_BLOBNAME_MAP[x])
                     else:
                         new_v.append(x)
@@ -287,7 +286,7 @@ class BackendHandler:
                 for x in v:
                     func += str(x) + ', '
                 func += '], '
-            elif type(v) == oneflow_api.LazyConsistentBlob:
+            elif type(v) == oneflow._oneflow_internal.LazyConsistentBlob:
                 v = cls.ONEFLOW_BLOBNAME_MAP[v]
                 func += str(v) + ', '
             else:
