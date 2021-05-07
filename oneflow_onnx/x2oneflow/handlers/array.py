@@ -201,8 +201,6 @@ class Squeeze(BackendHandler):
     def version_13(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
 
-# TODO(BBuf) add expand op: https://github.com/Oneflow-Inc/oneflow/pull/4164
-# This is a temporary solution of senet
 
 @onnx_op("Expand")
 @flow_func(flow.broadcast_like)
@@ -213,23 +211,14 @@ class Expand(BackendHandler):
         x = tensor_dict[node.input_tensor_names[0]]
         init_dict = kwargs["init_dict"]
         shape = init_dict[node.input_tensor_names[1]].tolist()
-        # like_tensor = flow.constant(
-        #     value=1.0,
-        #     dtype=flow.float32,
-        #     shape=(shape[0], shape[1], shape[2], shape[3]),
-        # )
         if x not in oneflow_blobname_map:
             oneflow_blobname_map[x] = node.input_tensor_names[0]
         
-        # func = 'like_tensor = flow.constant(value=1.0, dtype=flow.float32, shape=({}, {}, {}, {}),)\n'.format(shape[0], shape[1], shape[2], shape[3])
-        # if func not in oneflow_code_gen:
-        #     oneflow_code_gen.append(func)
         func = '{} = flow.expand({}, expand_size=[{}, {}, {}, {}])\n'.format(node.output_tensor_names[0], node.input_tensor_names[0], 
                                                                                             shape[0], shape[1], shape[2], shape[3])
         if func not in oneflow_code_gen:
             oneflow_code_gen.append(func)
         
-        # y =  flow.broadcast_like(x, like=like_tensor, broadcast_axes=(2, 3))
         y = flow.expand(x, expand_size=[shape[0], shape[1], shape[2], shape[3]])
         if y not in oneflow_blobname_map:
             oneflow_blobname_map[y] = node.output_tensor_names[0]
