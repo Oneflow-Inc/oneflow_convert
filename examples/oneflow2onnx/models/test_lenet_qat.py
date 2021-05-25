@@ -11,4 +11,7 @@ def test_lenet_qat():
     with open("lenet_qat_temp_dir_name.txt","r") as f:
         temp_dir_name = f.readline()
     temp_dir = os.path.join("/tmp", temp_dir_name)
-    convert_to_onnx_and_check(predict_job, flow_weight_dir=temp_dir, onnx_model_path="/tmp")
+    flow.load_variables(flow.checkpoint.get(temp_dir))
+    convert_to_onnx_and_check(predict_job, onnx_model_path="/tmp", explicit_init=False)
+
+test_lenet_qat()

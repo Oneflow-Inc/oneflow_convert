@@ -100,9 +100,6 @@ def convert_to_onnx_and_check(
         for i in range(len(a)):
             if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
                 print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
-    for k,v in flow.get_all_variables().items():
-        print(k)
-        print(v.numpy())
     print(onnx_res)
     print(oneflow_res)
     assert np.allclose(onnx_res, oneflow_res, rtol=rtol, atol=atol)
