@@ -43,6 +43,7 @@ def convert_to_onnx_and_check(
                 dtype=flow.float,
                 initializer=flow.random_uniform_initializer(),
             )
+    flow.train.CheckPoint().init()
     if flow_weight_dir == None:
         flow_weight_dir = tempfile.TemporaryDirectory()
         flow.checkpoint.save(flow_weight_dir.name)
@@ -89,7 +90,9 @@ def convert_to_onnx_and_check(
         ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
-    oneflow_res = job_func(*ipt_dict.values()).get().numpy()
+    oneflow_res = job_func(*ipt_dict.values())
+    if not isinstance(oneflow_res,np.ndarray):
+        oneflow_res = job_func(*ipt_dict.values()).get().numpy()
     rtol, atol = 1e-2, 1e-5
     if print_outlier:
         a = onnx_res.flatten()
@@ -97,5 +100,11 @@ def convert_to_onnx_and_check(
         for i in range(len(a)):
             if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
                 print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
+    for k,v in flow.get_all_variables().items():
+        print(k)
+        print(v.numpy())
+    print(onnx_res)
+    print(oneflow_res)
     assert np.allclose(onnx_res, oneflow_res, rtol=rtol, atol=atol)
+    
     flow.clear_default_session()
