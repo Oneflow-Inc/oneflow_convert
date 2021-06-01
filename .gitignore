@@ -7,5 +7,3 @@ __pycache__/
 build/
 dist/
 oneflow_onnx.egg-info/
-examples/oneflow2onnx/models/lenet_qat_temp_dir_name.txt
-mnist.npz
