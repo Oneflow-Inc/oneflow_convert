@@ -1,9 +1,11 @@
 import os
 import common
+import argparse
+import shutil
 import numpy as np
 import tensorrt as trt
 import oneflow as flow
-from models import get_lenet_job_function
+from models import get_lenet_job_function, LENET_MODEL_QAT_DIR
 from oneflow_onnx.oneflow2onnx.util import export_onnx_model, run_onnx, compare_result
 
 
@@ -52,22 +54,22 @@ def run_tensorrt(onnx_path, test_case):
 
 
 def test_lenet_qat():
-    batch_size = 100
+    batch_size = 16
     predict_job = get_lenet_job_function("predict", batch_size=batch_size)
-    temp_dir_name = ""
-    with open("lenet_qat_temp_dir_name.txt", "r") as f:
-        temp_dir_name = f.readline()
-    temp_dir = os.path.join("/tmp", temp_dir_name)
-    flow.load_variables(flow.checkpoint.get(temp_dir))
+    flow.load_variables(flow.checkpoint.get(LENET_MODEL_QAT_DIR))
 
-    onnx_model_path, cleanup = export_onnx_model(predict_job, onnx_model_path="/tmp")
+    onnx_model_path, cleanup = export_onnx_model(predict_job,opset=13)
 
     ipt_dict, onnx_res = run_onnx(onnx_model_path)
     oneflow_res = predict_job(*ipt_dict.values())
     compare_result(oneflow_res, onnx_res)
-    
-    trt_res = run_tensorrt(onnx_model_path, ipt_dict[list(ipt_dict.keys())[0]])
-    compare_result(oneflow_res, trt_res)
 
+    trt_res = run_tensorrt(onnx_model_path, ipt_dict[list(ipt_dict.keys())[0]])
+    compare_result(oneflow_res, trt_res, True)
+
+    flow.clear_default_session()
+    cleanup()
+    if os.path.exists(LENET_MODEL_QAT_DIR):
+        shutil.rmtree(LENET_MODEL_QAT_DIR)
 
 test_lenet_qat()

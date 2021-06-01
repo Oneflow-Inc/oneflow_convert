@@ -30,7 +30,6 @@ def run_onnx(onnx_model_path, ort_optimize=True):
         else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     )
     sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt)
-    # onnx_model_dir.cleanup()
     assert len(sess.get_outputs()) == 1
     assert len(sess.get_inputs()) <= 1
     ipt_dict = OrderedDict()
@@ -44,7 +43,13 @@ def run_onnx(onnx_model_path, ort_optimize=True):
     return ipt_dict, onnx_res
 
 
-def export_onnx_model(job_func, external_data=False, opset=None, flow_weight_dir=None, onnx_model_path="/tmp"):
+def export_onnx_model(
+    job_func,
+    external_data=False,
+    opset=None,
+    flow_weight_dir=None,
+    onnx_model_path="/tmp",
+):
     if flow_weight_dir == None:
         flow_weight_dir = tempfile.TemporaryDirectory()
         flow.checkpoint.save(flow_weight_dir.name)
@@ -81,15 +86,15 @@ def export_onnx_model(job_func, external_data=False, opset=None, flow_weight_dir
     return onnx_model_path, cleanup
 
 
-def compare_result(oneflow_result, another_result, print_outlier=False):
+def compare_result(a, b, print_outlier=False):
     rtol, atol = 1e-2, 1e-5
     if print_outlier:
-        a = another_result.flatten()
-        b = oneflow_result.flatten()
+        a = a.flatten()
+        b = b.flatten()
         for i in range(len(a)):
             if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
                 print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
-    assert np.allclose(another_result, oneflow_result, rtol=rtol, atol=atol)
+    assert np.allclose(a, b, rtol=rtol, atol=atol)
 
 
 def convert_to_onnx_and_check(
@@ -122,7 +127,7 @@ def convert_to_onnx_and_check(
     ipt_dict, onnx_res = run_onnx(onnx_model_path, ort_optimize)
     oneflow_res = job_func(*ipt_dict.values())
     if not isinstance(oneflow_res, np.ndarray):
-        oneflow_res = job_func(*ipt_dict.values()).get().numpy()
+        oneflow_res = oneflow_res.get().numpy()
 
     compare_result(oneflow_res, onnx_res, print_outlier)
 

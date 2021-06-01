@@ -1,7 +1,10 @@
 import os
+import shutil
 import uuid
+import argparse
 import oneflow as flow
-from models import get_lenet_job_function
+from models import get_lenet_job_function, LENET_MODEL_QAT_DIR
+
 
 if __name__ == "__main__":
     batch_size = 100
@@ -15,8 +18,6 @@ if __name__ == "__main__":
             loss = train_job(images, labels)
             if i % 20 == 0:
                 print(loss.mean())
-    temp_dir_name = str(uuid.uuid4())
-    with open("lenet_qat_temp_dir_name.txt", "w") as f:
-        f.write(temp_dir_name)
-    temp_dir = os.path.join("/tmp", temp_dir_name)
-    flow.checkpoint.save(temp_dir)
+    if os.path.exists(LENET_MODEL_QAT_DIR):
+        shutil.rmtree(LENET_MODEL_QAT_DIR)
+    flow.checkpoint.save(LENET_MODEL_QAT_DIR)

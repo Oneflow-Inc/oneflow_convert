@@ -84,3 +84,6 @@ def get_lenet_job_function(
             return logits
 
         return eval_job
+
+
+LENET_MODEL_QAT_DIR = "/tmp/lenet_model_qat_dir"
