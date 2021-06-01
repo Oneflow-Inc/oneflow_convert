@@ -48,6 +48,7 @@ def get_lenet_job_function(
     func_type: str = "train", enable_qat: bool = True, batch_size: int = 100
 ):
     func_config = flow.FunctionConfig()
+    func_config.cudnn_conv_force_fwd_algo(1)
     if enable_qat:
         func_config.enable_qat(True)
         func_config.qat.symmetric(True)
@@ -78,7 +79,7 @@ def get_lenet_job_function(
             images: tp.Numpy.Placeholder((batch_size, 1, 28, 28), dtype=flow.float),
         ) -> tp.Numpy:
             with flow.scope.placement("gpu", "0:0"):
-                logits = Lenet(images)      
+                logits = Lenet(images)
 
             return logits
 

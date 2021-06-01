@@ -16,7 +16,7 @@ if __name__ == "__main__":
             if i % 20 == 0:
                 print(loss.mean())
     temp_dir_name = str(uuid.uuid4())
-    with open("lenet_qat_temp_dir_name.txt","w") as f:
+    with open("lenet_qat_temp_dir_name.txt", "w") as f:
         f.write(temp_dir_name)
     temp_dir = os.path.join("/tmp", temp_dir_name)
     flow.checkpoint.save(temp_dir)
