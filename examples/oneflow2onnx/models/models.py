@@ -30,18 +30,25 @@ def Lenet(data):
     pool2 = flow.nn.max_pool2d(
         conv2, ksize=2, strides=2, padding="VALID", name="pool2", data_format="NCHW"
     )
-    reshape = flow.reshape(pool2, [pool2.shape[0], -1])
-    hidden = flow.layers.dense(
-        reshape,
+    # fc is replaced by conv to support tensorrt7
+    hidden1 = flow.layers.conv2d(
+        pool2,
         512,
-        activation=flow.nn.relu,
-        kernel_initializer=initializer,
-        name="dense1",
-        use_bias=False,
+        7,
+        padding="VALID",
+        name='hidden1',
+        use_bias=False
     )
-    return flow.layers.dense(
-        hidden, 10, kernel_initializer=initializer, name="dense2", use_bias=False
+    hidden2 = flow.layers.conv2d(
+        hidden1,
+        10,
+        1,
+        padding="VALID",
+        name='hidden2',
+        use_bias=False
     )
+    reshape = flow.reshape(hidden2, [hidden2.shape[0], -1])
+    return reshape
 
 
 def get_lenet_job_function(
