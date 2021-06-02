@@ -21,6 +21,7 @@ if __name__ == "__main__":
     if os.path.exists(LENET_MODEL_QAT_DIR):
         shutil.rmtree(LENET_MODEL_QAT_DIR)
     flow.checkpoint.save(LENET_MODEL_QAT_DIR)
+    # Without the following 'print' CI won't pass, but I have no idea why.
     print(
         "Model was saved at "
         + LENET_MODEL_QAT_DIR

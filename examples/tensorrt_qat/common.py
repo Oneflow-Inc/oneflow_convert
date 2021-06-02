@@ -32,17 +32,22 @@ except NameError:
 
 EXPLICIT_BATCH = 1 << (int)(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
 
+
 def GiB(val):
     return val * 1 << 30
 
 
 def add_help(description):
-    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     args, _ = parser.parse_known_args()
 
 
-def find_sample_data(description="Runs a TensorRT Python sample", subfolder="", find_files=[], err_msg=""):
-    '''
+def find_sample_data(
+    description="Runs a TensorRT Python sample", subfolder="", find_files=[], err_msg=""
+):
+    """
     Parses sample arguments.
     Args:
         description (str): Description of the sample.
@@ -50,12 +55,20 @@ def find_sample_data(description="Runs a TensorRT Python sample", subfolder="", 
         find_files (str): A list of filenames to find. Each filename will be replaced with an absolute path.
     Returns:
         str: Path of data directory.
-    '''
+    """
 
     # Standard command-line arguments for all samples.
     kDEFAULT_DATA_ROOT = os.path.join(os.sep, "usr", "src", "tensorrt", "data")
-    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-d", "--datadir", help="Location of the TensorRT sample data directory, and any additional data directories.", action="append", default=[kDEFAULT_DATA_ROOT])
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument(
+        "-d",
+        "--datadir",
+        help="Location of the TensorRT sample data directory, and any additional data directories.",
+        action="append",
+        default=[kDEFAULT_DATA_ROOT],
+    )
     args, _ = parser.parse_known_args()
 
     def get_data_path(data_dir):
@@ -63,15 +76,26 @@ def find_sample_data(description="Runs a TensorRT Python sample", subfolder="", 
         data_path = os.path.join(data_dir, subfolder)
         if not os.path.exists(data_path):
             if data_dir != kDEFAULT_DATA_ROOT:
-                print("WARNING: " + data_path + " does not exist. Trying " + data_dir + " instead.")
+                print(
+                    "WARNING: "
+                    + data_path
+                    + " does not exist. Trying "
+                    + data_dir
+                    + " instead."
+                )
             data_path = data_dir
         # Make sure data directory exists.
         if not (os.path.exists(data_path)) and data_dir != kDEFAULT_DATA_ROOT:
-            print("WARNING: {:} does not exist. Please provide the correct data path with the -d option.".format(data_path))
+            print(
+                "WARNING: {:} does not exist. Please provide the correct data path with the -d option.".format(
+                    data_path
+                )
+            )
         return data_path
 
     data_paths = [get_data_path(data_dir) for data_dir in args.datadir]
     return data_paths, locate_files(data_paths, find_files, err_msg)
+
 
 def locate_files(data_paths, filenames, err_msg=""):
     """
@@ -97,8 +121,13 @@ def locate_files(data_paths, filenames, err_msg=""):
     # Check that all files were found
     for f, filename in zip(found_files, filenames):
         if not f or not os.path.exists(f):
-            raise FileNotFoundError("Could not find {:}. Searched in data paths: {:}\n{:}".format(filename, data_paths, err_msg))
+            raise FileNotFoundError(
+                "Could not find {:}. Searched in data paths: {:}\n{:}".format(
+                    filename, data_paths, err_msg
+                )
+            )
     return found_files
+
 
 # Simple helper data class that's a little nicer to use than a 2-tuple.
 class HostDeviceMem(object):
@@ -111,6 +140,7 @@ class HostDeviceMem(object):
 
     def __repr__(self):
         return self.__str__()
+
 
 # Allocates all buffers required for an engine, i.e. host/device inputs/outputs.
 def allocate_buffers(engine):
@@ -133,19 +163,23 @@ def allocate_buffers(engine):
             outputs.append(HostDeviceMem(host_mem, device_mem))
     return inputs, outputs, bindings, stream
 
+
 # This function is generalized for multiple inputs/outputs.
 # inputs and outputs are expected to be lists of HostDeviceMem objects.
 def do_inference(context, bindings, inputs, outputs, stream, batch_size=1):
     # Transfer input data to the GPU.
     [cuda.memcpy_htod_async(inp.device, inp.host, stream) for inp in inputs]
     # Run inference.
-    context.execute_async(batch_size=batch_size, bindings=bindings, stream_handle=stream.handle)
+    context.execute_async(
+        batch_size=batch_size, bindings=bindings, stream_handle=stream.handle
+    )
     # Transfer predictions back from the GPU.
     [cuda.memcpy_dtoh_async(out.host, out.device, stream) for out in outputs]
     # Synchronize the stream
     stream.synchronize()
     # Return only the host outputs.
     return [out.host for out in outputs]
+
 
 # This function is generalized for multiple inputs/outputs for full dimension networks.
 # inputs and outputs are expected to be lists of HostDeviceMem objects.
@@ -161,14 +195,16 @@ def do_inference_v2(context, bindings, inputs, outputs, stream):
     # Return only the host outputs.
     return [out.host for out in outputs]
 
+
 def generate_md5_checksum(local_path):
     """Returns the MD5 checksum of a local file.
     Keyword argument:
     local_path -- path of the file whose checksum shall be generated
     """
-    with open(local_path, 'rb') as local_file:
+    with open(local_path, "rb") as local_file:
         data = local_file.read()
         import hashlib
+
         return hashlib.md5(data).hexdigest()
 
 
@@ -182,17 +218,19 @@ def download_file(local_path, link, checksum_reference=None):
     checksum_reference -- expected MD5 checksum of the file
     """
     if not os.path.exists(local_path):
-        print('Downloading from %s, this may take a while...' % link)
+        print("Downloading from %s, this may take a while..." % link)
         import wget
+
         wget.download(link, local_path)
         print()
     if checksum_reference is not None:
         checksum = generate_md5_checksum(local_path)
         if checksum != checksum_reference:
             raise ValueError(
-                'The MD5 checksum of local file %s differs from %s, please manually remove \
-                 the file and try again.' %
-                (local_path, checksum_reference))
+                "The MD5 checksum of local file %s differs from %s, please manually remove \
+                 the file and try again."
+                % (local_path, checksum_reference)
+            )
     return local_path
 
 
@@ -214,6 +252,7 @@ def retry_call(func, args=[], kwargs={}, n_retries=3):
                 raise
             print("retry...")
 
+
 # Usage: @retry(n_retries)
 def retry(n_retries=3):
     """Wrap a function to retry it several times. Decorator version of `retry_call`.
@@ -224,8 +263,11 @@ def retry(n_retries=3):
         def func(...):
             pass
     """
+
     def wrapper(func):
         def _wrapper(*args, **kwargs):
             retry_call(func, args, kwargs, n_retries)
+
         return _wrapper
+
     return wrapper

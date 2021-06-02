@@ -54,6 +54,7 @@ def run_tensorrt(onnx_path, test_case):
 
 
 def test_lenet_qat():
+    # Without the following 'print' CI won't pass, but I have no idea why.
     print(
         "Model exists. "
         if os.path.exists(LENET_MODEL_QAT_DIR)
