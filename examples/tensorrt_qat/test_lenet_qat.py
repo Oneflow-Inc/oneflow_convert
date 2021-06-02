@@ -54,11 +54,16 @@ def run_tensorrt(onnx_path, test_case):
 
 
 def test_lenet_qat():
+    print(
+        "Model exists. "
+        if os.path.exists(LENET_MODEL_QAT_DIR)
+        else "Model does not exist. "
+    )
     batch_size = 16
     predict_job = get_lenet_job_function("predict", batch_size=batch_size)
     flow.load_variables(flow.checkpoint.get(LENET_MODEL_QAT_DIR))
 
-    onnx_model_path, cleanup = export_onnx_model(predict_job,opset=13)
+    onnx_model_path, cleanup = export_onnx_model(predict_job, opset=10)
 
     ipt_dict, onnx_res = run_onnx(onnx_model_path)
     oneflow_res = predict_job(*ipt_dict.values())
@@ -71,5 +76,3 @@ def test_lenet_qat():
     cleanup()
     if os.path.exists(LENET_MODEL_QAT_DIR):
         shutil.rmtree(LENET_MODEL_QAT_DIR)
-
-test_lenet_qat()

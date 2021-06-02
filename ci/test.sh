@@ -6,7 +6,7 @@ if [ -f requirements.txt ]; then pip install --user -r requirements.txt; fi
 python3 -m pip install oneflow --user -U -f https://staging.oneflow.info/branch/master/cu102
 python3 setup.py install
 python3 examples/tensorrt_qat/test_lenet_qat_train.py
-python3 -m pytest examples/tensorrt_qat/test_lenet_qat.py
+python3 -m pytest -s examples/tensorrt_qat/test_lenet_qat.py
 python3 -m pytest examples/oneflow2onnx
 python3 -m pytest examples/x2oneflow/pytorch2oneflow/nodes
 python3 -m pytest examples/x2oneflow/pytorch2oneflow/models

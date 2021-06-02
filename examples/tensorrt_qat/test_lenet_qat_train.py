@@ -21,3 +21,9 @@ if __name__ == "__main__":
     if os.path.exists(LENET_MODEL_QAT_DIR):
         shutil.rmtree(LENET_MODEL_QAT_DIR)
     flow.checkpoint.save(LENET_MODEL_QAT_DIR)
+    print(
+        "Model was saved at "
+        + LENET_MODEL_QAT_DIR
+        + ". Status : "
+        + str(os.path.exists(LENET_MODEL_QAT_DIR))
+    )
