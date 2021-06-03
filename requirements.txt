@@ -4,7 +4,7 @@ onnxoptimizer>=0.2.5
 onnxruntime>=1.6.0
 tf2onnx==1.8.4
 paddlepaddle==2.0.1
-tensorflow_cpu==2.4.0
+tensorflow_cpu==2.4.2
 torch==1.8.1
 torchvision==0.9.1
 paddle2onnx>=0.5
