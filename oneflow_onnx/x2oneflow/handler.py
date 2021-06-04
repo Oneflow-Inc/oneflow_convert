@@ -245,13 +245,13 @@ class BackendHandler:
     def code_gen(cls, flow_fun, kwargs):
         def import_func(func):
             flag = 0
-            if hasattr(flow, func):
+            if hasattr(flow.math, func):
                 flag = 1
-            elif hasattr(flow.math, func):
-                flag = 2
             elif hasattr(flow.layers, func):
-                flag = 3
+                flag = 2
             elif hasattr(flow.nn, func):
+                flag = 3
+            elif hasattr(flow, func):
                 flag = 4
             elif func == "api_get_variable":
                 return str("flow.get_variable")
@@ -259,13 +259,13 @@ class BackendHandler:
             if flag == 0:
                 raise NotImplementedError("can not import this func:{} from oneflow".format(func))
             elif flag == 1:
-                return str("flow." + func)
-            elif flag == 2:
                 return str("flow.math." + func)
-            elif flag == 3:
+            elif flag == 2:
                 return str("flow.layers." + func)
-            elif flag == 4:
+            elif flag == 3:
                 return str("flow.nn." + func)
+            elif flag == 4:
+                return str("flow." + func)
         
         func = str(flow_fun).split()
         func = func[1]

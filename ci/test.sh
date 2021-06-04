@@ -40,4 +40,4 @@ python3 -m pytest examples/x2oneflow/paddle2oneflow/models/test_vggnet.py
 python3 -m pytest examples/x2oneflow/paddle2oneflow/models/test_vision_transformer.py
 python3 -m pytest examples/x2oneflow/paddle2oneflow/models/test_xception_deeplab.py
 python3 -m pytest examples/x2oneflow/paddle2oneflow/models/test_xception.py
-
+./test_code_gen.sh
