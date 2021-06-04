@@ -92,3 +92,4 @@ python3 setup.py install
 - 2021/4/14 修复CI错误，支持X2OneFlow的所有模型自动代码生成功能，发布0.2.3 whell包。
 - 2020/4/15 完成X2OneFlow所有模型的自动代码生成功能，发布0.3.0 whell包。
 - 2020/4/16 将Expand OP并入主分支，并修复导入oneflow_api报错的bug，发布0.3.1 whell包。
+- 2020/4/16 解决自动代码生成遗留问题，并将自动代码生成的测试加入CI，发布0.3.2 wheell包。
