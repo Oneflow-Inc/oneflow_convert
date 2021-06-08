@@ -271,3 +271,47 @@ def retry(n_retries=3):
         return _wrapper
 
     return wrapper
+
+
+def build_engine_onnx(model_file, verbose=False):
+    if verbose:
+        TRT_LOGGER = trt.Logger(trt.Logger.VERBOSE)
+    else:
+        TRT_LOGGER = trt.Logger(trt.Logger.INFO)
+
+    network_flags = 1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    network_flags = network_flags | (
+        1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_PRECISION)
+    )
+
+    with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
+        flags=network_flags
+    ) as network, trt.OnnxParser(network, TRT_LOGGER) as parser:
+        with open(model_file, "rb") as model:
+            if not parser.parse(model.read()):
+                print("ERROR: Failed to parse the ONNX file.")
+                for error in range(parser.num_errors):
+                    print(parser.get_error(error))
+                return None
+        config = builder.create_builder_config()
+        config.max_workspace_size = 1 << 30
+        config.flags = config.flags | 1 << int(trt.BuilderFlag.INT8)
+        return builder.build_engine(network, config)
+
+
+def run_tensorrt(onnx_path, test_case):
+    with build_engine_onnx(onnx_path) as engine:
+        inputs, outputs, bindings, stream = allocate_buffers(engine)
+        with engine.create_execution_context() as context:
+            batch_size = test_case.shape[0]
+            test_case = test_case.reshape(-1)
+            np.copyto(inputs[0].host, test_case)
+            trt_outputs = do_inference_v2(
+                context,
+                bindings=bindings,
+                inputs=inputs,
+                outputs=outputs,
+                stream=stream,
+            )
+            data = trt_outputs[0]
+            return data.reshape(batch_size, -1)

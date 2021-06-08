@@ -1,7 +1,5 @@
 import os
 import shutil
-import uuid
-import argparse
 import cv2
 import numpy as np
 import oneflow as flow
@@ -18,7 +16,7 @@ def resize(images):
 
 
 if __name__ == "__main__":
-    batch_size = 100
+    batch_size = 16
     (train_images, train_labels), (test_images, test_labels) = flow.data.load_mnist(
         batch_size, batch_size
     )
@@ -30,6 +28,8 @@ if __name__ == "__main__":
             loss = train_job(images, labels)
             if i % 20 == 0:
                 print(loss.mean())
+            if i == 100:
+                break
     if os.path.exists(MOBILENET_MODEL_QAT_DIR):
         shutil.rmtree(MOBILENET_MODEL_QAT_DIR)
     flow.checkpoint.save(MOBILENET_MODEL_QAT_DIR)
