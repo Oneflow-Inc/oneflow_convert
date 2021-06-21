@@ -18,28 +18,43 @@ import tempfile
 import numpy as np
 import oneflow as flow
 import onnxruntime as ort
+from typing import Optional, Union, Tuple, List
 from collections import OrderedDict
 from oneflow_onnx.oneflow2onnx.flow2onnx import Export
 
 
-def run_onnx(onnx_model_path, ort_optimize=True):
+def run_onnx(
+    onnx_model_path: str,
+    providers: Union[str, List[str]],
+    ipt_dict: Optional[OrderedDict] = None,
+    ort_optimize: bool = True,
+) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
     ort_sess_opt = ort.SessionOptions()
     ort_sess_opt.graph_optimization_level = (
         ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
         if ort_optimize
         else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     )
-    sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt)
+    sess = ort.InferenceSession(
+        onnx_model_path, sess_options=ort_sess_opt, providers=providers
+    )
     assert len(sess.get_outputs()) == 1
     assert len(sess.get_inputs()) <= 1
-    ipt_dict = OrderedDict()
-    for ipt in sess.get_inputs():
-        ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
-            np.float32
-        )
-        ipt_dict[ipt.name] = ipt_data
+
+    only_return_result = ipt_dict is not None
+
+    if ipt_dict is None:
+        ipt_dict = OrderedDict()
+        for ipt in sess.get_inputs():
+            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
+                np.float32
+            )
+            ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
+
+    if only_return_result:
+        return onnx_res
     return ipt_dict, onnx_res
 
 
@@ -86,8 +101,13 @@ def export_onnx_model(
     return onnx_model_path, cleanup
 
 
-def compare_result(a, b, print_outlier=False):
-    rtol, atol = 1e-2, 1e-5
+def compare_result(
+    a: np.ndarray,
+    b: np.ndarray,
+    rtol: float = 1e-2,
+    atol: float = 1e-5,
+    print_outlier: bool = False,
+):
     if print_outlier:
         a = a.flatten()
         b = b.flatten()
@@ -129,7 +149,7 @@ def convert_to_onnx_and_check(
     if not isinstance(oneflow_res, np.ndarray):
         oneflow_res = oneflow_res.get().numpy()
 
-    compare_result(oneflow_res, onnx_res, print_outlier)
+    compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
     flow.clear_default_session()
     cleanup()

@@ -1,7 +1,7 @@
 onnx>=1.8.0
 onnx-simplifier>=0.3.3
 onnxoptimizer>=0.2.5
-onnxruntime>=1.6.0
+onnxruntime-gpu>=1.8.0
 tf2onnx==1.8.4
 paddlepaddle==2.0.1
 tensorflow_cpu==2.4.0

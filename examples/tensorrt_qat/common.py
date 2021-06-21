@@ -315,3 +315,12 @@ def run_tensorrt(onnx_path, test_case):
             )
             data = trt_outputs[0]
             return data.reshape(batch_size, -1)
+
+
+def get_onnx_provider(ctx: str = "cpu"):
+    if ctx == "gpu":
+        return ["CUDAExecutionProvider"]
+    elif ctx == "cpu":
+        return ["CPUExecutionProvider"]
+    else:
+        raise NotImplementedError("Not supported device type. ")
