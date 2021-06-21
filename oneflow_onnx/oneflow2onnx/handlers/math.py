@@ -92,6 +92,7 @@ class BiasAdd(common.BroadcastOp):
 
 
 @flow_op(["leaky_relu", "softplus"], onnx_op=["LeakyRelu", "Softplus"])
+@flow_op("prelu", onnx_op="PRelu", flow_ibns=["x", "alpha"])
 class DirectOpSinceOpset1:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -812,3 +813,4 @@ class GreaterLessEqual:
         )
         ctx.CopyShape(output_name, new_node.output_tensor_names[0])
         ctx.set_dtype(new_node.output_tensor_names[0], ctx.get_dtype(output_name))
+
