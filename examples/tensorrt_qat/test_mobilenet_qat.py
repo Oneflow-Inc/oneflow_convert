@@ -14,7 +14,7 @@ def test_mobilenet_qat():
     # Without the following 'print' CI won't pass, but I have no idea why.
     print("Model exists. " if model_existed else "Model does not exist. ")
 
-    batch_size = 4
+    batch_size = 2
     predict_job = get_mobilenet_job_function("predict", batch_size=batch_size)
     flow.load_variables(flow.checkpoint.get(MOBILENET_MODEL_QAT_DIR))
 
