@@ -14,7 +14,7 @@ def test_mobilenet_qat():
     # Without the following 'print' CI won't pass, but I have no idea why.
     print("Model exists. " if model_existed else "Model does not exist. ")
 
-    batch_size = 2
+    batch_size = 32
     predict_job = get_mobilenet_job_function("predict", batch_size=batch_size)
     flow.load_variables(flow.checkpoint.get(MOBILENET_MODEL_QAT_DIR))
 
@@ -26,7 +26,7 @@ def test_mobilenet_qat():
     compare_result(oneflow_res, onnx_res, print_outlier=True)
 
     trt_res = run_tensorrt(onnx_model_path, ipt_dict[list(ipt_dict.keys())[0]])
-    compare_result(oneflow_res, trt_res, rtol=7e-2, print_outlier=True)
+    compare_result(oneflow_res, trt_res, print_outlier=True)
 
     flow.clear_default_session()
     cleanup()

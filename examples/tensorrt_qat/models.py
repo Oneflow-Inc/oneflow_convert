@@ -126,20 +126,12 @@ def mobilenet_unit(
         bias_regularizer=_get_regularizer("bias"),
         name=prefix,
     )
-    bn = _batch_norm(
-        conv,
-        axis=1,
-        momentum=0.9,
-        epsilon=1e-5,
-        trainable=trainable,
-        training=training,
-        name="%s-BatchNorm" % prefix,
-    )
+
     if if_act:
-        act = _relu6(bn, prefix)
+        act = _relu6(conv, prefix)
         return act
     else:
-        return bn
+        return conv
 
 
 def shortcut(data_in, data_residual, prefix):
@@ -308,6 +300,7 @@ class MobileNetV2(object):
                     data_format=data_format,
                 )
                 in_c = int(round(c * self.multiplier))
+        # return last_bottleneck_layer
         last_fm = mobilenet_unit(
             data=last_bottleneck_layer,
             num_filter=int(1280 * self.multiplier) if self.multiplier > 1.0 else 1280,
