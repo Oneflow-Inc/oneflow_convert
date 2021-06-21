@@ -1,6 +1,8 @@
 import oneflow as flow
 import oneflow.typing as tp
 
+flow.env.init()
+
 
 def Lenet(data):
     initializer = flow.truncated_normal(0.1)
@@ -371,9 +373,13 @@ def Mobilenet(
 
 
 def get_lenet_job_function(
-    func_type: str = "train", enable_qat: bool = True, batch_size: int = 100
+    func_type: str = "train",
+    enable_qat: bool = True,
+    batch_size: int = 100,
+    ctx: str = "gpu",
 ):
     func_config = flow.FunctionConfig()
+    func_config.default_placement_scope(flow.scope.placement(ctx, "0:0"))
     func_config.cudnn_conv_force_fwd_algo(1)
     if enable_qat:
         func_config.enable_qat(True)
@@ -388,7 +394,7 @@ def get_lenet_job_function(
             images: tp.Numpy.Placeholder((batch_size, 1, 28, 28), dtype=flow.float),
             labels: tp.Numpy.Placeholder((batch_size,), dtype=flow.int32),
         ) -> tp.Numpy:
-            with flow.scope.placement("gpu", "0:0"):
+            with flow.scope.placement(ctx, "0:0"):
                 logits = Lenet(images)
                 loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
                     labels, logits, name="softmax_loss"
@@ -404,7 +410,7 @@ def get_lenet_job_function(
         def eval_job(
             images: tp.Numpy.Placeholder((batch_size, 1, 28, 28), dtype=flow.float),
         ) -> tp.Numpy:
-            with flow.scope.placement("gpu", "0:0"):
+            with flow.scope.placement(ctx, "0:0"):
                 logits = Lenet(images)
 
             return logits
@@ -413,10 +419,14 @@ def get_lenet_job_function(
 
 
 def get_mobilenet_job_function(
-    func_type: str = "train", enable_qat: bool = True, batch_size: int = 100
+    func_type: str = "train",
+    enable_qat: bool = True,
+    batch_size: int = 100,
+    ctx: str = "gpu",
 ):
     func_config = flow.FunctionConfig()
     func_config.cudnn_conv_force_fwd_algo(1)
+    func_config.default_placement_scope(flow.scope.placement(ctx, "0:0"))
     if enable_qat:
         func_config.enable_qat(True)
         func_config.qat.symmetric(True)
@@ -430,7 +440,7 @@ def get_mobilenet_job_function(
             images: tp.Numpy.Placeholder((batch_size, 1, 224, 224), dtype=flow.float),
             labels: tp.Numpy.Placeholder((batch_size,), dtype=flow.int32),
         ) -> tp.Numpy:
-            with flow.scope.placement("gpu", "0:0"):
+            with flow.scope.placement(ctx, "0:0"):
                 logits = Mobilenet(images, num_classes=10)
                 loss = flow.nn.sparse_softmax_cross_entropy_with_logits(
                     labels, logits, name="softmax_loss"
@@ -446,7 +456,7 @@ def get_mobilenet_job_function(
         def eval_job(
             images: tp.Numpy.Placeholder((batch_size, 1, 224, 224), dtype=flow.float),
         ) -> tp.Numpy:
-            with flow.scope.placement("gpu", "0:0"):
+            with flow.scope.placement(ctx, "0:0"):
                 logits = Mobilenet(
                     images, trainable=False, training=False, num_classes=10
                 )
