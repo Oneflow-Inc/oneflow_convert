@@ -18,7 +18,7 @@ def test_lenet_qat():
 
     onnx_model_path, cleanup = export_onnx_model(predict_job, opset=10)
 
-    ipt_dict, onnx_res = run_onnx(onnx_model_path, get_onnx_provider())
+    ipt_dict, onnx_res = run_onnx(onnx_model_path, get_onnx_provider("cpu"))
     oneflow_res = predict_job(*ipt_dict.values())
     compare_result(oneflow_res, onnx_res, print_outlier=True)
 
