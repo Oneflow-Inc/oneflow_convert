@@ -132,4 +132,4 @@ def convert_to_onnx_and_check(
     compare_result(oneflow_res, onnx_res, print_outlier)
 
     flow.clear_default_session()
-    cleanup()
+    # cleanup()
