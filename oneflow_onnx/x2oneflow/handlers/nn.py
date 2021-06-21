@@ -407,3 +407,34 @@ class LeakyRelu(BackendHandler):
     @classmethod
     def version_6(cls, node, tensor_dict, **kwargs):
         return cls._common(node, tensor_dict, **kwargs)
+
+@onnx_op("PRelu")
+@flow_func(flow.layers.prelu)
+class PRelu(BackendHandler):
+
+    @classmethod
+    def _common(cls, node, tensor_dict, **kwargs):
+        name = node.input_tensor_names[0]
+
+        cls.copy_variable_file(node.input_tensor_names[1], name + "-alpha")
+        node.input_tensor_names = node.input_tensor_names[:1]
+
+        return [
+            cls.run_onnx_node(node, tensor_dict, name=name, **kwargs, attrs={"shared_axes": [2, 3]})
+        ]
+
+    @classmethod
+    def version_1(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_6(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_7(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
+
+    @classmethod
+    def version_9(cls, node, tensor_dict, **kwargs):
+        return cls._common(node, tensor_dict, **kwargs)
