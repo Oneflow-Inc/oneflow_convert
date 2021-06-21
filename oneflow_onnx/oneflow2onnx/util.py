@@ -25,7 +25,7 @@ from oneflow_onnx.oneflow2onnx.flow2onnx import Export
 
 def run_onnx(
     onnx_model_path: str,
-    providers: Union[str, List[str]],
+    providers: List[str],
     ipt_dict: Optional[OrderedDict] = None,
     ort_optimize: bool = True,
 ) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
@@ -144,7 +144,9 @@ def convert_to_onnx_and_check(
         job_func, external_data, opset, flow_weight_dir, onnx_model_path
     )
 
-    ipt_dict, onnx_res = run_onnx(onnx_model_path, ort_optimize)
+    ipt_dict, onnx_res = run_onnx(
+        onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
+    )
     oneflow_res = job_func(*ipt_dict.values())
     if not isinstance(oneflow_res, np.ndarray):
         oneflow_res = oneflow_res.get().numpy()
