@@ -45,7 +45,7 @@ def generate_unary_op_test(
     def job1():
         x = flow.get_variable(
             name="x1",
-            shape=(2, 3, 4),
+            shape=(2, 3, 4, 5),
             dtype=flow.float,
             initializer=flow.random_uniform_initializer(min_val, max_val),
         )
@@ -236,3 +236,10 @@ def test_scalar_add_int():
 
 def test_scalar_add_float():
     generate_unary_op_test(flow.math.add, 5.1)
+
+def test_leaky_relu():
+    generate_unary_op_test(flow.nn.leaky_relu, 0.6)
+
+
+def test_prelu():
+    generate_unary_op_test(flow.layers.prelu)
