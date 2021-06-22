@@ -52,4 +52,4 @@ jobs:
       - name: Remove container
         if: always()
         run: |
-          docker rm -f ${container_name} || true
+          docker rm -f ${{ env.container_name }} || true
