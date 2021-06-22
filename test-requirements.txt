@@ -1,3 +1,4 @@
+opencv-python
 pytest
 nvidia-pyindex
 nvidia-tensorrt==7.2.3.4
