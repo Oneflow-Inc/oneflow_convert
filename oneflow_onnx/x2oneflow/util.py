@@ -146,6 +146,8 @@ def load_pytorch_module_and_check(
 
     if oneflow_code_gen_flag == True and len(input_size) == 4:
         oneflow_code_gen_func(input_size, model_weight_save_dir)
+        flow.clear_default_session()
+        return
         
     if train_flag == False:
         pt_module.eval()
@@ -236,6 +238,8 @@ def load_paddle_module_and_check(
 
     if oneflow_code_gen_flag == True and len(input_size) == 4:
         oneflow_code_gen_func(input_size, model_weight_save_dir)
+        flow.clear_default_session()
+        return
     
     if train_flag == False:
         pd_module.eval()
@@ -331,6 +335,8 @@ def load_tensorflow2_module_and_check(
 
     if oneflow_code_gen_flag == True and len(input_size) == 4:
         oneflow_code_gen_func(input_size, model_weight_save_dir)
+        flow.clear_default_session()
+        return
     
     if train_flag == True:
         flow_res = job_train(ipt1)
