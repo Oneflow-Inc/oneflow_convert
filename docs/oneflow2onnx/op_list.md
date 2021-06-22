@@ -21,4 +21,5 @@
 | 53 | Conv     | 54 | QuantizeLinear | 56 | ReduceMin    | 57 | BatchNormalization|
 | 58 | ReduceSum| 59 | ReduceProd | 60 | ArgMax   | 61 | ArgMin             |
 |62  | Reshape  | 63 | Squeeze    | 64 | Transpose| 65 | Concat             |
-| 66 | Cast     | 67 | Identity   | 68 | Mul      |
+| 66 | Cast     | 67 | Identity   | 68 | Mul      | 69 | PReLU              |
+| 70 | LeakyReLU|
