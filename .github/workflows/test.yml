@@ -53,7 +53,8 @@ jobs:
       - name: Load image
         if: env.should_load_img == '1'
         run: |
-          docker import ${{ env.image_url }} --message "New image imported from tarball" - ${{ env.image_tag }}
+          wget ${{ env.image_url }}
+          docker load -i $(basename "${{ env.image_url }}")
       - name: Test
         run: |
           docker run $extra_docker_args \
