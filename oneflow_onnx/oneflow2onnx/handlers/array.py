@@ -28,6 +28,7 @@ import numpy as np
 from onnx import numpy_helper
 from onnx import onnx_pb
 from onnx.onnx_pb import TensorProto
+import onnx
 
 import oneflow
 import oneflow_onnx
@@ -208,3 +209,24 @@ class Identity:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         pass
+
+@flow_op("constant", "Constant")
+class Constant:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        print(node)
+        floating_value = node.attrs.get("floating_value", 0.0)
+        integer_value = node.attrs.get("integer_value", 0)
+        is_floating_value = node.attrs.get("is_floating_value", False)
+        shape = node.attrs.get("shape", None)
+        if is_floating_value:
+            values = np.full(shape=shape, fill_value=floating_value, dtype=np.float32)
+        else:
+            values = np.full(shape=shape, fill_value=integer_value, dtype=np.int32)
+        output_name = node.output_tensor_names[0]
+        ctx.RemoveNode(node.name)
+        if is_floating_value:
+            ctx.MakeConst(output_name, values)
+        else:
+            ctx.MakeConst(output_name, values)
+

@@ -34,9 +34,10 @@ def run_onnx(onnx_model_path, ort_optimize=True):
     assert len(sess.get_inputs()) <= 1
     ipt_dict = OrderedDict()
     for ipt in sess.get_inputs():
-        ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
-            np.float32
-        )
+        # ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
+        #     np.float32
+        # )
+        ipt_data = (np.random.randint(0, 255, size=ipt.shape).astype(np.float32) - 128.0 ) / 128.0
         ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]

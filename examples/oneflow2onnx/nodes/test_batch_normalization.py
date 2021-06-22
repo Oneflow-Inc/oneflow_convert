@@ -84,3 +84,36 @@ def test_bn_nhwc():
         )
 
     convert_to_onnx_and_check(bn)
+
+
+def test_bn_nc():
+    @flow.global_function()
+    def bn(x: tp.Numpy.Placeholder((3, 4))):
+        params_shape = (4,)
+        mean = flow.get_variable(
+            name="mean",
+            shape=params_shape,
+            dtype=flow.float,
+            initializer=flow.random_uniform_initializer(),
+        )
+        variance = flow.get_variable(
+            name="var",
+            shape=params_shape,
+            dtype=flow.float,
+            initializer=flow.random_uniform_initializer(),
+        )
+        gamma = flow.get_variable(
+            name="gamma",
+            shape=params_shape,
+            dtype=flow.float,
+            initializer=flow.random_uniform_initializer(),
+        )
+        beta = flow.get_variable(
+            name="beta",
+            shape=params_shape,
+            dtype=flow.float,
+            initializer=flow.random_uniform_initializer(),
+        )
+        return flow.nn.batch_normalization(x, mean, variance, beta, gamma, 1e-5, axis=1)
+
+    convert_to_onnx_and_check(bn)

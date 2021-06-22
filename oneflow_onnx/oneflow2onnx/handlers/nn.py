@@ -368,7 +368,13 @@ class BatchNorm:
             new_output = [node.output_tensor_names[0]]
             node.output_tensor_names = new_output
 
-        _ConvConvertInputs(ctx, node, with_kernel=False)
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        
+        if len(input_shape) == 4:
+            _ConvConvertInputs(ctx, node, with_kernel=False)
+        else:
+            # for [n, c] batch_norm
+            pass
 
         scale_shape = ctx.get_shape(node.input_tensor_names[1])
         mean_shape = ctx.get_shape(node.input_tensor_names[3])

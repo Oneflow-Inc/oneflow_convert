@@ -175,15 +175,15 @@ def get_fc1(last_conv, num_classes, fc_type, input_channel=512):
             trainable=True,
             name="pre_fc1",
         )
-        fc1 = _batch_norm(
-            fc1,
-            epsilon=2e-5,
-            scale=False,
-            center=True,
-            is_training=False,
-            data_format="NCHW",
-            name="fc1",
-        )
+        # fc1 = _batch_norm(
+        #     fc1,
+        #     epsilon=2e-5,
+        #     scale=False,
+        #     center=True,
+        #     is_training=False,
+        #     data_format="NCHW",
+        #     name="fc1",
+        # )
     elif fc_type == "FC":
         body = _batch_norm(
             body,
