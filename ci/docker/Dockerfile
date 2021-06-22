@@ -30,5 +30,4 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
     find /miniconda3/ -follow -type f -name '*.a' -delete && \
     find /miniconda3/ -follow -type f -name '*.js.map' -delete && \
     /miniconda3/bin/conda clean -afy && \
-    $PIP_INSTALL opencv-python && \
-    $PIP_INSTALL pytest
+    rm -f ./Miniconda3-latest-Linux-x86_64.sh
