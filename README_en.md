@@ -95,3 +95,5 @@ This tool is to transform OneFlow models into models that can be used on the Ser
 - 2021/4/14 Refined CI errors. Supported code generations for all functions of X2OneFlow. 0.2.3 whell package was announced.
 - 2020/4/15 Finalized code generations for all functions of X2OneFlow. 0.3.0 whell was announced.
 - 2020/4/16 Merged Expand OP into the main branch. Debugged oneflow_api. 0.3.1 whell package was announced.
+- 2020/4/16 Solve the remaining problems of automatic code generation, add the test of automatic code generation to CI. 0.3.2 whell package was announced. 
+- 2020/6/21 Add PreLU/LeakyReLU OP ONNX Export， fix automatic code generation bug. 0.3.3 whell package was announced. 
