@@ -162,28 +162,29 @@ def get_fc1(last_conv, num_classes, fc_type, input_channel=512):
             name="bn1"
         )
         body = _dropout(body, dropout_prob=0.4)
-        body = flow.reshape(body, (body.shape[0], -1))
-        fc1 = flow.layers.dense(
-            inputs=body,
-            units=num_classes,
-            activation=None,
-            use_bias=True,
-            kernel_initializer=_get_initializer(),
-            bias_initializer=flow.zeros_initializer(),
-            kernel_regularizer=_get_regularizer("weight"),
-            bias_regularizer=_get_regularizer("bias"),
-            trainable=True,
-            name="pre_fc1",
-        )
-        fc1 = _batch_norm(
-            fc1,
-            epsilon=2e-5,
-            scale=False,
-            center=True,
-            is_training=False,
-            data_format="NCHW",
-            name="fc1",
-        )
+        fc1 = body
+        # body = flow.reshape(body, (body.shape[0], -1))
+        # fc1 = flow.layers.dense(
+        #     inputs=body,
+        #     units=num_classes,
+        #     activation=None,
+        #     use_bias=True,
+        #     kernel_initializer=_get_initializer(),
+        #     bias_initializer=flow.zeros_initializer(),
+        #     kernel_regularizer=_get_regularizer("weight"),
+        #     bias_regularizer=_get_regularizer("bias"),
+        #     trainable=True,
+        #     name="pre_fc1",
+        # )
+        # fc1 = _batch_norm(
+        #     fc1,
+        #     epsilon=2e-5,
+        #     scale=False,
+        #     center=True,
+        #     is_training=False,
+        #     data_format="NCHW",
+        #     name="fc1",
+        # )
     elif fc_type == "FC":
         body = _batch_norm(
             body,
@@ -390,7 +391,7 @@ def get_symbol(input_blob):
                 name="stage%d_unit%d" % (i + 1, j + 2),
             )
     fc1 = get_fc1(input_blob, num_classes, fc_type)
-    return input_blob
+    return fc1
 
 
 
