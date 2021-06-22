@@ -1,0 +1,5 @@
+pytest
+nvidia-pyindex
+nvidia-tensorrt==7.2.3.4
+flake8
+gast==0.3.3
