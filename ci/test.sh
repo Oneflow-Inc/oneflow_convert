@@ -5,7 +5,7 @@ python3 -m pip install --user nvidia-pyindex
 python3 -m pip install -r test-requirements.txt --user
 if [ -f requirements.txt ]; then pip install --user -r requirements.txt; fi
 python3 -m pip install oneflow --user -U -f https://staging.oneflow.info/branch/master/cu102
-python3 -m pip install oneflow --user gast==0.3.3
+python3 -m pip install gast==0.3.3 --user
 python3 setup.py install
 # python3 examples/tensorrt_qat/test_lenet_qat_train.py
 # python3 -m pytest -s examples/tensorrt_qat/test_lenet_qat.py
