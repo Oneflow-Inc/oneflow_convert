@@ -7,6 +7,7 @@ python -m pip install nvidia-tensorrt==8.0.0.3
 python -m pip install pycuda
 if [ -f requirements.txt ]; then pip install --user -r requirements.txt; fi
 python -m pip install oneflow --user -U -f https://staging.oneflow.info/branch/master/cu110
+python -m pip install --user gast==0.3.3
 python setup.py install
 python examples/tensorrt_qat/test_lenet_qat_train.py
 python -m pytest -s examples/tensorrt_qat/test_lenet_qat.py
@@ -42,3 +43,4 @@ python -m pytest examples/x2oneflow/paddle2oneflow/models/test_vggnet.py
 python -m pytest examples/x2oneflow/paddle2oneflow/models/test_vision_transformer.py
 python -m pytest examples/x2oneflow/paddle2oneflow/models/test_xception_deeplab.py
 python -m pytest examples/x2oneflow/paddle2oneflow/models/test_xception.py
+./test_code_gen.sh
