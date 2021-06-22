@@ -34,7 +34,7 @@ jobs:
           echo "extra_docker_args=${extra_docker_args}" >> $GITHUB_ENV
           echo "container_name=${container_name}" >> $GITHUB_ENV
           echo "image_tag=oneflow_convert_tools_test_cu11:0.1" >> $GITHUB_ENV
-          echo "image_url=oneflow_convert_tools_test_cu11:0.1" >> $GITHUB_ENV
+          echo "image_url=https://oneflow-static.oss-cn-beijing.aliyuncs.com/docker_images/oneflow_convert_tools_test_cu11.0.1.tar.gz" >> $GITHUB_ENV
       - name: Check image
         run: |
           if [[ "$(docker images -q ${{ env.image_tag }} 2> /dev/null)" == "" ]]; then
