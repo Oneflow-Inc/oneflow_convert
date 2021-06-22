@@ -92,8 +92,8 @@ def compare_result(a, b, print_outlier=False):
         a = a.flatten()
         b = b.flatten()
         for i in range(len(a)):
-            if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
-                print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
+            # if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
+            print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
     assert np.allclose(a, b, rtol=rtol, atol=atol)
 
 

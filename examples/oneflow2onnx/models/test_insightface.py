@@ -310,39 +310,6 @@ def residual_unit_v3(
         name="%s%s_bn3" % (name, suffix),
     )
 
-    if use_se:
-        # se begin
-        input_blob = _avg_pool(
-            bn3, pool_size=[7, 7], strides=[1, 1], padding="VALID"
-        )
-        input_blob = _conv2d_layer(
-            name="%s%s_se_conv1" % (name, suffix),
-            input=input_blob,
-            filters=num_filter // 16,
-            kernel_size=1,
-            strides=[1, 1],
-            padding="valid",
-            data_format=data_format,
-            use_bias=True,
-            dilation_rate=1,
-            activation=None,
-        )
-        input_blob = _prelu(input_blob, name="%s%s_se_relu1" % (name, suffix))
-        input_blob = _conv2d_layer(
-            name="%s%s_se_conv2" % (name, suffix),
-            input=input_blob,
-            filters=num_filter,
-            kernel_size=1,
-            strides=[1, 1],
-            padding="valid",
-            data_format=data_format,
-            use_bias=True,
-            dilation_rate=1,
-            activation=None,
-        )
-        input_blob = flow.math.sigmoid(input=input_blob)
-        bn3 = flow.math.multiply(x=input_blob, y=bn3)
-        # se end
 
     if dim_match:
         input_blob = in_data
@@ -422,7 +389,7 @@ def get_symbol(input_blob):
                 data_format=data_format,
                 name="stage%d_unit%d" % (i + 1, j + 2),
             )
-    #fc1 = get_fc1(input_blob, num_classes, fc_type)
+    fc1 = get_fc1(input_blob, num_classes, fc_type)
     return input_blob
 
 

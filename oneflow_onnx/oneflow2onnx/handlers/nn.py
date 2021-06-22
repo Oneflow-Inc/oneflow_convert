@@ -401,3 +401,11 @@ class BatchNorm:
     def Version_9(cls, ctx, node, **kwargs):
         # is_test was removed - no change for us
         cls.Version_6(ctx, node, **kwargs)
+
+@flow_op(["dropout"], onnx_op="Dropout")
+class Dropout:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        pass
+
+    
