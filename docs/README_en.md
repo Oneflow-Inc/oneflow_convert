@@ -1,4 +1,4 @@
-# \#oneflow2onnx
+# oneflow2onnx
 
 **简体中文 | [English](README_en.md)**
 
