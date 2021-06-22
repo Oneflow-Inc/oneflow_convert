@@ -18,16 +18,9 @@ import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 
-def test_reshape():
+def test_dropout():
     @flow.global_function()
-    def reshape(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.reshape(x, (4, 30))
+    def pad(x: tp.Numpy.Placeholder((3, 5))):
+        return flow.nn.dropout(x, rate=0.5)
 
-    convert_to_onnx_and_check(reshape)
-
-def test_reshape_negative_dim():
-    @flow.global_function()
-    def reshape(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.reshape(x, (3, -1))
-
-    convert_to_onnx_and_check(reshape)
+    convert_to_onnx_and_check(pad)
