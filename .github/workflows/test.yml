@@ -47,7 +47,7 @@ jobs:
       - name: Test
         run: |
           docker run $extra_docker_args \
-            ${image_tag} \
+            ${{ env.image_tag }} \
             bash ci/test.sh
       - name: Remove container
         if: always()
