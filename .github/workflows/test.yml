@@ -32,11 +32,12 @@ jobs:
           extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/oneflow_convert_tools_test_cu11/0.1/local-bin:/root/.local/bin"
           extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/oneflow_convert_tools_test_cu11/0.1/site-packages38:/root/.local/lib/python3.8/site-packages"
           echo "extra_docker_args=${extra_docker_args}" >> $GITHUB_ENV
+          echo "image_name=oneflow_convert_tools_test_cu11:0.1" >> $GITHUB_ENV
           echo "container_name=${container_name}" >> $GITHUB_ENV
       - name: Test
         run: |
           docker run $extra_docker_args \
-            oneflow-test:$USER \
+            ${image_name} \
             bash ci/test.sh
       - name: Remove container
         if: always()
