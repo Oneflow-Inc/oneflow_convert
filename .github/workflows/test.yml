@@ -59,7 +59,7 @@ jobs:
         run: |
           docker run $extra_docker_args \
             ${{ env.image_tag }} \
-            bash ci/test.sh
+            /miniconda3/bin/conda run -n base /bin/bash ci/test.sh
       - name: Remove container
         if: always()
         run: |
