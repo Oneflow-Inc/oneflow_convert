@@ -427,13 +427,13 @@ def get_symbol(input_blob):
 
 
 
-def test_resnet50():
+def test_insightface():
     @flow.global_function()
     def InferenceNet(images: tp.Numpy.Placeholder((1, 3, 112, 112))):
         logits = get_symbol(images)
         return logits 
     
     
-    convert_to_onnx_and_check(InferenceNet, flow_weight_dir=None, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(InferenceNet, print_outlier=True, flow_weight_dir=None, onnx_model_path="/tmp")
 
 
