@@ -18,16 +18,16 @@ import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 
-def test_reshape():
+def test_constant_float():
     @flow.global_function()
-    def reshape(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.reshape(x, (4, 30))
+    def constant(x: tp.Numpy.Placeholder((3, 5))):
+        return flow.constant(value=1.5, shape=(1, 3, 3), dtype=flow.float)
 
-    convert_to_onnx_and_check(reshape)
+    convert_to_onnx_and_check(constant)
 
-def test_reshape_negative_dim():
+def test_constant_int():
     @flow.global_function()
-    def reshape(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.reshape(x, (3, -1))
+    def constant(x: tp.Numpy.Placeholder((3, 5))):
+        return flow.constant(value=1, shape=(1, 3, 3), dtype=flow.int)
 
-    convert_to_onnx_and_check(reshape)
+    convert_to_onnx_and_check(constant)
