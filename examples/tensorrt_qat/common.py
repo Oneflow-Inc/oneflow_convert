@@ -273,7 +273,7 @@ def retry(n_retries=3):
     return wrapper
 
 
-def build_engine_onnx(model_file, verbose=False):
+def build_qat_engine_from_onnx(model_file, verbose=False):
     if verbose:
         TRT_LOGGER = trt.Logger(trt.Logger.VERBOSE)
     else:
@@ -300,7 +300,7 @@ def build_engine_onnx(model_file, verbose=False):
 
 
 def run_tensorrt(onnx_path, test_case):
-    with build_engine_onnx(onnx_path) as engine:
+    with build_qat_engine_from_onnx(onnx_path) as engine:
         inputs, outputs, bindings, stream = allocate_buffers(engine)
         with engine.create_execution_context() as context:
             batch_size = test_case.shape[0]
