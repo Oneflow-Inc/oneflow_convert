@@ -100,7 +100,7 @@ def compare_result(a, b, print_outlier=False):
 def convert_to_onnx_and_check(
     job_func,
     print_outlier=False,
-    explicit_init=True,
+    explicit_init=False,
     external_data=False,
     ort_optimize=True,
     opset=None,
