@@ -1,0 +1,5 @@
+opencv-python
+pytest
+nvidia-tensorrt==7.2.3.4
+pycuda
+flake8
