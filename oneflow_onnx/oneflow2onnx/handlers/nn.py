@@ -408,9 +408,3 @@ class BatchNorm:
         # is_test was removed - no change for us
         cls.Version_6(ctx, node, **kwargs)
 
-@flow_op(["dropout"], onnx_op=["Dropout"], flow_ibns=["in", "mask"])
-class Dropout:
-    @classmethod
-    def Version_1(cls, ctx, node, **kwargs):
-        pass
-
