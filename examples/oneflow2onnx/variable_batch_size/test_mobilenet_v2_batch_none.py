@@ -356,5 +356,5 @@ def test_mobilenetv2():
     def mobilenetv2(x: tp.Numpy.Placeholder((1, 3, 224, 224))):
         return Mobilenet(x)
 
-    convert_to_onnx_and_check(mobilenetv2, flow_weight_dir=None, onnx_model_path="/tmp", batch_size=None)
+    convert_to_onnx_and_check(mobilenetv2, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=True)
 
