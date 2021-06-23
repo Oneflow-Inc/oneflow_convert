@@ -34,10 +34,9 @@ def run_onnx(onnx_model_path, ort_optimize=True):
     assert len(sess.get_inputs()) <= 1
     ipt_dict = OrderedDict()
     for ipt in sess.get_inputs():
-        # ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
-        #     np.float32
-        # )
-        ipt_data = (np.random.randint(0, 255, size=ipt.shape).astype(np.float32) - 128.0 ) / 128.0
+        ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
+            np.float32
+        )
         ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
@@ -93,8 +92,8 @@ def compare_result(a, b, print_outlier=False):
         a = a.flatten()
         b = b.flatten()
         for i in range(len(a)):
-            # if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
-            print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
+            if np.abs(a[i] - b[i]) > atol + rtol * np.abs(b[i]):
+                print("a[{}]={}, b[{}]={}".format(i, a[i], i, b[i]))
     assert np.allclose(a, b, rtol=rtol, atol=atol)
 
 

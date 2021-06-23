@@ -28,7 +28,6 @@ import numpy as np
 from onnx import numpy_helper
 from onnx import onnx_pb
 from onnx.onnx_pb import TensorProto
-import onnx
 
 import oneflow
 import oneflow_onnx
