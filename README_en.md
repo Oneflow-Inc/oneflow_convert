@@ -97,5 +97,7 @@ This tool is to transform OneFlow models into models that can be used on the Ser
 - 2020/4/16 Merged Expand OP into the main branch. Debugged oneflow_api. 0.3.1 whell package was announced.
 - 2020/4/16 Solve the remaining problems of automatic code generation, add the test of automatic code generation to CI. 0.3.2 whell package was announced. 
 - 2020/6/21 Add PreLU/LeakyReLU OP ONNX Export， fix automatic code generation bug. 0.3.3 whell package was announced. 
-- 2020/6/32 Add Constant OP ONNX Export，fix batchnorm op export onnx bug (which caused in insightface) and disable the global function that 
+- 2020/6/23 Add Constant OP ONNX Export，fix batchnorm op export onnx bug (which caused in insightface) and disable the global function that 
 is enabled by default when exporting ONNX . 0.3.3.20210623 whell package was announced. 
+- 2020/6/24 Add Flatten OP ONNX Export. 0.3.4 whell package was announced. 
+
