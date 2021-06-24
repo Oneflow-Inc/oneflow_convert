@@ -112,6 +112,13 @@ class Reshape:
                 node.output_tensor_names[0], output_cast.output_tensor_names[0]
             )
 
+@flow_op("flatten", "Flatten")
+class Flatten:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        start_dim = node.attrs.get("start_dim", None)
+        node.attrs["axis"] = start_dim
+
 
 @flow_op("squeeze", "Squeeze")
 class Squeeze:
