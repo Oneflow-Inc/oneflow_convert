@@ -25,3 +25,24 @@ def test_flatten():
 
     convert_to_onnx_and_check(flatten)
 
+def test_flatten_aixs_negative():
+    @flow.global_function()
+    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
+        return flow.flatten(x, start_dim=0, end_dim=-1)
+
+    convert_to_onnx_and_check(flatten)
+
+def test_flatten_aixs_default():
+    @flow.global_function()
+    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
+        return flow.flatten(x)
+
+    convert_to_onnx_and_check(flatten)
+
+def test_flatten_dtype_int():
+    @flow.global_function()
+    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
+        x = flow.cast(x, flow.int32)
+        return flow.flatten(x)
+
+    convert_to_onnx_and_check(flatten, opset=11)

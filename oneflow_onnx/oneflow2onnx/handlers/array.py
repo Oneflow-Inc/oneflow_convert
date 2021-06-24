@@ -117,8 +117,16 @@ class Flatten:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         start_dim = node.attrs.get("start_dim", 1)
+        dtype = ctx.get_dtype(node.input_tensor_names[0])
+        assert dtype == 1, f"onnx opset version 1/9 only support float32 data_type!"
+        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
         node.attrs["axis"] = start_dim
 
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        start_dim = node.attrs.get("start_dim", 1)
+        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
+        node.attrs["axis"] = start_dim
 
 @flow_op("squeeze", "Squeeze")
 class Squeeze:
