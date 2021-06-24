@@ -230,6 +230,7 @@ def Export(
     extra_opset: Optional[int] = None,
     shape_override: Optional[Dict[Text, List[int]]] = None,
     external_data: bool = False,
+    dynamic_batch_size: bool = False,
 ):
     r"""Export a oneflow model into ONNX format.
 
@@ -262,6 +263,10 @@ def Export(
             model_proto = onnx_graph.MakeModel(
                 job_name, onnx_filename, external_data=external_data
             )
+
+            if dynamic_batch_size == True:
+                model_proto.graph.input[0].type.tensor_type.shape.dim[0].dim_param = 'None'
+
             with open(onnx_filename, "wb") as f:
                 try:
                     f.write(model_proto.SerializeToString())

@@ -64,6 +64,7 @@ def export_onnx_model(
     opset=None,
     flow_weight_dir=None,
     onnx_model_path="/tmp",
+    dynamic_batch_size=False,
 ):
     if flow_weight_dir == None:
         flow_weight_dir = tempfile.TemporaryDirectory()
@@ -79,6 +80,7 @@ def export_onnx_model(
             onnx_model_path,
             opset=opset,
             external_data=external_data,
+            dynamic_batch_size=dynamic_batch_size,
         )
         flow_weight_dir.cleanup()
     else:
@@ -92,6 +94,7 @@ def export_onnx_model(
             onnx_model_path,
             opset=opset,
             external_data=external_data,
+            dynamic_batch_size=dynamic_batch_size,
         )
 
     def cleanup():
@@ -126,6 +129,7 @@ def convert_to_onnx_and_check(
     opset=None,
     flow_weight_dir=None,
     onnx_model_path="/tmp",
+    dynamic_batch_size=False,
 ):
     if explicit_init:
         # it is a trick to keep check_point.save() from hanging when there is no variable
@@ -141,17 +145,20 @@ def convert_to_onnx_and_check(
     flow.train.CheckPoint().init()
 
     onnx_model_path, cleanup = export_onnx_model(
-        job_func, external_data, opset, flow_weight_dir, onnx_model_path
+        job_func, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
     )
 
-    ipt_dict, onnx_res = run_onnx(
+
+    if dynamic_batch_size != True:
+        ipt_dict, onnx_res = run_onnx(
         onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
-    )
-    oneflow_res = job_func(*ipt_dict.values())
-    if not isinstance(oneflow_res, np.ndarray):
-        oneflow_res = oneflow_res.get().numpy()
+        )
+        oneflow_res = job_func(*ipt_dict.values())
+        if not isinstance(oneflow_res, np.ndarray):
+            oneflow_res = oneflow_res.get().numpy()
 
-    compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
+        compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
+
 
     flow.clear_default_session()
     # cleanup()
