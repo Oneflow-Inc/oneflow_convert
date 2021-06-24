@@ -98,5 +98,7 @@ python3 setup.py install
 - 2020/4/16 解决自动代码生成遗留问题，并将自动代码生成的测试加入CI，发布0.3.2 whell包。
 - 2020/6/21 导出ONNX新增PreLU/LeakyReLU OP，修复自动代码生成bug，发布0.3.3 whell包。
 - 2020/6/23 导出ONNX新增Constant OP，修复BN只有NC两个维度（InsightFace）导出的bug以及禁用导出ONNX时默认开启的global function，发布0.3.3.20210623 whell包。
+- 2020/6/24 导出ONNX新增Flatten OP，发布0.3.4 whell包。
+
 
 
