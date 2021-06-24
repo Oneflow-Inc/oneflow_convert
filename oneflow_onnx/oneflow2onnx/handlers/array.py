@@ -116,7 +116,7 @@ class Reshape:
 class Flatten:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
-        start_dim = node.attrs.get("start_dim", None)
+        start_dim = node.attrs.get("start_dim", 1)
         node.attrs["axis"] = start_dim
 
 
