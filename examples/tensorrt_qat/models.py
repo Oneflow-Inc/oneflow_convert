@@ -47,7 +47,7 @@ def Lenet(data):
     pool2 = flow.nn.max_pool2d(
         conv2, ksize=2, strides=2, padding="VALID", name="pool2", data_format="NCHW"
     )
-    reshape = flow.reshape(pool2, [pool2.shape[0], -1])
+    reshape = flow.reshape(pool2, [pool2.shape[0], -1], name="reshape")
     hidden = flow.layers.dense(
         reshape,
         512,
@@ -56,6 +56,7 @@ def Lenet(data):
         name="dense1",
     )
     return flow.layers.dense(hidden, 10, kernel_initializer=initializer, name="dense2")
+
 
 def _get_regularizer(model_name):
     # all decay
@@ -337,7 +338,7 @@ class MobileNetV2(object):
             name="pool5",
         )
         fc = flow.layers.dense(
-            flow.reshape(pool, (pool.shape[0], -1)),
+            flow.reshape(pool, (pool.shape[0], -1), name="reshape"),
             units=class_num,
             use_bias=False,
             kernel_initializer=_get_initializer("dense_weight"),
@@ -392,7 +393,7 @@ def get_lenet_job_function(
         func_config.qat.symmetric(True)
         func_config.qat.per_channel_weight_quantization(False)
         func_config.qat.moving_min_max_stop_update_after_iters(1000)
-        func_config.qat.target_backend("tensorrt7")
+        func_config.qat.target_backend("tensorrt")
     if func_type == "train":
 
         @flow.global_function(type="train", function_config=func_config)
@@ -438,7 +439,7 @@ def get_mobilenet_job_function(
         func_config.qat.symmetric(True)
         func_config.qat.per_channel_weight_quantization(False)
         func_config.qat.moving_min_max_stop_update_after_iters(1000)
-        func_config.qat.target_backend("tensorrt7")
+        func_config.qat.target_backend("tensorrt")
     if func_type == "train":
 
         @flow.global_function(type="train", function_config=func_config)
