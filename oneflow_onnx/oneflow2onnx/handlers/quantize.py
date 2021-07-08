@@ -150,8 +150,8 @@ class MovingAverageMinMaxObserver:
             raise ValueError("invalid quantization formula: " + formula)
 
         ctx.RemoveNode(node.name)
-        ctx.MakeConst(node.output_tensor_names[0], scale.flatten())
-        ctx.MakeConst(node.output_tensor_names[1], zero_point)
+        ctx.MakeConst(node.output_tensor_names[0], scale.squeeze())
+        ctx.MakeConst(node.output_tensor_names[1], zero_point.squeeze())
 
 
 @flow_op(
@@ -173,7 +173,7 @@ class FakeQuantization:
         )
         if opset < 13:
             scale_shape = ctx.get_shape(node.input_tensor_names[1])
-            if not (len(scale_shape) == 1 and scale_shape[0] == 1):
+            if not len(scale_shape) == 0:
                 raise RuntimeError("per-channel mode is not supported in version 10")
 
         else:
