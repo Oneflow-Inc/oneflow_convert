@@ -859,7 +859,7 @@ class Graph(object):
         tensor_name = node.output_tensor_names[0]
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
-        path = pathjoin(self._model_save_dir, node.output_tensor_names[0][2:])
+        path = pathjoin(self._model_save_dir, ".".join(node.output_tensor_names[0].split(".")[1:]))
         tensor_value = np.fromfile(
             path, dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name))
         ).reshape(self.get_shape(tensor_name))

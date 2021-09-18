@@ -155,65 +155,35 @@ def _ConvConvertInputs(
 
 
 def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2):
-    padding = node.attrs.get("padding")
-    if padding:
-        if dilations is None:
-            dilations = [1] * spatial * 2
-        if padding == "same":
-            padding = "same_lower"
-        if padding in ["same_lower", "same_upper"]:
-            pads = [0] * spatial * 2
-            input_shape = ctx.get_shape(node.input_tensor_names[0])
-            output_shape = ctx.get_shape(node.output_tensor_names[0])
-            # check if the input shape is valid
-            if len(input_shape) != len(pads):
-                logger.error(
-                    "node %s input needs to be rank %d, is %d",
-                    node.name,
-                    len(pads),
-                    len(input_shape),
-                )
-            # transpose shape to nchw
-            if node.is_nhwc():
-                input_shape = _SpatialMap(input_shape, constants.NHWC_TO_NCHW)
-                output_shape = _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
-            # calculate pads
-            if any(
-                input_shape[i + 2] == -1 or output_shape[i + 2] == -1
-                for i in range(spatial)
-            ):
-                logger.debug(
-                    "node %s has unknown dim for pads calculation, fallback to auto_pad: "
-                    "input_shape=%s, output_shape=%s",
-                    node.name,
-                    input_shape,
-                    output_shape,
-                )
-                if padding == "same_lower":
-                    node.attrs["auto_pad"] = "SAME_LOWER"
-                else:
-                    node.attrs["auto_pad"] = "SAME_UPPER"
-            else:
-                for i in range(spatial):
-                    pad = (
-                        (output_shape[i + 2] - 1) * strides[i]
-                        + dilations[i] * (kernel_shape[i] - 1)
-                        + 1
-                        - input_shape[i + 2]
-                    )
-                    pad = max(pad, 0)
-                    if padding == "same_lower":
-                        pads[i + spatial] = pad // 2
-                        pads[i] = pad - pad // 2
-                    else:
-                        pads[i] = pad // 2
-                        pads[i + spatial] = pad - pad // 2
-                node.attrs["pads"] = pads
+    if dilations is None:
+        dilations = [1] * spatial * 2
+    pads = [0] * spatial * 2
+    input_shape = ctx.get_shape(node.input_tensor_names[0])
+    output_shape = ctx.get_shape(node.output_tensor_names[0])
+    # check if the input shape is valid
+    if len(input_shape) != len(pads):
+        logger.error(
+            "node %s input needs to be rank %d, is %d",
+            node.name,
+            len(pads),
+            len(input_shape),
+        )
+    # transpose shape to nchw
+    if node.is_nhwc():
+        input_shape = _SpatialMap(input_shape, constants.NHWC_TO_NCHW)
+        output_shape = _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
+    for i in range(spatial):
+        pad = (
+            (output_shape[i + 2] - 1) * strides[i]
+            + dilations[i] * (kernel_shape[i] - 1)
+            + 1
+            - input_shape[i + 2]
+        )
+        pad = max(pad, 0)
+        pads[i + spatial] = pad // 2
+        pads[i] = pad - pad // 2
+    node.attrs["pads"] = pads
 
-        elif padding == "valid":
-            pass
-        else:
-            raise ValueError("invalid padding value: " + padding)
 
 
 def conv_dims_attr(node, name, new_name=None):
@@ -285,8 +255,8 @@ class PoolOp:
         # T Y = MaxPool(T X, @AttrType.STRING auto_pad, @AttrType.INTS kernel_shape, @AttrType.INTS pads,
         #               @AttrType.INTS strides)
         if len(node.input_tensor_names) < 3:
-            kernel_shape_flow = node.attrs["pool_size"]
-            strides_flow = node.attrs["strides"]
+            kernel_shape_flow = node.attrs["kernel_size"]
+            strides_flow = node.attrs["stride"]
         else:
             kernel_shape_flow = node.input_nodes[1].get_tensor_value()
             strides_flow = node.input_nodes[2].get_tensor_value()
