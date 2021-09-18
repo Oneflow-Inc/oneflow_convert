@@ -122,12 +122,11 @@ def convert_to_onnx_and_check(
         ipt_dict, onnx_res = run_onnx(
         onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
         )
-        oneflow_res = graph(*ipt_dict.values())
+        oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
         if not isinstance(oneflow_res, np.ndarray):
-            oneflow_res = oneflow_res.get().numpy()
+            oneflow_res = oneflow_res.numpy()
 
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
 
-    flow.clear_default_session()
     # cleanup()

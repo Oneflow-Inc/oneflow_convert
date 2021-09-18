@@ -182,7 +182,7 @@ class Node(object):
         # return self.op_type in ["Const", "ConstV2"]
 
     def is_graph_output(self):
-        return self.op_type in ["return"]
+        return self.op_type in ["output"]
 
     def is_graph_input(self):
         return self.op_type in ["input"]

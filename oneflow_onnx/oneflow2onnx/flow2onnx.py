@@ -188,6 +188,8 @@ def FlowOnnxMapping(g, ops_mapping):
             continue
 
         op = node.op_type
+        if op == "output":
+            continue
         map_info = ops_mapping.get(op)
         if map_info is None:
             unmapped_op[op] += 1
