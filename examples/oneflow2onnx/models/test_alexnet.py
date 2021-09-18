@@ -17,7 +17,7 @@ limitations under the License.
 import oneflow as flow
 import oneflow.nn as nn
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
-
+import tempfile
 class AlexNet(nn.Module):
     def __init__(self, num_classes: int = 1000) -> None:
         super(AlexNet, self).__init__()
@@ -25,16 +25,16 @@ class AlexNet(nn.Module):
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 192, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(192, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+            # nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            # nn.ReLU(inplace=True),
+            # nn.MaxPool2d(kernel_size=3, stride=2),
+            # nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            # nn.ReLU(inplace=True),
+            # nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            # nn.ReLU(inplace=True),
+            # nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            # nn.ReLU(inplace=True),
+            # nn.MaxPool2d(kernel_size=3, stride=2),
         )
         self.avgpool = nn.AvgPool2d((1, 1))
         self.classifier = nn.Sequential(
@@ -48,15 +48,15 @@ class AlexNet(nn.Module):
         )
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        # x = self.features(x)
-        x = self.avgpool(x)
+        x = self.features(x)
+        # x = self.avgpool(x)
         # x = flow.flatten(x, 1)
         # x = self.classifier(x)
         return x
 
 alexnet = AlexNet()
 alexnet.eval()
-# flow.save(alexnet.state_dict(), "/tmp/alexnet")
+
 class AlexNetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -71,7 +71,9 @@ def test_alexnet():
     alexnet_graph = AlexNetGraph()
     alexnet_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(alexnet_graph, flow_weight_dir="/tmp/alexnet", onnx_model_path="/tmp")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(alexnet.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(alexnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
 
 test_alexnet()
