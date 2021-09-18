@@ -106,7 +106,7 @@ class LoopOptimizer(GraphOptimizerBase):
                 new_perm = [0] + [
                     i + 1 for i in ori_perm
                 ]  # body output's rank is m > rank of loop's output is m+1
-                name = oneflow.util.unique_str("trans_moved_from_loop_body")
+                name = oneflow._oneflow_internal.UniqueStr("trans_moved_from_loop_body")
                 _ = parent_graph.InsertNewNodeOnOutput(
                     "Transpose", name_in_parent, name, perm=new_perm
                 )

@@ -163,7 +163,7 @@ class FakeQuantization:
         dequant_node = ctx.InsertNewNodeOnOutput(
             "DequantizeLinear",
             node.output_tensor_names[0],
-            name=oneflow.util.unique_str(node.name),
+            name=oneflow._oneflow_internal.UniqueStr(node.name),
         )
         if opset < 13:
             scale_shape = ctx.get_shape(node.input_tensor_names[1])

@@ -111,7 +111,7 @@ class ConstFoldOptimizer(GraphOptimizerBase):
             "length of node outputs and const vals should be same",
         )
         for old_input, val in zip(node.output_tensor_names, vals):
-            const_node = graph.MakeConst(oneflow.util.unique_str("const_fold_opt"), val)
+            const_node = graph.MakeConst(oneflow._oneflow_internal.UniqueStr("const_fold_opt"), val)
             graph.set_dtype(
                 const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype)
             )

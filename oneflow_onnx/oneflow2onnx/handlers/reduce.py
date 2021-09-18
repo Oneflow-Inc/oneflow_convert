@@ -80,7 +80,7 @@ class ArgMax:
         if ctx.get_dtype(node.output_tensor_names[0]) == onnx_pb.TensorProto.INT32:
             # current node will return int64 after conversion, which differs from previous dtype got from oneflow
             ctx.set_dtype(node.output_tensor_names[0], onnx_pb.TensorProto.INT64)
-            op_name = oneflow.util.unique_str("Cast")
+            op_name = oneflow._oneflow_internal.UniqueStr("Cast")
             cast_node = ctx.InsertNewNodeOnOutput(
                 "Cast",
                 node.output_tensor_names[0],

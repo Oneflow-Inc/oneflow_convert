@@ -59,43 +59,25 @@ def run_onnx(
 
 
 def export_onnx_model(
-    job_func,
+    graph,
     external_data=False,
     opset=None,
     flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    if flow_weight_dir == None:
-        flow_weight_dir = tempfile.TemporaryDirectory()
-        flow.checkpoint.save(flow_weight_dir.name)
-        # TODO(daquexian): a more elegant way?
-        while not os.path.exists(os.path.join(flow_weight_dir.name, "snapshot_done")):
-            pass
-        onnx_model_dir = onnx_model_path
-        onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
-        Export(
-            job_func,
-            flow_weight_dir.name,
-            onnx_model_path,
-            opset=opset,
-            external_data=external_data,
-            dynamic_batch_size=dynamic_batch_size,
-        )
-        flow_weight_dir.cleanup()
-    else:
-        while not os.path.exists(os.path.join(flow_weight_dir, "snapshot_done")):
-            pass
-        onnx_model_dir = onnx_model_path
-        onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
-        Export(
-            job_func,
-            flow_weight_dir,
-            onnx_model_path,
-            opset=opset,
-            external_data=external_data,
-            dynamic_batch_size=dynamic_batch_size,
-        )
+    while not os.path.exists(os.path.join(flow_weight_dir, "snapshot_done")):
+        pass
+    onnx_model_dir = onnx_model_path
+    onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
+    Export(
+        graph,
+        flow_weight_dir,
+        onnx_model_path,
+        opset=opset,
+        external_data=external_data,
+        dynamic_batch_size=dynamic_batch_size,
+    )
 
     def cleanup():
         if os.path.exists(onnx_model_path):
@@ -121,7 +103,7 @@ def compare_result(
 
 
 def convert_to_onnx_and_check(
-    job_func,
+    graph,
     print_outlier=False,
     explicit_init=False,
     external_data=False,
@@ -131,21 +113,8 @@ def convert_to_onnx_and_check(
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    if explicit_init:
-        # it is a trick to keep check_point.save() from hanging when there is no variable
-        @flow.global_function()
-        def add_var():
-            return flow.get_variable(
-                name="trick",
-                shape=(1,),
-                dtype=flow.float,
-                initializer=flow.random_uniform_initializer(),
-            )
-
-    flow.train.CheckPoint().init()
-
     onnx_model_path, cleanup = export_onnx_model(
-        job_func, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
+        graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
     )
 
 
@@ -153,7 +122,7 @@ def convert_to_onnx_and_check(
         ipt_dict, onnx_res = run_onnx(
         onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
         )
-        oneflow_res = job_func(*ipt_dict.values())
+        oneflow_res = graph(*ipt_dict.values())
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.get().numpy()
 

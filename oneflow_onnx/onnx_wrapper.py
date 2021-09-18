@@ -427,7 +427,7 @@ class Graph(object):
         # add identity node after each output, in case it is renamed during conversion.
         for o in self.outputs:
             n = self.get_node_by_output_in_current_graph(o)
-            new_output_name = oneflow.util.unique_str(n.name + "_raw_output")
+            new_output_name = oneflow._oneflow_internal.UniqueStr(n.name + "_raw_output")
             n_shapes = n.output_shapes
             n_dtypes = n.output_dtypes
             body_graphs = n.graph.contained_graphs.pop(n.name, None)
@@ -530,7 +530,7 @@ class Graph(object):
             dtypes = []
 
         if name is None:
-            name = oneflow.util.unique_str(op_type)
+            name = oneflow._oneflow_internal.UniqueStr(op_type)
 
         if op_name_scope:
             name = "_".join([op_name_scope, name])
@@ -859,7 +859,7 @@ class Graph(object):
         tensor_name = node.output_tensor_names[0]
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
-        path = pathjoin(self._model_save_dir, node.output_tensor_names[0])
+        path = pathjoin(self._model_save_dir, node.output_tensor_names[0][2:])
         tensor_value = np.fromfile(
             path, dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name))
         ).reshape(self.get_shape(tensor_name))
@@ -1112,7 +1112,7 @@ class Graph(object):
                 space,
                 node.op_type,
                 node.name,
-                self.get_shape(oneflow.util.unique_str(node.name)),
+                self.get_shape(oneflow._oneflow_internal.UniqueStr(node.name)),
             )
         )
         space += "    "
@@ -1167,8 +1167,8 @@ class Graph(object):
             node that was inserted
         """
         if name is None:
-            name = oneflow.util.unique_str(node.name)
-        new_output = oneflow.util.unique_str(name)
+            name = oneflow._oneflow_internal.UniqueStr(node.name)
+        new_output = oneflow._oneflow_internal.UniqueStr(name)
         if not isinstance(input_name, list):
             input_name = [input_name]
 
@@ -1208,7 +1208,7 @@ class Graph(object):
             type(op_type),
         )
 
-        new_output = oneflow.util.unique_str(name)
+        new_output = oneflow._oneflow_internal.UniqueStr(name)
         new_node = self.MakeNode(
             op_type,
             [output_name],

@@ -222,7 +222,7 @@ def TopologicalSort(g, continue_on_error):
             pass
 
 def Export(
-    job_func: Callable,
+    graph: Callable,
     model_save_dir: Text,
     onnx_filename: Text,
     continue_on_error: bool = False,
@@ -235,7 +235,7 @@ def Export(
     r"""Export a oneflow model into ONNX format.
 
     Args:
-        job_func: The job function
+        graph: oneflow.nn.Graph
         model_save_dir: The directory containing oneflow model weights. Users are expected to call check_point.save(dir), wait for the model saving finishing, and pass the argument 'dir' as model_save_dir.
         onnx_filename: a string for the output filename
         continue_on_error: if an op can't be processed (aka there is no mapping), continue
@@ -246,38 +246,34 @@ def Export(
     """
     assert os.getenv("ENABLE_USER_OP") != "False"
     assert os.path.isdir(model_save_dir)
-    job_set = oneflow.experimental.get_job_set()
-    job_name = job_func.__name__
-    for job in job_set.job:
-        # TODO(OYY) Modify the interface before modifying it
-        if job.job_conf.job_name == job_name:
-            onnx_graph = ProcessFlowGraph(
-                job,
-                model_save_dir,
-                continue_on_error=continue_on_error,
-                opset=opset,
-                extra_opset=extra_opset,
-                shape_override=shape_override,
-            )
-            onnx_graph = optimizer.OptimizeGraph(onnx_graph)
-            model_proto = onnx_graph.MakeModel(
-                job_name, onnx_filename, external_data=external_data
-            )
+    job = graph._full_graph_proto
+    onnx_graph = ProcessFlowGraph(
+        job,
+        model_save_dir,
+        continue_on_error=continue_on_error,
+        opset=opset,
+        extra_opset=extra_opset,
+        shape_override=shape_override,
+    )
+    onnx_graph = optimizer.OptimizeGraph(onnx_graph)
+    model_proto = onnx_graph.MakeModel(
+        "tmp", onnx_filename, external_data=external_data
+    )
 
-            if dynamic_batch_size == True:
-                model_proto.graph.input[0].type.tensor_type.shape.dim[0].dim_param = 'None'
+    if dynamic_batch_size == True:
+        model_proto.graph.input[0].type.tensor_type.shape.dim[0].dim_param = 'None'
 
-            with open(onnx_filename, "wb") as f:
-                try:
-                    f.write(model_proto.SerializeToString())
-                except ValueError as e:
-                    raise ValueError(
-                        "Error occured when running model_proto.SerializeToString(). If the model is larger than 2GB, please specify external_data=True when calling flow.onnx.export. Original error message:\n{}".format(
-                            e
-                        )
-                    )
-            return
-    raise ValueError('Cannot find job "{}" in jobset'.format(job_name))
+    with open(onnx_filename, "wb") as f:
+        try:
+            f.write(model_proto.SerializeToString())
+        except ValueError as e:
+            raise ValueError(
+                "Error occured when running model_proto.SerializeToString(). If the model is larger than 2GB, please specify external_data=True when calling flow.onnx.export. Original error message:\n{}".format(
+                    e
+                )
+            )
+    return
+            
 
 
 def ProcessFlowGraph(

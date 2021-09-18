@@ -104,7 +104,7 @@ def _ConvConvertInputs(
                 reshape.skip_conversion = True
             else:
                 # new reshape takes new shape as input_tensor_names[1]
-                shape_name = oneflow.util.unique_str(node.name)
+                shape_name = oneflow._oneflow_internal.UniqueStr(node.name)
                 ctx.MakeConst(shape_name, np.array(new_kernel_shape, dtype=np.int64))
                 input_name = node.input_tensor_names[1]
                 reshape = ctx.MakeNode("Reshape", [input_name, shape_name])
@@ -139,7 +139,7 @@ def _ConvConvertInputs(
         for idx in output_indices:
             output_name = node.output_tensor_names[idx]
             output_shape = ctx.get_shape(node.output_tensor_names[idx])
-            op_name = oneflow.util.unique_str(node.name)
+            op_name = oneflow._oneflow_internal.UniqueStr(node.name)
             transpose = ctx.InsertNewNodeOnOutput(
                 "Transpose", output_name, name=op_name
             )
@@ -263,8 +263,8 @@ class ConvOp:
         cls.Version_1(ctx, node, **kwargs)
 
 
-@flow_op(["avg_pool_2d"], onnx_op="AveragePool")
-@flow_op(["max_pool_2d"], onnx_op="MaxPool")
+@flow_op(["avgpool_2d"], onnx_op="AveragePool")
+@flow_op(["maxpool_2d"], onnx_op="MaxPool")
 class PoolOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -306,6 +306,7 @@ class PoolOp:
         _ConvConvertInputs(ctx, node, with_kernel=False)
 
 
+
 @flow_op(["pad"], onnx_op="Pad")
 class Pad:
     @classmethod
@@ -328,7 +329,7 @@ class Pad:
         padding_before = node.attrs["padding_before"]
         padding_after = node.attrs["padding_after"]
         paddings = np.array(padding_before + padding_after).astype(np.int64)
-        padding_node = ctx.MakeConst(oneflow.util.unique_str("const"), paddings)
+        padding_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), paddings)
         node.input_tensor_names.append(padding_node.output_tensor_names[0])
         dtype = ctx.get_dtype(node.input_tensor_names[0])
         const_val = (
@@ -337,7 +338,7 @@ class Pad:
             else node.attrs["floating_constant_value"]
         )
         const_val = np.array(const_val).astype(util.Onnx2NumpyDtype(dtype))
-        const_val_node = ctx.MakeConst(oneflow.util.unique_str("const"), const_val)
+        const_val_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), const_val)
         node.input_tensor_names.append(const_val_node.output_tensor_names[0])
 
 
@@ -388,7 +389,7 @@ class BatchNorm:
                 ),
                 dtype=val_type,
             )
-            new_mean_node_name = oneflow.util.unique_str(node.name)
+            new_mean_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_mean_node_name, new_mean_value)
             node.input_tensor_names[3] = new_mean_node_name
 
@@ -399,7 +400,7 @@ class BatchNorm:
                 ),
                 dtype=val_type,
             )
-            new_val_node_name = oneflow.util.unique_str(node.name)
+            new_val_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_val_node_name, new_var_value)
             node.input_tensor_names[4] = new_val_node_name
 
