@@ -70,6 +70,7 @@ def test_alexnet():
     
     alexnet_graph = AlexNetGraph()
     alexnet_graph._compile(flow.randn(1, 3, 224, 224))
+    # print(alexnet_graph._full_graph_proto)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(alexnet.state_dict(), tmpdirname)

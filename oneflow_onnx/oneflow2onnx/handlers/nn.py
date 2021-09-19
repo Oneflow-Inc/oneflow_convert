@@ -254,6 +254,7 @@ class PoolOp:
         # T output = MaxPool(T input, @list(int) ksize, @list(int) strides, @string padding, @string data_format)
         # T Y = MaxPool(T X, @AttrType.STRING auto_pad, @AttrType.INTS kernel_shape, @AttrType.INTS pads,
         #               @AttrType.INTS strides)
+        print(node.output_tensor_names)
         if len(node.input_tensor_names) < 3:
             kernel_shape_flow = node.attrs["kernel_size"]
             strides_flow = node.attrs["stride"]
@@ -273,8 +274,6 @@ class PoolOp:
                 "padding_after", [0, 0]
             )
             node.attrs["pads"] = pads
-        _ConvConvertInputs(ctx, node, with_kernel=False)
-
 
 
 @flow_op(["pad"], onnx_op="Pad")

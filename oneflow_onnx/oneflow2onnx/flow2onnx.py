@@ -113,6 +113,9 @@ def FlowToOnnxNaive(graph, shape_override):
 
     def get_outputs(node):
         if is_user_op(node):
+            print(node)
+            print(type(node))
+            print(node.user_conf.output)
             obns = handler.flow_op.obn4op_type(get_op_type(node))
             if obns is None:
                 assert all([len(x.s) == 1 for x in node.user_conf.output.values()])
