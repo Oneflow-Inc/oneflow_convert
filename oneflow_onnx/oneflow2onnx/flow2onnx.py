@@ -86,7 +86,9 @@ def FlowToOnnxNaive(graph, shape_override):
                 for order in node.user_conf.input_order:
                     for key, val in node.user_conf.input.items():
                         if key == order:
-                            res.append(val.s[0])
+                            for _ in range(len(val.s)):
+                                res.append(val.s[_])
+
                 return res
             ipts = []
             for ibn in ibns:
@@ -122,7 +124,8 @@ def FlowToOnnxNaive(graph, shape_override):
                 for order in node.user_conf.output_order:
                     for key, val in node.user_conf.output.items():
                         if key == order:
-                            res.append(val.s[0])
+                            for _ in range(len(val.s)):
+                                res.append(val.s[_])
                 return res
             outputs = []
             for obn in obns:
@@ -169,8 +172,6 @@ def FlowToOnnxNaive(graph, shape_override):
             op_type = get_op_type(node)
             input_names = get_inputs(node)
             output_names = get_outputs(node)
-            input_order = node.user_conf.input_order
-            output_order = node.user_conf.output_order
             onnx_node = helper.make_node(
                 op_type, input_names, output_names, name=node.name, **attr 
             )
