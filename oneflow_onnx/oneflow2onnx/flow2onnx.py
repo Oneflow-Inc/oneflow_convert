@@ -82,9 +82,12 @@ def FlowToOnnxNaive(graph, shape_override):
         if is_user_op(node):
             ibns = handler.flow_op.ibn4op_type(get_op_type(node))
             if ibns is None:
-                return list(
-                    itertools.chain(*[x.s for x in node.user_conf.input.values()])
-                )
+                res = []
+                for order in node.user_conf.input_order:
+                    for key, val in node.user_conf.input.items():
+                        if key == order:
+                            res.append(val.s[0])
+                return res
             ipts = []
             for ibn in ibns:
                 for key, val in node.user_conf.input.items():
@@ -113,13 +116,14 @@ def FlowToOnnxNaive(graph, shape_override):
 
     def get_outputs(node):
         if is_user_op(node):
-            print(node)
-            print(type(node))
-            print(node.user_conf.output)
             obns = handler.flow_op.obn4op_type(get_op_type(node))
             if obns is None:
-                assert all([len(x.s) == 1 for x in node.user_conf.output.values()])
-                return [x.s[0] for x in node.user_conf.output.values()]
+                res = []
+                for order in node.user_conf.output_order:
+                    for key, val in node.user_conf.output.items():
+                        if key == order:
+                            res.append(val.s[0])
+                return res
             outputs = []
             for obn in obns:
                 for key, val in node.user_conf.output.items():
@@ -165,8 +169,10 @@ def FlowToOnnxNaive(graph, shape_override):
             op_type = get_op_type(node)
             input_names = get_inputs(node)
             output_names = get_outputs(node)
+            input_order = node.user_conf.input_order
+            output_order = node.user_conf.output_order
             onnx_node = helper.make_node(
-                op_type, input_names, output_names, name=node.name, **attr
+                op_type, input_names, output_names, name=node.name, **attr 
             )
             onnx_nodes.append(onnx_node)
         except Exception as ex:
