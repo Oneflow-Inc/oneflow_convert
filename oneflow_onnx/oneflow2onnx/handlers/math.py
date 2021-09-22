@@ -287,6 +287,13 @@ class ClipOps:
         else:
             node.input_tensor_names.append("")
 
+@flow_op("hardtanh", onnx_op="Clip")
+class HardTanh(ClipOps):
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        min_val = 0.0
+        max_val = 6.0
+        super().Version_1(ctx, node, min_val, max_val)
 
 @flow_op(["clip_by_scalar", "clip_by_scalar_min", "clip_by_scalar_max"], onnx_op="Clip")
 class ClipByValueOp(ClipOps):
