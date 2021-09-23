@@ -13,70 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+class AddN(flow.nn.Module):
+    def __init__(self) -> None:
+        super(AddN, self).__init__()
+    
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        y = x + x + x
+        return y
 
-def test_add_2():
-    @flow.global_function()
-    def add_2():
-        x = flow.get_variable(
-            name="x",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        y = flow.get_variable(
-            name="y",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.math.add_n([x, y])
+addn = AddN()
+class AddNOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = addn
 
-    convert_to_onnx_and_check(add_2)
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
-def test_add_3():
-    @flow.global_function()
-    def add_3():
-        x = flow.get_variable(
-            name="x",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        y = flow.get_variable(
-            name="y",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        z = flow.get_variable(
-            name="z",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.math.add_n([x, y, z])
+def test_addn():
+    
+    addn_graph = AddNOpGraph()
+    addn_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(add_3)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(addn.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(addn_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-
-def test_add_many():
-    @flow.global_function()
-    def add_many():
-        variables = []
-        for i in range(50):
-            variables.append(
-                flow.get_variable(
-                    name=str(i),
-                    shape=(2, 3),
-                    dtype=flow.float,
-                    initializer=flow.random_uniform_initializer(),
-                )
-            )
-        return flow.math.add_n(variables)
-
-    convert_to_onnx_and_check(add_many)
+test_addn()
