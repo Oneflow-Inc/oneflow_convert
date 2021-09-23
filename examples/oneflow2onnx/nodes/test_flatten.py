@@ -13,36 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
+
+class Flatten(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Flatten, self).__init__()
+        self.flatten = flow.nn.Flatten()
+
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return self.flatten(x)
+
+flatten = Flatten()
+class flattenOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = flatten
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
 def test_flatten():
-    @flow.global_function()
-    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.flatten(x, start_dim=1, end_dim=-1)
+    
+    flatten_graph = flattenOpGraph()
+    flatten_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(flatten)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(flatten.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(flatten_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-def test_flatten_aixs_negative():
-    @flow.global_function()
-    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.flatten(x, start_dim=0, end_dim=-1)
-
-    convert_to_onnx_and_check(flatten)
-
-def test_flatten_aixs_default():
-    @flow.global_function()
-    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        return flow.flatten(x)
-
-    convert_to_onnx_and_check(flatten)
-
-def test_flatten_dtype_int():
-    @flow.global_function()
-    def flatten(x: tp.Numpy.Placeholder((3, 4, 2, 5))):
-        x = flow.cast(x, flow.int32)
-        return flow.flatten(x)
-
-    convert_to_onnx_and_check(flatten, opset=11)
+test_flatten()

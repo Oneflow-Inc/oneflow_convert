@@ -13,105 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+class MatMul(flow.nn.Module):
+    def __init__(self) -> None:
+        super(MatMul, self).__init__()
+        self.matmul = flow.nn.Linear(20, 30)
+
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return self.matmul(x)
+
+matmul = MatMul()
+class matmulOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = matmul
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
 
 def test_matmul():
-    @flow.global_function()
-    def matmul():
-        a = flow.get_variable(
-            name="a",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        b = flow.get_variable(
-            name="b",
-            shape=(3, 4),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.matmul(a, b)
+    
+    matmul_graph = matmulOpGraph()
+    matmul_graph._compile(flow.randn(1, 20))
 
-    convert_to_onnx_and_check(matmul)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(matmul.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(matmul_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-
-def test_matmul_ta():
-    @flow.global_function()
-    def matmul():
-        a = flow.get_variable(
-            name="a",
-            shape=(3, 2),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        b = flow.get_variable(
-            name="b",
-            shape=(3, 4),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.matmul(a, b, transpose_a=True)
-
-    convert_to_onnx_and_check(matmul)
-
-
-def test_matmul_tb():
-    @flow.global_function()
-    def matmul():
-        a = flow.get_variable(
-            name="a",
-            shape=(2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        b = flow.get_variable(
-            name="b",
-            shape=(4, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.matmul(a, b, transpose_b=True)
-
-    convert_to_onnx_and_check(matmul)
-
-
-def test_matmul_ta_tb():
-    @flow.global_function()
-    def matmul():
-        a = flow.get_variable(
-            name="a",
-            shape=(3, 2),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        b = flow.get_variable(
-            name="b",
-            shape=(4, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.matmul(a, b, transpose_a=True, transpose_b=True)
-
-    convert_to_onnx_and_check(matmul)
-
-
-def test_batch_matmul():
-    @flow.global_function()
-    def matmul():
-        a = flow.get_variable(
-            name="a",
-            shape=(4, 2, 3),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        b = flow.get_variable(
-            name="b",
-            shape=(4, 3, 4),
-            dtype=flow.float,
-            initializer=flow.random_uniform_initializer(),
-        )
-        return flow.matmul(a, b)
-
-    convert_to_onnx_and_check(matmul)
+test_matmul()
