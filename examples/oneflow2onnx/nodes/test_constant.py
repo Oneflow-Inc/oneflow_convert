@@ -13,21 +13,35 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+class Constant(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Constant, self).__init__()
+    
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return flow.ones((2, 3)) + flow.zeros((2, 3))
 
-def test_constant_float():
-    @flow.global_function()
-    def constant(x: tp.Numpy.Placeholder((3, 5))):
-        return flow.constant(value=1.5, shape=(1, 3, 3), dtype=flow.float)
+constant = Constant()
+class constantOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = constant
 
-    convert_to_onnx_and_check(constant)
+    def build(self, x):
+        out = self.m(x)
+        return out
 
-def test_constant_int():
-    @flow.global_function()
-    def constant(x: tp.Numpy.Placeholder((3, 5))):
-        return flow.constant(value=1, shape=(1, 3, 3), dtype=flow.int)
 
-    convert_to_onnx_and_check(constant)
+def test_constant():
+    
+    constant_graph = constantOpGraph()
+    constant_graph._compile(flow.randn(1, 3, 224, 224))
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(constant.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(constant_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+
+test_constant()

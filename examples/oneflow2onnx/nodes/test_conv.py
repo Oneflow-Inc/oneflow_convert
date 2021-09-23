@@ -13,106 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-initializer = flow.random_uniform_initializer()
-initer_args = {"kernel_initializer": initializer, "bias_initializer": initializer}
+class Conv2d(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Conv2d, self).__init__()
+        self.conv = flow.nn.Conv2d(3, 16, 3)
+
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return self.conv(x)
+
+conv = Conv2d()
+class convOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = conv
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
-def test_conv2d_k2d1_valid():
-    @flow.global_function()
-    def conv2d_k3s1_valid(x: tp.Numpy.Placeholder((2, 4, 3, 5))):
-        return flow.layers.conv2d(
-            x, 6, kernel_size=3, strides=1, padding="VALID", **initer_args
-        )
+def test_conv():
+    
+    conv_graph = convOpGraph()
+    conv_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(conv2d_k3s1_valid)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(conv.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(conv_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-
-def test_conv2d_s2_valid():
-    @flow.global_function()
-    def conv2d_s2_valid(x: tp.Numpy.Placeholder((2, 4, 3, 5))):
-        return flow.layers.conv2d(
-            x, 6, kernel_size=1, strides=2, padding="VALID", **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d_s2_valid)
-
-
-def test_conv2d_s2_same():
-    @flow.global_function()
-    def conv2d_s2_same(x: tp.Numpy.Placeholder((2, 4, 3, 5))):
-        return flow.layers.conv2d(
-            x, 6, kernel_size=3, strides=2, padding="SAME", **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d_s2_same)
-
-
-def test_conv2d_k3s1_nhwc_valid():
-    @flow.global_function()
-    def conv2d_k3s1_nhwc_valid(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        return flow.layers.conv2d(
-            x,
-            6,
-            kernel_size=3,
-            strides=1,
-            padding="VALID",
-            data_format="NHWC",
-            **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d_k3s1_nhwc_valid)
-
-
-def test_conv2d_k3s1_nhwc_same_d2():
-    @flow.global_function()
-    def conv2d(x: tp.Numpy.Placeholder((2, 7, 5, 4))):
-        return flow.layers.conv2d(
-            x,
-            6,
-            kernel_size=3,
-            strides=1,
-            dilation_rate=2,
-            padding="SAME",
-            data_format="NHWC",
-            **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d)
-
-
-def test_conv2d_k3s1_nchw_same_g2():
-    @flow.global_function()
-    def conv2d(x: tp.Numpy.Placeholder((2, 4, 5, 3))):
-        return flow.layers.conv2d(
-            x,
-            6,
-            kernel_size=3,
-            strides=1,
-            groups=2,
-            padding="SAME",
-            data_format="NCHW",
-            **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d)
-
-
-def test_conv2d_k3s1_nchw_same_depthwise():
-    @flow.global_function()
-    def conv2d(x: tp.Numpy.Placeholder((2, 4, 5, 3))):
-        return flow.layers.conv2d(
-            x,
-            4,
-            kernel_size=3,
-            strides=1,
-            groups=4,
-            padding="SAME",
-            data_format="NCHW",
-            **initer_args
-        )
-
-    convert_to_onnx_and_check(conv2d)
+test_conv()
