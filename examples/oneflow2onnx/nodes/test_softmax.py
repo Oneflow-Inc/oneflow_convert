@@ -13,22 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
+
+class Softmax(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Softmax, self).__init__()
+        self.softmax = flow.nn.Softmax(dim=1)
+    
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return self.softmax(x)
+
+softmax = Softmax()
+class softmaxOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = softmax
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
 def test_softmax():
-    @flow.global_function()
-    def softmax(x: tp.Numpy.Placeholder((3, 5))):
-        return flow.nn.softmax(x)
+    
+    softmax_graph = softmaxOpGraph()
+    softmax_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(softmax)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(softmax.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(softmax_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-
-def test_softmax_with_axis():
-    @flow.global_function()
-    def softmax(x: tp.Numpy.Placeholder((3, 5, 4))):
-        return flow.nn.softmax(x, axis=1)
-
-    convert_to_onnx_and_check(softmax)
+test_softmax()
