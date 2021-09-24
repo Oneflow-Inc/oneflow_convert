@@ -116,20 +116,20 @@ class Inception3(nn.Module):
         self.Mixed_7a = inception_d(768)
         self.Mixed_7b = inception_e(1280)
         self.Mixed_7c = inception_e(2048)
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.avgpool = nn.AvgPool2d((8, 8))
         self.dropout = nn.Dropout()
         self.fc = nn.Linear(2048, num_classes)
 
-        if init_weights:
-            for m in self.modules():
-                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                    stddev = float(m.stddev) if hasattr(m, "stddev") else 0.1  # type: ignore
-                    flow.nn.init.trunc_normal_(
-                        m.weight, mean=0.0, std=stddev, a=-2, b=2
-                    )
-                elif isinstance(m, nn.BatchNorm2d):
-                    nn.init.constant_(m.weight, 1)
-                    nn.init.constant_(m.bias, 0)
+        # if init_weights:
+        #     for m in self.modules():
+        #         if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+        #             stddev = float(m.stddev) if hasattr(m, "stddev") else 0.1  # type: ignore
+        #             flow.nn.init.trunc_normal_(
+        #                 m.weight, mean=0.0, std=stddev, a=-2, b=2
+        #             )
+        #         elif isinstance(m, nn.BatchNorm2d):
+        #             nn.init.constant_(m.weight, 1)
+        #             nn.init.constant_(m.bias, 0)
 
     def _transform_input(self, x: Tensor) -> Tensor:
         if self.transform_input:
@@ -191,7 +191,7 @@ class Inception3(nn.Module):
         # N x 2048
         x = self.fc(x)
         # N x 1000 (num_classes)
-        return x, aux
+        return x
 
 
 class InceptionA(nn.Module):
@@ -418,7 +418,7 @@ class InceptionAux(nn.Module):
         self.fc = nn.Linear(768, num_classes)
         self.fc.stddev = 0.001  # type: ignore[assignment]
         self.avg_pool = nn.AvgPool2d(kernel_size=5, stride=3)
-        self.adaptive_avp_pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.adaptive_avp_pool = nn.AvgPool2d((1, 1))
 
     def forward(self, x: Tensor) -> Tensor:
         # N x 768 x 17 x 17
@@ -453,22 +453,22 @@ class BasicConv2d(nn.Module):
 inceptionv3 = inception_v3()
 inceptionv3.eval()
 
-# class inceptionv3Graph(flow.nn.Graph):
-#     def __init__(self):
-#         super().__init__()
-#         self.m = inceptionv3
+class inceptionv3Graph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = inceptionv3
 
-#     def build(self, x):
-#         out = self.m(x)
-#         return out
+    def build(self, x):
+        out = self.m(x)
+        return out
 
-# def test_inceptionv3():
+def test_inceptionv3():
     
-#     inceptionv3_graph = inceptionv3Graph()
-#     inceptionv3_graph._compile(flow.randn(1, 3, 299, 299))
+    inceptionv3_graph = inceptionv3Graph()
+    inceptionv3_graph._compile(flow.randn(1, 3, 299, 299))
 
-#     with tempfile.TemporaryDirectory() as tmpdirname:
-#         flow.save(inceptionv3.state_dict(), tmpdirname)
-#         convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(inceptionv3.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-# test_inceptionv3()
+test_inceptionv3()
