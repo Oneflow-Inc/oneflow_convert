@@ -10,20 +10,9 @@
 
 #### Introduction
 
-oneflow_onnx tool package includes two major functions: one is to export OneFlow out of ONNX, while the other is to transform ONNX models, which are obtained from other training frameworks, into Oneflow models. This tool package has already been adapted to TensorFlow/Pytorch/PaddlePaddle pre-trained models. The process of oneflow_onnx extracting ONNX and transforming it into OneFlow's format is called X2OneFlow (X representing TensorFlow/Pytorch/PaddlePaddle).
-
 - OneFlow2ONNX models are supported. Specifically, OneFlow's lazy mode model can be transfomed into ONNX's format. Transformable OneFlow model can be obtained by using the method explained on [flow.checkpoint.save ](https://docs.oneflow.org/basics_topics/model_load_save.html). For more information, please refer to [OneFlow2ONNX Model List](docs/oneflow2onnx/oneflow2onnx_model_zoo.md).
-- X2OneFlow models are supported. TensorFlow/Pytorch/PaddlePaddle model can be transformed into OneFlow's format through ONNX.
 - OneFlow2ONNX operators are supported. Currently, oneflow_onnx is fully capable of exporting ONNX Opset10, and parts of OneFlow operator can transform ONNX Opsets that are in lower order. Please refer to [OneFlow2ONNX Operator Lists](docs/oneflow2onnx/op_list.md) for more information.
-- X2OneFlow operators are supported. Currently, oneflow_onnx is fully capable of supporting most CV operators in TensorFlow/Pytorch/PaddlePaddle. Please refer to [X2OneFlow Operator Lists](docs/x2oneflow/op_list.md) for more information.
-- Code generation is also supported. oneflow_onnx is able to generate OneFlow code and transforming models simultaneously . Please refer to [X2OneFlow Code Generation List](docs/x2oneflow/code_gen.md) for more information.
 
-> To sum up,
->
-> - OneFlow2ONNX can support over 80 ONNX OP
-> - X2OneFlow can support 80 ONNX OP,  50+ TensorFlow OP, 80+ Pytorch OP, and 50+ PaddlePaddle OP
->
-> which covers most operations when doing CV model classifications. Since the OPs and models we support are all in eager mode API, users are required to install versions of PaddlePaddle >= 2.0.0, TensorFlow >= 2.0.0, and there is no specific requirements for Pytorch. Until now, X2OneFlow has successfully transformed 50+ official models from TensorFlow/Pytorch/PaddlePaddle, and you're always welcomed to experience our product.
 
 #### Environment Dependencies
 
@@ -38,22 +27,13 @@ onnxruntime>=1.6.0
 oneflow (https://github.com/Oneflow-Inc/oneflow#install-with-pip-package)
 ```
 
-If you'd llike to use X2OneFlow, the following versions of deep learning frameworks are needed:
-
-```sh
-pytorch>=1.7.0
-paddlepaddle>=2.0.0
-paddle2onnx>=0.6
-tensorflow>=2.0.0
-tf2onnx>=1.8.4
-```
 
 #### Installation
 
 ##### Method 1
 
 ```sh
-pip install oneflow_onn
+pip install oneflow_onnx
 ```
 
 **Method 2**
@@ -71,33 +51,6 @@ Please refer to [Examples](examples/README.md)
 #### Related Documents
 
 - [OneFlow2ONNX Model List](docs/oneflow2onnx/oneflow2onnx_model_zoo.md)
-- [X2OneFlow Model List](docs/x2oneflow/x2oneflow_model_zoo.md)
 - [OneFlow2ONNX Operator List](docs/oneflow2onnx/op_list.md)
-- [X2OneFlow Operator List](docs/x2oneflow/op_list.md)
 - [Examples](examples/README.md)
-
-### nchw2nhwc_tool
-
-#### Introduction
-
-This tool is to transform NCHW, which is trained through OneFlow, into NHWC Format. Please click [here](nchw2nhwc_tool/README.md) for more information
-
-
-### save_serving_tool
-
-#### Introduction
-
-This tool is to transform OneFlow models into models that can be used on the Serving end. Please click [here](save_serving_tool/README.md) for more information
-
-### Project Status
-
-- 2021/4/13 Successively supported code generations for ResNet18. C testing script was removed after failed OP transformation. 0.2.2 wheel package was announced.
-- 2021/4/14 Refined CI errors. Supported code generations for all functions of X2OneFlow. 0.2.3 whell package was announced.
-- 2020/4/15 Finalized code generations for all functions of X2OneFlow. 0.3.0 whell was announced.
-- 2020/4/16 Merged Expand OP into the main branch. Debugged oneflow_api. 0.3.1 whell package was announced.
-- 2020/4/16 Solve the remaining problems of automatic code generation, add the test of automatic code generation to CI. 0.3.2 whell package was announced. 
-- 2020/6/21 Add PreLU/LeakyReLU OP ONNX Export， fix automatic code generation bug. 0.3.3 whell package was announced. 
-- 2020/6/23 Add Constant OP ONNX Export，fix batchnorm op export onnx bug (which caused in insightface) and disable the global function that 
-is enabled by default when exporting ONNX . 0.3.3.20210623 whell package was announced. 
-- 2020/6/24 Add Flatten OP ONNX Export. 0.3.4 whell package was announced. 
 

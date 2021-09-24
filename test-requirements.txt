@@ -1,5 +1,0 @@
-opencv-python
-pytest
-nvidia-tensorrt==8.0.0.3
-pycuda
-flake8
