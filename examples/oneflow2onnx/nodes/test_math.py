@@ -28,9 +28,9 @@ class MathOps(flow.nn.Module):
         y2 = y2 + x
         y2 = flow.abs(y2)
         y2 = flow.ceil(y2)
-        # y3 = flow.clip(x, -1.0, 1.0)
-        # y3 = flow.acos(y3)
-        # y2 = y2 + y3
+        y3 = flow.clip(x, -1.0, 1.0)
+        y3 = flow.acos(y3)
+        y2 = y2 + y3
 
         return y2
 
