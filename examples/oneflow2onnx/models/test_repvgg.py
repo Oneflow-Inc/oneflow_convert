@@ -190,7 +190,7 @@ class RepVGG(nn.Module):
         self.stage4 = self._make_stage(
             int(512 * width_multiplier[3]), num_blocks[3], stride=2
         )
-        self.gap = nn.AdaptiveAvgPool2d(output_size=1)
+        self.gap = nn.AvgPool2d(7)
         self.linear = nn.Linear(int(512 * width_multiplier[3]), num_classes)
 
     def _make_stage(self, planes, num_blocks, stride):
