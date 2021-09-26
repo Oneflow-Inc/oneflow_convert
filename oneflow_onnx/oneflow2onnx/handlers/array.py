@@ -207,6 +207,29 @@ class Concat:
         cls.Version_1(ctx, node, **kwargs)
 
 
+@flow_op("slice", "Slice")
+class Slice:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["start"]).astype(np.int64))
+        node.input_tensor_names.append(starts.output_tensor_names[0])
+        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop"), np.array(node.attrs["stop"]).astype(np.int64))
+        node.input_tensor_names.append(ends.output_tensor_names[0])
+        slice_axes = []
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        for i in range(len(input_shape)):
+            slice_axes.append(i)
+        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64))
+        node.input_tensor_names.append(axes.output_tensor_names[0])
+        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64))
+        node.input_tensor_names.append(steps.output_tensor_names[0])
+
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+        
+
 @flow_op("gather_nd", onnx_op="GatherND", flow_ibns=["params", "indices"])
 class GatherND:
     @classmethod
