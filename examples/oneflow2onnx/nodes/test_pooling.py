@@ -13,166 +13,37 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+class Pool(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Pool, self).__init__()
+        self.max_pool2d = flow.nn.MaxPool2d(kernel_size=3, padding=1, stride=1)
+        self.avg_pool2d = flow.nn.AvgPool2d(kernel_size=3, padding=1, stride=1)
+    
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return self.max_pool2d(x) + self.avg_pool2d(x)
 
-def test_max_pooling_2d_k3s1_valid_nhwc():
-    @flow.global_function()
-    def max_pooling_2d_k3s1_valid_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.max_pool2d(
-            x, ksize=3, strides=1, padding="VALID", data_format="NHWC"
-        )
+pool = Pool()
+class poolOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = pool
 
-    convert_to_onnx_and_check(max_pooling_2d_k3s1_valid_nhwc)
-
-
-def test_max_pooling_2d_k3s1_same_nhwc():
-    @flow.global_function()
-    def max_pooling_2d_k3s1_same_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.max_pool2d(
-            x, ksize=3, strides=1, padding="SAME", data_format="NHWC"
-        )
-
-    convert_to_onnx_and_check(max_pooling_2d_k3s1_same_nhwc)
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
-def test_max_pooling_2d_k2s2_same_nhwc():
-    @flow.global_function()
-    def max_pooling_2d_k2s2_same_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.max_pool2d(
-            x, ksize=2, strides=2, padding="SAME", data_format="NHWC"
-        )
+def test_pool():
+    
+    pool_graph = poolOpGraph()
+    pool_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(max_pooling_2d_k2s2_same_nhwc)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(pool.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(pool_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-
-def test_max_pooling_2d_k2s2_same_nchw():
-    @flow.global_function()
-    def max_pooling_2d_k2s2_same_nchw(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.max_pool2d(
-            x, ksize=2, strides=2, padding="SAME", data_format="NCHW"
-        )
-
-    convert_to_onnx_and_check(max_pooling_2d_k2s2_same_nchw)
-
-
-def test_max_pooling_2d_k3s1_valid_nchw():
-    @flow.global_function()
-    def max_pooling_2d_k3s1_valid_nchw(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.max_pool2d(
-            x, ksize=3, strides=1, padding="VALID", data_format="NCHW"
-        )
-
-    convert_to_onnx_and_check(max_pooling_2d_k3s1_valid_nchw)
-
-
-def test_avg_pooling_2d_k3s1_valid_nhwc():
-    @flow.global_function()
-    def avg_pooling_2d_k3s1_valid_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.avg_pool2d(
-            x, ksize=3, strides=1, padding="VALID", data_format="NHWC"
-        )
-
-    convert_to_onnx_and_check(avg_pooling_2d_k3s1_valid_nhwc)
-
-
-def test_avg_pooling_2d_k3s1_same_nhwc():
-    @flow.global_function()
-    def avg_pooling_2d_k3s1_same_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.avg_pool2d(
-            x, ksize=3, strides=1, padding="SAME", data_format="NHWC"
-        )
-
-    convert_to_onnx_and_check(avg_pooling_2d_k3s1_same_nhwc)
-
-
-def test_avg_pooling_2d_k2s2_same_nhwc():
-    @flow.global_function()
-    def avg_pooling_2d_k2s2_same_nhwc(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.avg_pool2d(
-            x, ksize=2, strides=2, padding="SAME", data_format="NHWC"
-        )
-
-    convert_to_onnx_and_check(avg_pooling_2d_k2s2_same_nhwc)
-
-
-def test_avg_pooling_2d_k3s1_valid_nchw():
-    @flow.global_function()
-    def avg_pooling_2d_k3s1_valid_nchw(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.avg_pool2d(
-            x, ksize=3, strides=1, padding="VALID", data_format="NCHW"
-        )
-
-    convert_to_onnx_and_check(avg_pooling_2d_k3s1_valid_nchw)
-
-
-def test_avg_pooling_2d_k2s2_same_nchw():
-    @flow.global_function()
-    def avg_pooling_2d_k2s2_same_nchw(x: tp.Numpy.Placeholder((2, 3, 5, 4))):
-        x += flow.get_variable(
-            name="v1",
-            shape=(1, 1),
-            dtype=flow.float,
-            initializer=flow.zeros_initializer(),
-        )
-        return flow.nn.avg_pool2d(
-            x, ksize=2, strides=2, padding="SAME", data_format="NCHW"
-        )
-
-    convert_to_onnx_and_check(avg_pooling_2d_k2s2_same_nchw)
+test_pool()

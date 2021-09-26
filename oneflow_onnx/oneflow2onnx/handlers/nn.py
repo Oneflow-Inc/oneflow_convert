@@ -104,7 +104,7 @@ def _ConvConvertInputs(
                 reshape.skip_conversion = True
             else:
                 # new reshape takes new shape as input_tensor_names[1]
-                shape_name = oneflow.util.unique_str(node.name)
+                shape_name = oneflow._oneflow_internal.UniqueStr(node.name)
                 ctx.MakeConst(shape_name, np.array(new_kernel_shape, dtype=np.int64))
                 input_name = node.input_tensor_names[1]
                 reshape = ctx.MakeNode("Reshape", [input_name, shape_name])
@@ -139,7 +139,7 @@ def _ConvConvertInputs(
         for idx in output_indices:
             output_name = node.output_tensor_names[idx]
             output_shape = ctx.get_shape(node.output_tensor_names[idx])
-            op_name = oneflow.util.unique_str(node.name)
+            op_name = oneflow._oneflow_internal.UniqueStr(node.name)
             transpose = ctx.InsertNewNodeOnOutput(
                 "Transpose", output_name, name=op_name
             )
@@ -155,65 +155,35 @@ def _ConvConvertInputs(
 
 
 def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2):
-    padding = node.attrs.get("padding")
-    if padding:
-        if dilations is None:
-            dilations = [1] * spatial * 2
-        if padding == "same":
-            padding = "same_lower"
-        if padding in ["same_lower", "same_upper"]:
-            pads = [0] * spatial * 2
-            input_shape = ctx.get_shape(node.input_tensor_names[0])
-            output_shape = ctx.get_shape(node.output_tensor_names[0])
-            # check if the input shape is valid
-            if len(input_shape) != len(pads):
-                logger.error(
-                    "node %s input needs to be rank %d, is %d",
-                    node.name,
-                    len(pads),
-                    len(input_shape),
-                )
-            # transpose shape to nchw
-            if node.is_nhwc():
-                input_shape = _SpatialMap(input_shape, constants.NHWC_TO_NCHW)
-                output_shape = _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
-            # calculate pads
-            if any(
-                input_shape[i + 2] == -1 or output_shape[i + 2] == -1
-                for i in range(spatial)
-            ):
-                logger.debug(
-                    "node %s has unknown dim for pads calculation, fallback to auto_pad: "
-                    "input_shape=%s, output_shape=%s",
-                    node.name,
-                    input_shape,
-                    output_shape,
-                )
-                if padding == "same_lower":
-                    node.attrs["auto_pad"] = "SAME_LOWER"
-                else:
-                    node.attrs["auto_pad"] = "SAME_UPPER"
-            else:
-                for i in range(spatial):
-                    pad = (
-                        (output_shape[i + 2] - 1) * strides[i]
-                        + dilations[i] * (kernel_shape[i] - 1)
-                        + 1
-                        - input_shape[i + 2]
-                    )
-                    pad = max(pad, 0)
-                    if padding == "same_lower":
-                        pads[i + spatial] = pad // 2
-                        pads[i] = pad - pad // 2
-                    else:
-                        pads[i] = pad // 2
-                        pads[i + spatial] = pad - pad // 2
-                node.attrs["pads"] = pads
+    if dilations is None:
+        dilations = [1] * spatial * 2
+    pads = [0] * spatial * 2
+    input_shape = ctx.get_shape(node.input_tensor_names[0])
+    output_shape = ctx.get_shape(node.output_tensor_names[0])
+    # check if the input shape is valid
+    if len(input_shape) != len(pads):
+        logger.error(
+            "node %s input needs to be rank %d, is %d",
+            node.name,
+            len(pads),
+            len(input_shape),
+        )
+    # transpose shape to nchw
+    if node.is_nhwc():
+        input_shape = _SpatialMap(input_shape, constants.NHWC_TO_NCHW)
+        output_shape = _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
+    for i in range(spatial):
+        pad = (
+            (output_shape[i + 2] - 1) * strides[i]
+            + dilations[i] * (kernel_shape[i] - 1)
+            + 1
+            - input_shape[i + 2]
+        )
+        pad = max(pad, 0)
+        pads[i + spatial] = pad // 2
+        pads[i] = pad - pad // 2
+    node.attrs["pads"] = pads
 
-        elif padding == "valid":
-            pass
-        else:
-            raise ValueError("invalid padding value: " + padding)
 
 
 def conv_dims_attr(node, name, new_name=None):
@@ -263,8 +233,8 @@ class ConvOp:
         cls.Version_1(ctx, node, **kwargs)
 
 
-@flow_op(["avg_pool_2d"], onnx_op="AveragePool")
-@flow_op(["max_pool_2d"], onnx_op="MaxPool")
+@flow_op(["avgpool_2d"], onnx_op="AveragePool")
+@flow_op(["maxpool_2d"], onnx_op="MaxPool")
 class PoolOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -285,8 +255,8 @@ class PoolOp:
         # T Y = MaxPool(T X, @AttrType.STRING auto_pad, @AttrType.INTS kernel_shape, @AttrType.INTS pads,
         #               @AttrType.INTS strides)
         if len(node.input_tensor_names) < 3:
-            kernel_shape_flow = node.attrs["pool_size"]
-            strides_flow = node.attrs["strides"]
+            kernel_shape_flow = node.attrs["kernel_size"]
+            strides_flow = node.attrs["stride"]
         else:
             kernel_shape_flow = node.input_nodes[1].get_tensor_value()
             strides_flow = node.input_nodes[2].get_tensor_value()
@@ -303,7 +273,6 @@ class PoolOp:
                 "padding_after", [0, 0]
             )
             node.attrs["pads"] = pads
-        _ConvConvertInputs(ctx, node, with_kernel=False)
 
 
 @flow_op(["pad"], onnx_op="Pad")
@@ -328,7 +297,7 @@ class Pad:
         padding_before = node.attrs["padding_before"]
         padding_after = node.attrs["padding_after"]
         paddings = np.array(padding_before + padding_after).astype(np.int64)
-        padding_node = ctx.MakeConst(oneflow.util.unique_str("const"), paddings)
+        padding_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), paddings)
         node.input_tensor_names.append(padding_node.output_tensor_names[0])
         dtype = ctx.get_dtype(node.input_tensor_names[0])
         const_val = (
@@ -337,7 +306,7 @@ class Pad:
             else node.attrs["floating_constant_value"]
         )
         const_val = np.array(const_val).astype(util.Onnx2NumpyDtype(dtype))
-        const_val_node = ctx.MakeConst(oneflow.util.unique_str("const"), const_val)
+        const_val_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), const_val)
         node.input_tensor_names.append(const_val_node.output_tensor_names[0])
 
 
@@ -388,7 +357,7 @@ class BatchNorm:
                 ),
                 dtype=val_type,
             )
-            new_mean_node_name = oneflow.util.unique_str(node.name)
+            new_mean_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_mean_node_name, new_mean_value)
             node.input_tensor_names[3] = new_mean_node_name
 
@@ -399,7 +368,7 @@ class BatchNorm:
                 ),
                 dtype=val_type,
             )
-            new_val_node_name = oneflow.util.unique_str(node.name)
+            new_val_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_val_node_name, new_var_value)
             node.input_tensor_names[4] = new_val_node_name
 

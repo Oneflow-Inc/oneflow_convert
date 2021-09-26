@@ -13,14 +13,35 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import tempfile
 import oneflow as flow
-import oneflow.typing as tp
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
+
+class Transpose(flow.nn.Module):
+    def __init__(self) -> None:
+        super(Transpose, self).__init__()
+    
+    def forward(self, x: flow.Tensor) -> flow.Tensor:
+        return flow.transpose(x, 1, 2)
+
+transpose = Transpose()
+class transposeOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = transpose
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 
 def test_transpose():
-    @flow.global_function()
-    def transpose(x: tp.Numpy.Placeholder((3, 5, 4))):
-        return flow.transpose(x, perm=(2, 0, 1))
+    
+    transpose_graph = transposeOpGraph()
+    transpose_graph._compile(flow.randn(1, 3, 224, 224))
 
-    convert_to_onnx_and_check(transpose)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(transpose.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(transpose_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+
+test_transpose()

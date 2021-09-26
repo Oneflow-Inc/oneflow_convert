@@ -124,7 +124,7 @@ class GraphBuilder(object):
         res = tensor
         if isinstance(tensor, list):
             res = self.graph.MakeConst(
-                oneflow.util.unique_str("const_slice"), np.array(tensor, dtype)
+                oneflow._oneflow_internal.UniqueStr("const_slice"), np.array(tensor, dtype)
             ).output[0]
 
         util.MakeSure(

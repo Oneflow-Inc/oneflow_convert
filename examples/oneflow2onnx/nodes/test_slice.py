@@ -17,32 +17,32 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-class Conv2d(flow.nn.Module):
+class Slice(flow.nn.Module):
     def __init__(self) -> None:
-        super(Conv2d, self).__init__()
-        self.conv = flow.nn.Conv2d(3, 16, 3)
-
+        super(Slice, self).__init__()
+    
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        return self.conv(x)
+        return x[:, :1, :, :]
 
-conv = Conv2d()
-class convOpGraph(flow.nn.Graph):
+slice = Slice()
+class sliceOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = conv
+        self.m = slice
 
     def build(self, x):
         out = self.m(x)
         return out
 
 
-def test_conv():
+def test_slice():
     
-    conv_graph = convOpGraph()
-    conv_graph._compile(flow.randn(1, 3, 224, 224))
+    slice_graph = sliceOpGraph()
+    slice_graph._compile(flow.randn(1, 3, 224, 224))
+    # print(slice_graph._full_graph_proto)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(conv.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(conv_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+        flow.save(slice.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(slice_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-test_conv()
+test_slice()
