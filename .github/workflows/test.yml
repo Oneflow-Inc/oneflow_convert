@@ -37,24 +37,18 @@ jobs:
           set -x
           extra_docker_args=""
           container_name=onnx-pr-${{ github.event.pull_request.number }}-run-id-${{ github.run_id }}-${test_suite}-test
+          extra_docker_args+=" --runtime=nvidia"
           extra_docker_args+=" --name ${container_name}"
           extra_docker_args+=" --shm-size=8g --rm -w $PWD -v $PWD:$PWD"
           extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/oneflow_convert_tools_test_cu11/0.1/local-bin:/root/.local/bin"
           extra_docker_args+=" -v $HOME/ci-cache/${{ github.repository }}/oneflow_convert_tools_test_cu11/0.1/site-packages38:/root/.local/lib/python3.8/site-packages"
           echo "extra_docker_args=${extra_docker_args}" >> $GITHUB_ENV
           echo "container_name=${container_name}" >> $GITHUB_ENV
-          echo "image_tag=oneflow_convert_tools_test_cu11:0.1" >> $GITHUB_ENV
-          echo "image_url=https://oneflow-static.oss-cn-beijing.aliyuncs.com/docker_images/oneflow_convert_tools_test_cu11.0.1.tar.gz" >> $GITHUB_ENV
-      - name: Check image
-        run: |
-          if [[ "$(docker images -q ${{ env.image_tag }} 2> /dev/null)" == "" ]]; then
-            echo "should_load_img=1" >> $GITHUB_ENV
-          fi
+          echo "image_tag=registry.cn-beijing.aliyuncs.com/oneflow/oneflow_convert_tools_test_cu11:0.1" >> $GITHUB_ENV
       - name: Load image
         if: env.should_load_img == '1'
         run: |
-          wget ${{ env.image_url }}
-          docker load -i $(basename "${{ env.image_url }}")
+          docker pull ${{ env.image_tag }}
       - name: Test
         run: |
           docker run $extra_docker_args \
