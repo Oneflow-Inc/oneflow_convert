@@ -101,9 +101,9 @@ class ResNet(nn.Module):
 def ResNet18():
     return ResNet(BasicBlock, [2, 2, 2, 2])
 
-quantization_resnet18 = ResNet18()
+resnet18 = ResNet18()
 
-gm: flow.fx.GraphModule = flow.fx.symbolic_trace(quantization_resnet18)
+gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
 qconfig = {
     'quantization_bit': 8, 
     'quantization_scheme': "symmetric", 
@@ -128,10 +128,11 @@ class ResNet18Graph(flow.nn.Graph):
 def test_resnet():
     
     resnet_graph = ResNet18Graph()
-    resnet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    resnet_graph.debug()
+    resnet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(quantization_resnet18.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+    # with tempfile.TemporaryDirectory() as tmpdirname:
+    #     flow.save(quantization_resnet18.state_dict(), tmpdirname)
+    #     convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
 
 test_resnet()
