@@ -23,7 +23,7 @@ jobs:
           access_token: ${{ github.token }}
   build:
     if: github.event.pull_request.draft == false && github.base_ref == 'main' && contains(github.event.pull_request.requested_reviewers.*.login, 'oneflow-ci-bot')
-    runs-on: [self-hosted, linux, gpu]
+    runs-on: [self-hosted, linux, provision]
     needs: [cancel_previous]
     steps:
       - name: Fix permissions
