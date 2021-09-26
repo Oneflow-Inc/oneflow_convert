@@ -189,6 +189,6 @@ def test_vgg16():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(vgg16.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
 
 test_vgg16()

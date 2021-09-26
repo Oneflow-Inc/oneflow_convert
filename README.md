@@ -14,8 +14,8 @@ OneFlow 相关的模型转换工具
 #### 简介
 
 
-- OneFlow2ONNX 模型支持，支持 OneFlow 静态图模型转为 ONNX，可转换由 [flow.checkpoint.save ](https://docs.oneflow.org/basics_topics/model_load_save.html) 方法保存下来的 OneFlow 模型，详情可以参考 [OneFlow2ONNX 模型列表](docs/oneflow2onnx/oneflow2onnx_model_zoo.md)。
-- OneFlow2ONNX 算子支持，目前稳定支持导出 ONNX Opset10，部分 OneFlow 算子支持更低的 ONNX Opset 转换，详情可以参考 [OneFlow2ONNX 算子列表](docs/oneflow2onnx/op_list.md)。
+- OneFlow2ONNX 模型支持，支持 OneFlow 动态图模型转为 ONNX，详情可以参考 [OneFlow2ONNX 模型列表](docs/oneflow2onnx/oneflow2onnx_model_zoo.md)。
+- OneFlow2ONNX 算子支持，支持 CV 中大部分常见算子，详情可以参考 [OneFlow2ONNX 算子列表](docs/oneflow2onnx/op_list.md)。
 
 
 #### 环境依赖
@@ -25,8 +25,6 @@ OneFlow 相关的模型转换工具
 ```sh
 python>=3.5
 onnx>=1.8.0
-onnx-simplifier>=0.3.3
-onnxoptimizer>=0.2.5
 onnxruntime>=1.6.0
 oneflow>=0.5.0
 ```
