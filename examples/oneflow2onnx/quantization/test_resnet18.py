@@ -128,7 +128,7 @@ class ResNet18Graph(flow.nn.Graph):
 def test_resnet():
     
     resnet_graph = ResNet18Graph()
-    resnet_graph.debug()
+    # resnet_graph.debug()
     resnet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
 
     # with tempfile.TemporaryDirectory() as tmpdirname:

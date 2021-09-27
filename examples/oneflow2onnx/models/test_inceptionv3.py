@@ -120,16 +120,16 @@ class Inception3(nn.Module):
         self.dropout = nn.Dropout()
         self.fc = nn.Linear(2048, num_classes)
 
-        # if init_weights:
-        #     for m in self.modules():
-        #         if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        #             stddev = float(m.stddev) if hasattr(m, "stddev") else 0.1  # type: ignore
-        #             flow.nn.init.trunc_normal_(
-        #                 m.weight, mean=0.0, std=stddev, a=-2, b=2
-        #             )
-        #         elif isinstance(m, nn.BatchNorm2d):
-        #             nn.init.constant_(m.weight, 1)
-        #             nn.init.constant_(m.bias, 0)
+        if init_weights:
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                    stddev = float(m.stddev) if hasattr(m, "stddev") else 0.1  # type: ignore
+                    flow.nn.init.trunc_normal_(
+                        m.weight, mean=0.0, std=stddev, a=-2, b=2
+                    )
+                elif isinstance(m, nn.BatchNorm2d):
+                    nn.init.constant_(m.weight, 1)
+                    nn.init.constant_(m.bias, 0)
 
     def _transform_input(self, x: Tensor) -> Tensor:
         if self.transform_input:
