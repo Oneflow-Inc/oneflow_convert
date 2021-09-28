@@ -102,6 +102,7 @@ def ResNet18():
     return ResNet(BasicBlock, [2, 2, 2, 2])
 
 resnet18 = ResNet18()
+resnet18.eval()
 
 gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
 qconfig = {
@@ -115,6 +116,7 @@ qconfig = {
 quantization_resnet18 = quantization_aware_training(gm, flow.randn(1, 3, 32, 32), qconfig)
 quantization_resnet18 = quantization_resnet18.to("cuda")
 quantization_resnet18.eval()
+print(quantization_resnet18)
 
 class ResNet18Graph(flow.nn.Graph):
     def __init__(self):
@@ -128,7 +130,6 @@ class ResNet18Graph(flow.nn.Graph):
 def test_resnet():
     
     resnet_graph = ResNet18Graph()
-    # resnet_graph.debug()
     resnet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
 
     # with tempfile.TemporaryDirectory() as tmpdirname:
