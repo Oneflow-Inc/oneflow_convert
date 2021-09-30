@@ -3,6 +3,7 @@ import oneflow as flow
 import oneflow.nn as nn
 import oneflow.nn.functional as F
 from oneflow.fx.passes.quantization import quantization_aware_training
+from oneflow.fx.passes.dequantization import dequantization_aware_training
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 class BasicBlock(nn.Module):
@@ -102,26 +103,32 @@ def ResNet18():
     return ResNet(BasicBlock, [2, 2, 2, 2])
 
 resnet18 = ResNet18()
+resnet18 = resnet18.to("cuda")
 resnet18.eval()
 
 gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
 qconfig = {
     'quantization_bit': 8, 
     'quantization_scheme': "symmetric", 
-    'quantization_formula': "cambricon", 
+    'quantization_formula': "google", 
     'per_layer_quantization': True,
     'momentum': 0.95,
 }
 
-quantization_resnet18 = quantization_aware_training(gm, flow.randn(1, 3, 32, 32), qconfig)
+quantization_resnet18 = quantization_aware_training(gm, flow.randn(1, 3, 32, 32).to("cuda"), qconfig)
 quantization_resnet18 = quantization_resnet18.to("cuda")
 quantization_resnet18.eval()
-print(quantization_resnet18)
+
+origin_gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
+dequantization_resnet18 = dequantization_aware_training(origin_gm, gm, flow.randn(1, 3, 32, 32).to("cuda"), qconfig)
+dequantization_resnet18 = dequantization_resnet18.to("cuda")
+dequantization_resnet18.eval()
+print(dequantization_resnet18)
 
 class ResNet18Graph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = quantization_resnet18
+        self.m = dequantization_resnet18
 
     def build(self, x):
         out = self.m(x)
@@ -131,9 +138,10 @@ def test_resnet():
     
     resnet_graph = ResNet18Graph()
     resnet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
+    # print(resnet_graph)    
 
-    # with tempfile.TemporaryDirectory() as tmpdirname:
-    #     flow.save(quantization_resnet18.state_dict(), tmpdirname)
-    #     convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(dequantization_resnet18.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
 
 test_resnet()
