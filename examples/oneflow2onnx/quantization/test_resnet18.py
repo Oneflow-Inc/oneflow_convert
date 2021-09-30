@@ -1,11 +1,13 @@
+import os
+import shutil
 import tempfile
 import oneflow as flow
 import oneflow.nn as nn
 import oneflow.nn.functional as F
 from oneflow.fx.passes.quantization import quantization_aware_training
 from oneflow.fx.passes.dequantization import dequantization_aware_training
-from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
-
+from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check, run_onnx, compare_result
+from common import run_tensorrt, get_onnx_provider
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -123,7 +125,6 @@ origin_gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
 dequantization_resnet18 = dequantization_aware_training(origin_gm, gm, flow.randn(1, 3, 32, 32).to("cuda"), qconfig)
 dequantization_resnet18 = dequantization_resnet18.to("cuda")
 dequantization_resnet18.eval()
-print(dequantization_resnet18)
 
 class ResNet18Graph(flow.nn.Graph):
     def __init__(self):
@@ -134,14 +135,15 @@ class ResNet18Graph(flow.nn.Graph):
         out = self.m(x)
         return out
 
-def test_resnet():
-    
+def test_resnet():   
     resnet_graph = ResNet18Graph()
     resnet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
-    # print(resnet_graph)    
-
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(dequantization_resnet18.state_dict(), tmpdirname)
         convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+        ipt_dict, onnx_res = run_onnx("/tmp/model.onnx", get_onnx_provider("cpu"))
+        trt_res = run_tensorrt("/tmp/model.onnx", ipt_dict[list(ipt_dict.keys())[0]])
+        compare_result(onnx_res, trt_res, atol=1e-4, print_outlier=True)
 
 test_resnet()
+

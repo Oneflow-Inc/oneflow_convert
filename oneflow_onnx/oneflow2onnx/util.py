@@ -46,7 +46,7 @@ def run_onnx(
     if ipt_dict is None:
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
-            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
+            ipt_data = np.random.uniform(low=-0.5, high=0.5, size=ipt.shape).astype(
                 np.float32
             )
             ipt_dict[ipt.name] = ipt_data
