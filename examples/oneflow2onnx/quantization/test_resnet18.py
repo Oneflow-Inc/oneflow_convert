@@ -120,6 +120,8 @@ qconfig = {
 quantization_resnet18 = quantization_aware_training(gm, flow.randn(1, 3, 32, 32).to("cuda"), qconfig)
 quantization_resnet18 = quantization_resnet18.to("cuda")
 quantization_resnet18.eval()
+checkpoint = flow.load('/home/zhangxiaoyu/oneflow-cifar/checkpoint/epoch_11_val_acc_83.280000')
+quantization_resnet18.load_state_dict(checkpoint)
 
 origin_gm: flow.fx.GraphModule = flow.fx.symbolic_trace(resnet18)
 dequantization_resnet18 = dequantization_aware_training(origin_gm, gm, flow.randn(1, 3, 32, 32).to("cuda"), qconfig)
