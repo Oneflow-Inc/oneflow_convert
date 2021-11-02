@@ -470,10 +470,6 @@ def test_inceptionv3():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(inceptionv3.state_dict(), tmpdirname)
-<<<<<<< HEAD
-        convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
-=======
         convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
->>>>>>> c4f0b0b8e481a2c150916100947a2f0b8660a1cb
 
 test_inceptionv3()
