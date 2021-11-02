@@ -24,11 +24,7 @@ long_description += "Email: zhangxiaoyu@oneflow.org"
 
 setuptools.setup(
     name="oneflow_onnx",
-<<<<<<< HEAD
     version="0.5.1",
-=======
-    version="0.5.0.rc",
->>>>>>> parent of cca89ba... release v0.5.0 (#42)
     author="zhangxiaoyu",
     author_email="zhangxiaoyu@oneflow.org",
     description="a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.",
