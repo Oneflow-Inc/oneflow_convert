@@ -122,7 +122,7 @@ def convert_to_onnx_and_check(
         ipt_dict, onnx_res = run_onnx(
         onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
         )
-        oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
+        oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.numpy()
 

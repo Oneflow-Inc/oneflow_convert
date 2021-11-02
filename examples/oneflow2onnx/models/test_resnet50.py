@@ -309,7 +309,7 @@ def test_resnet():
     
     resnet_graph = ResNetGraph()
     resnet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
-
+    print(resnet_graph._full_graph_proto)
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(resnet.state_dict(), tmpdirname)
         convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)

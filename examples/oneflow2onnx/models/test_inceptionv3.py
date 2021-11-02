@@ -216,7 +216,7 @@ class InceptionA(nn.Module):
         self.branch_pool = conv_block(in_channels, pool_features, kernel_size=1)
         self.avg_pool = nn.AvgPool2d(kernel_size=3, stride=1, padding=1)
 
-    def _forward(self, x: Tensor) -> List[Tensor]:
+    def _forward2(self, x: Tensor) -> List[Tensor]:
         branch1x1 = self.branch1x1(x)
 
         branch5x5 = self.branch5x5_1(x)
@@ -233,7 +233,7 @@ class InceptionA(nn.Module):
         return outputs
 
     def forward(self, x: Tensor) -> Tensor:
-        outputs = self._forward(x)
+        outputs = self._forward2(x)
         return flow.cat(outputs, 1)
 
 
@@ -251,7 +251,7 @@ class InceptionB(nn.Module):
         self.branch3x3dbl_3 = conv_block(96, 96, kernel_size=3, stride=2)
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2)
 
-    def _forward(self, x: Tensor) -> List[Tensor]:
+    def _forward2(self, x: Tensor) -> List[Tensor]:
         branch3x3 = self.branch3x3(x)
 
         branch3x3dbl = self.branch3x3dbl_1(x)
@@ -264,7 +264,7 @@ class InceptionB(nn.Module):
         return outputs
 
     def forward(self, x: Tensor) -> Tensor:
-        outputs = self._forward(x)
+        outputs = self._forward2(x)
         return flow.cat(outputs, 1)
 
 
@@ -294,7 +294,7 @@ class InceptionC(nn.Module):
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
         self.avg_pool = nn.AvgPool2d(kernel_size=3, stride=1, padding=1)
 
-    def _forward(self, x: Tensor) -> List[Tensor]:
+    def _forward2(self, x: Tensor) -> List[Tensor]:
         branch1x1 = self.branch1x1(x)
 
         branch7x7 = self.branch7x7_1(x)
@@ -314,7 +314,7 @@ class InceptionC(nn.Module):
         return outputs
 
     def forward(self, x: Tensor) -> Tensor:
-        outputs = self._forward(x)
+        outputs = self._forward2(x)
         return flow.cat(outputs, 1)
 
 
@@ -334,7 +334,7 @@ class InceptionD(nn.Module):
         self.branch7x7x3_4 = conv_block(192, 192, kernel_size=3, stride=2)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2)
 
-    def _forward(self, x: Tensor) -> List[Tensor]:
+    def _forward2(self, x: Tensor) -> List[Tensor]:
         branch3x3 = self.branch3x3_1(x)
         branch3x3 = self.branch3x3_2(branch3x3)
 
@@ -348,7 +348,7 @@ class InceptionD(nn.Module):
         return outputs
 
     def forward(self, x: Tensor) -> Tensor:
-        outputs = self._forward(x)
+        outputs = self._forward2(x)
         return flow.cat(outputs, 1)
 
 
@@ -373,7 +373,7 @@ class InceptionE(nn.Module):
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
         self.avg_pool = nn.AvgPool2d(kernel_size=3, stride=1, padding=1)
 
-    def _forward(self, x: Tensor) -> List[Tensor]:
+    def _forward2(self, x: Tensor) -> List[Tensor]:
         branch1x1 = self.branch1x1(x)
 
         branch3x3 = self.branch3x3_1(x)
@@ -398,7 +398,7 @@ class InceptionE(nn.Module):
         return outputs
 
     def forward(self, x: Tensor) -> Tensor:
-        outputs = self._forward(x)
+        outputs = self._forward2(x)
         return flow.cat(outputs, 1)
 
 
@@ -451,6 +451,7 @@ class BasicConv2d(nn.Module):
         return self.relu(x)
 
 inceptionv3 = inception_v3()
+inceptionv3 = inceptionv3.to("cuda")
 inceptionv3.eval()
 
 class inceptionv3Graph(flow.nn.Graph):
@@ -465,10 +466,10 @@ class inceptionv3Graph(flow.nn.Graph):
 def test_inceptionv3():
     
     inceptionv3_graph = inceptionv3Graph()
-    inceptionv3_graph._compile(flow.randn(1, 3, 299, 299))
+    inceptionv3_graph._compile(flow.randn(1, 3, 299, 299).to("cuda"))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(inceptionv3.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+    # with tempfile.TemporaryDirectory() as tmpdirname:
+    #     flow.save(inceptionv3.state_dict(), tmpdirname)
+    #     convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
 
 test_inceptionv3()
