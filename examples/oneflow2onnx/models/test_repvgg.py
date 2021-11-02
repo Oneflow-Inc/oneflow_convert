@@ -391,6 +391,6 @@ def test_repvgg():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(repvgg.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(repvgg_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+        convert_to_onnx_and_check(repvgg_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
 test_repvgg()
