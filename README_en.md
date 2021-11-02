@@ -10,8 +10,8 @@
 
 #### Introduction
 
-- OneFlow2ONNX models are supported. Specifically, OneFlow's eager mode model can be transfomed into ONNX's format. For more information, please refer to [OneFlow2ONNX Model List](docs/oneflow2onnx/oneflow2onnx_model_zoo.md).
-- OneFlow2ONNX operators are supported. Please refer to [OneFlow2ONNX Operator Lists](docs/oneflow2onnx/op_list.md) for more information.
+- OneFlow2ONNX models are supported. Specifically, OneFlow's lazy mode model can be transfomed into ONNX's format. Transformable OneFlow model can be obtained by using the method explained on [flow.checkpoint.save ](https://docs.oneflow.org/basics_topics/model_load_save.html). For more information, please refer to [OneFlow2ONNX Model List](docs/oneflow2onnx/oneflow2onnx_model_zoo.md).
+- OneFlow2ONNX operators are supported. Currently, oneflow_onnx is fully capable of exporting ONNX Opset10, and parts of OneFlow operator can transform ONNX Opsets that are in lower order. Please refer to [OneFlow2ONNX Operator Lists](docs/oneflow2onnx/op_list.md) for more information.
 
 
 #### Environment Dependencies
@@ -21,6 +21,8 @@
 ```sh
 python>=3.5
 onnx>=1.8.0
+onnx-simplifier>=0.3.3
+onnxoptimizer>=0.2.5
 onnxruntime>=1.6.0
 oneflow (https://github.com/Oneflow-Inc/oneflow#install-with-pip-package)
 ```

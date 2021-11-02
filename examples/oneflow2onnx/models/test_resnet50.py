@@ -312,6 +312,6 @@ def test_resnet():
     print(resnet_graph._full_graph_proto)
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(resnet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+        convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=False)
 
 test_resnet()
