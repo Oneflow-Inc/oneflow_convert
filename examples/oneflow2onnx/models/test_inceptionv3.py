@@ -468,8 +468,8 @@ def test_inceptionv3():
     inceptionv3_graph = inceptionv3Graph()
     inceptionv3_graph._compile(flow.randn(1, 3, 299, 299).to("cuda"))
 
-    # with tempfile.TemporaryDirectory() as tmpdirname:
-    #     flow.save(inceptionv3.state_dict(), tmpdirname)
-    #     convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(inceptionv3.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(inceptionv3_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
 
 test_inceptionv3()
