@@ -1,2 +1,4 @@
 onnx>=1.8.0
+onnx-simplifier>=0.3.3
+onnxoptimizer>=0.2.5
 onnxruntime-gpu>=1.8.0

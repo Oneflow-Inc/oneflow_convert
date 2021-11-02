@@ -74,6 +74,6 @@ def test_alexnet():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(alexnet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(alexnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+        convert_to_onnx_and_check(alexnet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
 test_alexnet()

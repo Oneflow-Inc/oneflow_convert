@@ -63,6 +63,6 @@ def test_lenet():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(lenet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(lenet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+        convert_to_onnx_and_check(lenet_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
 test_lenet()
