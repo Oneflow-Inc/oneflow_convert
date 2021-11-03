@@ -266,7 +266,7 @@ class AdaptiveAvgPoolOp:
             node.attrs["count_include_pad"] = 1
             node.attrs["ceil_mode"] = 0
         else:
-            raise NotImplementedError("The current adaptive_pool2d op with this setting does not support conversion to onnx, please concat BBuf(zhangxiaoyu@oneflow.org)!")
+            raise NotImplementedError("The current adaptive_pool2d op with this setting does not support conversion to onnx, please connect BBuf(zhangxiaoyu@oneflow.org)!")
 
 @flow_op(["avgpool_2d"], onnx_op="AveragePool")
 @flow_op(["maxpool_2d"], onnx_op="MaxPool")
