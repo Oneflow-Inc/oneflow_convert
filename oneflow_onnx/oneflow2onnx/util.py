@@ -67,8 +67,8 @@ def export_onnx_model(
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    if flow_weight_dir == None or os.path.exists(flow_weight_dir) == False:
-        raise Error('Please specify the correct model path!')
+    if flow_weight_dir is None or os.path.exists(flow_weight_dir) == False:
+        raise RuntimeError('Please specify the correct model path!')
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
