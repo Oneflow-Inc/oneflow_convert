@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from copy import Error
 import os
 import tempfile
 import numpy as np
@@ -66,8 +67,8 @@ def export_onnx_model(
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    while not os.path.exists(os.path.join(flow_weight_dir, "snapshot_done")):
-        pass
+    if flow_weight_dir == None or os.path.exists(flow_weight_dir) == False:
+        raise Error('Please specify the correct model path!')
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
