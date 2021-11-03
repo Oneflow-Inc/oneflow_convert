@@ -66,8 +66,8 @@ def export_onnx_model(
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    while not os.path.exists(os.path.join(flow_weight_dir, "snapshot_done")):
-        pass
+    if flow_weight_dir is None or os.path.exists(flow_weight_dir) == False:
+        raise RuntimeError('Please specify the correct model path!')
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(

@@ -233,6 +233,41 @@ class ConvOp:
         cls.Version_1(ctx, node, **kwargs)
 
 
+@flow_op("adaptive_avg_pool2d", onnx_op="AveragePool")
+class AdaptiveAvgPoolOp:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        cls._Convert(ctx, node, **kwargs)
+
+    @classmethod
+    def Version_10(cls, ctx, node, **kwargs):
+        cls._Convert(ctx, node, **kwargs)
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        # no change
+        cls._Convert(ctx, node, **kwargs)
+
+    @classmethod
+    def _Convert(cls, ctx, node, **kwargs):
+        # T output = MaxPool(T input, @list(int) ksize, @list(int) strides, @string padding, @string data_format)
+        # T Y = MaxPool(T X, @AttrType.STRING auto_pad, @AttrType.INTS kernel_shape, @AttrType.INTS pads,
+        #               @AttrType.INTS strides)
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        h, w = input_shape[2], input_shape[3]
+        output_size = node.attrs['output_size']
+        out_h, out_w = output_size[0], output_size[1]
+        if h % out_h == 0 and w % out_w == 0:
+            kernel_shape_flow = np.array([h / out_h, w / out_w], dtype=np.int64)
+            strides_flow = np.array([h / out_h, w / out_w], dtype=np.int64)
+            node.attrs["kernel_shape"] = kernel_shape_flow
+            node.attrs["strides"] = strides_flow
+            node.attrs["pads"] = np.array([0, 0, 0, 0], dtype=np.int64)
+            node.attrs["count_include_pad"] = 1
+            node.attrs["ceil_mode"] = 0
+        else:
+            raise NotImplementedError("The current adaptive_pool2d op with this setting does not support conversion to onnx, please contact BBuf(zhangxiaoyu@oneflow.org)!")
+
 @flow_op(["avgpool_2d"], onnx_op="AveragePool")
 @flow_op(["maxpool_2d"], onnx_op="MaxPool")
 class PoolOp:
