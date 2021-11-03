@@ -27,8 +27,7 @@ python>=3.5
 onnx>=1.8.0
 onnx-simplifier>=0.3.3
 onnxoptimizer>=0.2.5
-onnxruntime>=1.6.0
-oneflow>=0.5.0
+onnxruntime-gpu>=1.8.0
 ```
 
 #### 安装
