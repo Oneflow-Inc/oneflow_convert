@@ -404,6 +404,7 @@ class Graph(object):
         self._dtypes = dtypes
 
         self._model_save_dir = model_save_dir
+        self._param_dict = oneflow.load(self._model_save_dir)
         self._output_shapes = output_shapes
         self._opset = util.FindOpset(opset)
 
@@ -859,10 +860,8 @@ class Graph(object):
         tensor_name = node.output_tensor_names[0]
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
-        path = pathjoin(self._model_save_dir, ".".join(node.output_tensor_names[0].split(".")[1:]))
-        tensor_value = np.fromfile(
-            path, dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name))
-        ).reshape(self.get_shape(tensor_name))
+        key = ".".join(node.output_tensor_names[0].split(".")[1:])
+        tensor_value = self._param_dict[key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
         return tensor_value
 
     def get_shape(self, name):
