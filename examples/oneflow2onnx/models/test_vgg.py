@@ -18,6 +18,9 @@ import oneflow as flow
 import oneflow.nn as nn
 from typing import Union, List, Dict, Any, cast
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
+
+from flowvision.models import ModelCreator
+
 import tempfile
 
 
@@ -170,7 +173,8 @@ def vgg19_bn(pretrained: bool = False, **kwargs: Any) -> VGG:
     """
     return _vgg("vgg19_bn", "E", True)
 
-vgg16 = vgg16()
+# vgg16 = vgg16()
+vgg16 = ModelCreator.create_model("vgg16_bn", pretrained=False)
 vgg16 = vgg16.to("cuda")
 vgg16.eval()
 
@@ -190,6 +194,6 @@ def test_vgg16():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(vgg16.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
 
 test_vgg16()
