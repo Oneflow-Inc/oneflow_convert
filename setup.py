@@ -17,9 +17,9 @@ limitations under the License.
 from __future__ import absolute_import
 import setuptools
 
-long_description = "oneflow_onnx is a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.\n\n"
+long_description = "oneflow_onnx is a toolkit for converting trained model of OneFlow to ONNX.\n\n"
 long_description += "Usage: oneflow_onnx --model_dir src --save_file dist\n"
-long_description += "GitHub: https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx\n"
+long_description += "GitHub: https://github.com/Oneflow-Inc/oneflow_convert\n"
 long_description += "Email: zhangxiaoyu@oneflow.org"
 
 setuptools.setup(
@@ -27,7 +27,7 @@ setuptools.setup(
     version="0.5.3",
     author="zhangxiaoyu",
     author_email="zhangxiaoyu@oneflow.org",
-    description="a toolkit for converting trained model of OneFlow to ONNX and ONNX to OneFlow.",
+    description="a toolkit for converting trained model of OneFlow to ONNX.",
     long_description=long_description,
     long_description_content_type="text/plain",
     url="https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx",
