@@ -99,7 +99,7 @@ class DirectOpSinceOpset1:
 
 
 @flow_op("prelu", onnx_op="PRelu", flow_ibns=["x", "alpha"])
-class PreLUOp:
+class PReLUOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         input_shape = ctx.get_shape(node.input_tensor_names[0])
