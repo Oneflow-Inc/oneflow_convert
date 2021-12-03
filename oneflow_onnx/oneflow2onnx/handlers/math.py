@@ -92,11 +92,24 @@ class BiasAdd(common.BroadcastOp):
 
 
 @flow_op(["leaky_relu", "softplus"], onnx_op=["LeakyRelu", "Softplus"])
-@flow_op("prelu", onnx_op="PRelu", flow_ibns=["x", "alpha"])
 class DirectOpSinceOpset1:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         pass
+
+
+@flow_op("prelu", onnx_op="PRelu", flow_ibns=["x", "alpha"])
+class PReLUOp:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        alpha_shape = ctx.get_shape(node.input_tensor_names[1])
+        if len(alpha_shape) == 1:
+            new_shape = []
+            new_shape.append(alpha_shape[0])
+            for _ in range(1, len(input_shape) - 1):
+                new_shape.append(1)
+            ctx.set_shape(node.input_tensor_names[1], new_shape)
 
 
 @flow_op(
