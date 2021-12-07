@@ -41,7 +41,7 @@ pip install oneflow_onnx
 **安装方式2**
 
 ```
-git clone https://github.com/Oneflow-Inc/oneflow_convert_tools
+git clone https://github.com/Oneflow-Inc/oneflow_convert
 cd oneflow_convert
 python3 setup.py install
 ```
