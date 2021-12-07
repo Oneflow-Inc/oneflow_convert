@@ -26,6 +26,7 @@ class Softmax(flow.nn.Module):
         return self.softmax(x)
 
 softmax = Softmax()
+softmax = softmax.to("cuda")
 class softmaxOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +40,7 @@ class softmaxOpGraph(flow.nn.Graph):
 def test_softmax():
     
     softmax_graph = softmaxOpGraph()
-    softmax_graph._compile(flow.randn(1, 3, 224, 224))
+    softmax_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(softmax.state_dict(), tmpdirname)

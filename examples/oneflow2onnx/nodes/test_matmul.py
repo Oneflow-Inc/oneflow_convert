@@ -26,6 +26,7 @@ class MatMul(flow.nn.Module):
         return self.matmul(x)
 
 matmul = MatMul()
+matmul = matmul.to("cuda")
 class matmulOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +40,7 @@ class matmulOpGraph(flow.nn.Graph):
 def test_matmul():
     
     matmul_graph = matmulOpGraph()
-    matmul_graph._compile(flow.randn(1, 20))
+    matmul_graph._compile(flow.randn(1, 20).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(matmul.state_dict(), tmpdirname)

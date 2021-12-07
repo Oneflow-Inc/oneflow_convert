@@ -25,6 +25,7 @@ class Constant(flow.nn.Module):
         return flow.ones((2, 3)) + flow.zeros((2, 3))
 
 constant = Constant()
+constant = constant.to("cuda")
 class constantOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -38,7 +39,7 @@ class constantOpGraph(flow.nn.Graph):
 def test_constant():
     
     constant_graph = constantOpGraph()
-    constant_graph._compile(flow.randn(1, 3, 224, 224))
+    constant_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(constant.state_dict(), tmpdirname)

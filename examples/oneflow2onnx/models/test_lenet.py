@@ -47,7 +47,7 @@ lenet = LeNet()
 lenet = lenet.to("cuda")
 lenet.eval()
 
-class lenetGraph(flow.nn.Graph):
+class LenetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
         self.m = lenet
@@ -58,7 +58,7 @@ class lenetGraph(flow.nn.Graph):
 
 def test_lenet():
     
-    lenet_graph = lenetGraph()
+    lenet_graph = LenetGraph()
     lenet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:

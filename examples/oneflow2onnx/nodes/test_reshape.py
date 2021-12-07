@@ -25,6 +25,7 @@ class Reshape(flow.nn.Module):
         return flow.reshape(x, (1, 3, -1))
 
 reshape = Reshape()
+reshape = reshape.to("cuda")
 class reshapeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -38,7 +39,7 @@ class reshapeOpGraph(flow.nn.Graph):
 def test_reshape():
     
     reshape_graph = reshapeOpGraph()
-    reshape_graph._compile(flow.randn(1, 3, 224, 224))
+    reshape_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(reshape.state_dict(), tmpdirname)
