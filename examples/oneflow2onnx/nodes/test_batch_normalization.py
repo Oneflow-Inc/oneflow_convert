@@ -27,6 +27,8 @@ class BatchNorm(flow.nn.Module):
         return y
 
 batchnorm = BatchNorm()
+batchnorm.eval()
+batchnorm = batchnorm.to("cuda")
 class BatchNormOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +42,7 @@ class BatchNormOpGraph(flow.nn.Graph):
 def test_batchnorm():
     
     batchnorm_graph = BatchNormOpGraph()
-    batchnorm_graph._compile(flow.randn(1, 3, 224, 224))
+    batchnorm_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(batchnorm.state_dict(), tmpdirname)

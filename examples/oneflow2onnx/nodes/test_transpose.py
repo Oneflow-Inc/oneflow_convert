@@ -25,6 +25,7 @@ class Transpose(flow.nn.Module):
         return flow.transpose(x, 1, 2)
 
 transpose = Transpose()
+transpose = transpose.to("cuda")
 class transposeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -38,7 +39,7 @@ class transposeOpGraph(flow.nn.Graph):
 def test_transpose():
     
     transpose_graph = transposeOpGraph()
-    transpose_graph._compile(flow.randn(1, 3, 224, 224))
+    transpose_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(transpose.state_dict(), tmpdirname)

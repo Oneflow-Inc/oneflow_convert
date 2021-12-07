@@ -27,6 +27,7 @@ class Pool(flow.nn.Module):
         return self.max_pool2d(x) + self.avg_pool2d(x)
 
 pool = Pool()
+pool = pool.to("cuda")
 class poolOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +41,7 @@ class poolOpGraph(flow.nn.Graph):
 def test_pool():
     
     pool_graph = poolOpGraph()
-    pool_graph._compile(flow.randn(1, 3, 224, 224))
+    pool_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(pool.state_dict(), tmpdirname)

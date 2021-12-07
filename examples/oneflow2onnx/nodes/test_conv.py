@@ -26,6 +26,7 @@ class Conv2d(flow.nn.Module):
         return self.conv(x)
 
 conv = Conv2d()
+conv = conv.to("cuda")
 class convOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +40,7 @@ class convOpGraph(flow.nn.Graph):
 def test_conv():
     
     conv_graph = convOpGraph()
-    conv_graph._compile(flow.randn(1, 3, 224, 224))
+    conv_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(conv.state_dict(), tmpdirname)
