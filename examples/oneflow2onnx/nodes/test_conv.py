@@ -25,25 +25,25 @@ class Conv2d(flow.nn.Module):
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.conv(x)
 
-conv = Conv2d()
-conv = conv.to("cuda")
-class convOpGraph(flow.nn.Graph):
+conv_module = Conv2d()
+conv_module = conv_module.to("cuda")
+class Conv2dOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = conv
+        self.m = conv_module
 
     def build(self, x):
         out = self.m(x)
         return out
 
 
-def test_conv():
+def test_conv2d():
     
-    conv_graph = convOpGraph()
+    conv_graph = Conv2dOpGraph()
     conv_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(conv.state_dict(), tmpdirname)
+        flow.save(conv_module.state_dict(), tmpdirname)
         convert_to_onnx_and_check(conv_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
-test_conv()
+test_conv2d()
