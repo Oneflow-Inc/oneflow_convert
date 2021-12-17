@@ -27,7 +27,6 @@ from flowvision.models import ModelCreator
 import tempfile
 
 inceptionv3 = ModelCreator.create_model("inception_v3", pretrained=False)
-inceptionv3 = inceptionv3.to("cuda")
 inceptionv3.eval()
 
 class inceptionv3Graph(flow.nn.Graph):
@@ -42,7 +41,7 @@ class inceptionv3Graph(flow.nn.Graph):
 def test_inceptionv3():
     
     inceptionv3_graph = inceptionv3Graph()
-    inceptionv3_graph._compile(flow.randn(1, 3, 299, 299).to("cuda"))
+    inceptionv3_graph._compile(flow.randn(1, 3, 299, 299))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(inceptionv3.state_dict(), tmpdirname)

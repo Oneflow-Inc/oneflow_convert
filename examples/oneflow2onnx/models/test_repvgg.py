@@ -373,7 +373,6 @@ def create_RepVGG_D2se(deploy=False):
 
 repvgg = create_RepVGG_B2g4()
 repvgg.eval()
-repvgg = repvgg.to("cuda")
 
 class RepVGGGraph(flow.nn.Graph):
     def __init__(self):
@@ -387,7 +386,7 @@ class RepVGGGraph(flow.nn.Graph):
 def test_repvgg():
     
     repvgg_graph = RepVGGGraph()
-    repvgg_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    repvgg_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(repvgg.state_dict(), tmpdirname)

@@ -26,7 +26,6 @@ class GroupConv2d(flow.nn.Module):
         return self.group_conv2d(x)
 
 group_conv_module = GroupConv2d()
-group_conv_module = group_conv_module.to("cuda")
 class GraphConv2dOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +39,7 @@ class GraphConv2dOpGraph(flow.nn.Graph):
 def test_group_conv2d():
     
     group_conv_graph = GraphConv2dOpGraph()
-    group_conv_graph._compile(flow.randn(1, 16, 224, 224).to("cuda"))
+    group_conv_graph._compile(flow.randn(1, 16, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(group_conv_module.state_dict(), tmpdirname)

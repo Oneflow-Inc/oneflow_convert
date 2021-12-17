@@ -19,7 +19,6 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 relu = flow.nn.ReLU()
-relu = relu.to("cuda")
 class ReLUOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -31,7 +30,6 @@ class ReLUOpGraph(flow.nn.Graph):
 
 
 prelu = flow.nn.PReLU()
-prelu = prelu.to("cuda")
 class PReLUOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -45,7 +43,7 @@ class PReLUOpGraph(flow.nn.Graph):
 def test_relu():
     
     relu_graph = ReLUOpGraph()
-    relu_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    relu_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(relu.state_dict(), tmpdirname)
@@ -54,7 +52,7 @@ def test_relu():
 def test_prelu_one_channels():
     
     prelu_graph = PReLUOpGraph()
-    prelu_graph._compile(flow.randn(1, 1, 224, 224).to("cuda"))
+    prelu_graph._compile(flow.randn(1, 1, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(prelu.state_dict(), tmpdirname)
@@ -64,7 +62,7 @@ def test_prelu_n_channels():
     
     prelu_graph = PReLUOpGraph()
     channels=random.randint(2,10)
-    prelu_graph._compile(flow.randn(1, channels, 224, 224).to("cuda"))
+    prelu_graph._compile(flow.randn(1, channels, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(prelu.state_dict(), tmpdirname)

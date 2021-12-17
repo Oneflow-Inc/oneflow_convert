@@ -44,7 +44,6 @@ class LeNet(nn.Module):
         return logits
 
 lenet = LeNet()
-lenet = lenet.to("cuda")
 lenet.eval()
 
 class LenetGraph(flow.nn.Graph):
@@ -59,7 +58,7 @@ class LenetGraph(flow.nn.Graph):
 def test_lenet():
     
     lenet_graph = LenetGraph()
-    lenet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
+    lenet_graph._compile(flow.randn(1, 3, 32, 32))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(lenet.state_dict(), tmpdirname)

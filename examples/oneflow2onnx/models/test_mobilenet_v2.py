@@ -27,7 +27,6 @@ import tempfile
 
 mobilenetv2 = ModelCreator.create_model("mobilenet_v2", pretrained=False)
 mobilenetv2.eval()
-mobilenetv2 = mobilenetv2.to("cuda")
 class MobileNetV2Graph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +39,7 @@ class MobileNetV2Graph(flow.nn.Graph):
 def test_mobilenetv2():
     
     mobilenetv2_graph = MobileNetV2Graph()
-    mobilenetv2_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    mobilenetv2_graph._compile(flow.randn(1, 3, 224, 224))
     # print(mobilenetv2_graph._full_graph_proto)
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(mobilenetv2.state_dict(), tmpdirname)

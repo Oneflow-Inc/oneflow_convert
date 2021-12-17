@@ -175,7 +175,6 @@ def vgg19_bn(pretrained: bool = False, **kwargs: Any) -> VGG:
 
 # vgg16 = vgg16()
 vgg16 = ModelCreator.create_model("vgg16_bn", pretrained=False)
-vgg16 = vgg16.to("cuda")
 vgg16.eval()
 
 class vgg16Graph(flow.nn.Graph):
@@ -190,7 +189,7 @@ class vgg16Graph(flow.nn.Graph):
 def test_vgg16():
     
     vgg16_graph = vgg16Graph()
-    vgg16_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    vgg16_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(vgg16.state_dict(), tmpdirname)

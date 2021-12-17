@@ -25,7 +25,6 @@ class Pad(flow.nn.Module):
         return flow.nn.functional.pad(x, (1, 1))
 
 pad = Pad()
-pad = pad.to("cuda")
 class padOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +38,7 @@ class padOpGraph(flow.nn.Graph):
 def test_pad():
     
     pad_graph = padOpGraph()
-    pad_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    pad_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(pad.state_dict(), tmpdirname)

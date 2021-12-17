@@ -25,7 +25,6 @@ class Slice(flow.nn.Module):
         return x[:, :1, :, :]
 
 slice = Slice()
-slice = slice.to("cuda")
 class sliceOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +38,7 @@ class sliceOpGraph(flow.nn.Graph):
 def test_slice():
     
     slice_graph = sliceOpGraph()
-    slice_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    slice_graph._compile(flow.randn(1, 3, 224, 224))
     # print(slice_graph._full_graph_proto)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
