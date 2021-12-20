@@ -26,7 +26,6 @@ class Flatten(flow.nn.Module):
         return self.flatten(x)
 
 flatten = Flatten()
-flatten = flatten.to("cuda")
 class flattenOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +39,7 @@ class flattenOpGraph(flow.nn.Graph):
 def test_flatten():
     
     flatten_graph = flattenOpGraph()
-    flatten_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    flatten_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(flatten.state_dict(), tmpdirname)

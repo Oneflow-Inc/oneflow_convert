@@ -231,18 +231,17 @@ class ModelGraph(flow.nn.Graph):
         self.backbone = model
 
     def build(self, x):
-        x = x.to("cuda")
         out = self.backbone(x)
         return out
 
 
 def test_resnet50():
 
-    model_module = iresnet50(dropout=0.0, num_features=512).to("cuda")
+    model_module = iresnet50(dropout=0.0, num_features=512)
     model_module.eval()
     print(model_module)
     model_graph = ModelGraph(model_module)
-    model_graph._compile(flow.randn(1, 3, 112, 112).to("cuda"))
+    model_graph._compile(flow.randn(1, 3, 112, 112))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(model_module.state_dict(), tmpdirname)

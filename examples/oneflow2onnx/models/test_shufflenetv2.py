@@ -26,7 +26,6 @@ import tempfile
 
 shufflenet = ModelCreator.create_model("shufflenet_v2_x0_5", pretrained=False)
 shufflenet.eval()
-shufflenet = shufflenet.to("cuda")
 
 class shufflenetGraph(flow.nn.Graph):
     def __init__(self):
@@ -40,7 +39,7 @@ class shufflenetGraph(flow.nn.Graph):
 def test_shufflenet():
     
     shufflenet_graph = shufflenetGraph()
-    shufflenet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    shufflenet_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(shufflenet.state_dict(), tmpdirname)

@@ -26,7 +26,6 @@ class AddN(flow.nn.Module):
         return y
 
 addn = AddN()
-addn = addn.to("cuda")
 class AddNOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,7 +39,7 @@ class AddNOpGraph(flow.nn.Graph):
 def test_addn():
     
     addn_graph = AddNOpGraph()
-    addn_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    addn_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(addn.state_dict(), tmpdirname)

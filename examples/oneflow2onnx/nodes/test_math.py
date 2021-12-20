@@ -37,7 +37,6 @@ class MathOps(flow.nn.Module):
 
 
 math_ops = MathOps()
-math_ops = math_ops.to("cuda")
 class MathOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -51,7 +50,7 @@ class MathOpGraph(flow.nn.Graph):
 def test_math_ops():
     
     math_ops_graph = MathOpGraph()
-    math_ops_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    math_ops_graph._compile(flow.randn(1, 3, 224, 224))
     # print(math_ops_graph._full_graph_proto)
 
     with tempfile.TemporaryDirectory() as tmpdirname:

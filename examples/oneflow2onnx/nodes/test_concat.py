@@ -25,7 +25,6 @@ class ConCat(flow.nn.Module):
         return flow.cat([x, x, x], dim=1)
 
 concat = ConCat()
-concat = concat.to("cuda")
 class ConCatOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +38,7 @@ class ConCatOpGraph(flow.nn.Graph):
 def test_concat():
     
     concat_graph = ConCatOpGraph()
-    concat_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    concat_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(concat.state_dict(), tmpdirname)

@@ -23,7 +23,6 @@ from flowvision.models import ModelCreator
 import tempfile
 
 alexnet = ModelCreator.create_model("alexnet", pretrained=False)
-alexnet = alexnet.to("cuda")
 alexnet.eval()
 
 class AlexNetGraph(flow.nn.Graph):
@@ -38,7 +37,7 @@ class AlexNetGraph(flow.nn.Graph):
 def test_alexnet():
     
     alexnet_graph = AlexNetGraph()
-    alexnet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    alexnet_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(alexnet.state_dict(), tmpdirname)
