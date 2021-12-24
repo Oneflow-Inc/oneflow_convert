@@ -35,6 +35,7 @@ def run_onnx(
         if ort_optimize
         else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     )
+
     sess = ort.InferenceSession(
         onnx_model_path, sess_options=ort_sess_opt, providers=providers
     )
@@ -119,9 +120,14 @@ def convert_to_onnx_and_check(
 
 
     if dynamic_batch_size != True:
-        ipt_dict, onnx_res = run_onnx(
-        onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
-        )
+        if ort.__version__>'1.9.0':
+            ipt_dict, onnx_res = run_onnx(
+            onnx_model_path, ["TensorrtExecutionProvider","CUDAExecutionProvider","CPUExecutionProvider"], ort_optimize=ort_optimize
+            )
+        else:
+            ipt_dict, onnx_res = run_onnx(
+            onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
+            )
         oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.numpy()
