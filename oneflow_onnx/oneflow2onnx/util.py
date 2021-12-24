@@ -121,7 +121,7 @@ def convert_to_onnx_and_check(
     if dynamic_batch_size != True:
         if ort.__version__>'1.9.0':
             ipt_dict, onnx_res = run_onnx(
-            onnx_model_path, ["TensorrtExecutionProvider","CUDAExecutionProvider","CPUExecutionProvider"], ort_optimize=ort_optimize
+            onnx_model_path, ["CUDAExecutionProvider"], ort_optimize=ort_optimize
             )
         else:
             ipt_dict, onnx_res = run_onnx(
