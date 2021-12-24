@@ -35,7 +35,6 @@ def run_onnx(
         if ort_optimize
         else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     )
-
     sess = ort.InferenceSession(
         onnx_model_path, sess_options=ort_sess_opt, providers=providers
     )
