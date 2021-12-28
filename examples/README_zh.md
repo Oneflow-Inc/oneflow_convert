@@ -2,7 +2,6 @@
 
 目前OneFlow2ONNX 支持80+的OneFlow OP导出为ONNX OP。
 
-### `export_onnx_model()`
 ### export_onnx_model(`graph, external_data=False, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False`)
 
 **参数列表:**
