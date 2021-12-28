@@ -12,5 +12,5 @@ At present, oneflow2onnx supports the export of 80 + OneFlow OP to ONNX Op.
  - external_data - Save weights as ONNX external data, usually to bypass the 2GB file size limit of protobuf.
  - opset - Specifies the version of the transformation model. The opset to be used (`int`, default is `oneflow_onnx.constants.PREFERRED_OPSET`)
  - flow_weight_dir - Path to save neflow model weights.
- - onnx_model_path - The directory containing OneFlow model weights. Users are expected to call check_point.save(dir), wait for the model saving finishing, and pass the argument 'dir' as `model_save_dir`.
- - dynamic_batch_size - Whether to add a dimension containing batch. The default value is `False`.
+ - onnx_model_path - The directory containing OneFlow model weights. The user needs to call `check_point.save(flow_weight_dir)` and wait for the OneFlow model weight to be saved.
+ - dynamic_batch_size - Does the converted onnx model support dynamic batch. The default value is `False`.
