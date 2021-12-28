@@ -112,6 +112,7 @@ def convert_to_onnx_and_check(
     flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
+    device="cpu",
 ):
     onnx_model_path, cleanup = export_onnx_model(
         graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
@@ -127,10 +128,12 @@ def convert_to_onnx_and_check(
             ipt_dict, onnx_res = run_onnx(
             onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
             )
-        oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
+        if device=="gpu":
+            oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))     
+        else:
+            oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.numpy()
-
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
 
