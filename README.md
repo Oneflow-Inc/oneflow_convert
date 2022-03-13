@@ -179,7 +179,7 @@ convert_to_onnx_and_check(resnet34_graph,
 
 我们使用下面这张图像作为模型的输入：
 <div align="center">
-    <img alt="Demo Image" src="docs/cat.jpg" width="300px">
+    <img alt="Demo Image" src="docs/cat.png" width="300px">
 </div>
 
 

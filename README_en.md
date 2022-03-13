@@ -187,7 +187,7 @@ Before performing inference, ensure that the ONNX Runtime is installed, that is 
 
 We use the following image as input to the model:
 <div align="center">
-    <img alt="Demo Image" src="docs/cat.jpg" width="300px">
+    <img alt="Demo Image" src="docs/cat.png" width="300px">
 </div>
 
 
