@@ -17,7 +17,9 @@ limitations under the License.
 from __future__ import absolute_import
 import setuptools
 
-long_description = "oneflow_onnx is a toolkit for converting trained model of OneFlow to ONNX.\n\n"
+long_description = (
+    "oneflow_onnx is a toolkit for converting trained model of OneFlow to ONNX.\n\n"
+)
 long_description += "Usage: oneflow_onnx --model_dir src --save_file dist\n"
 long_description += "GitHub: https://github.com/Oneflow-Inc/oneflow_convert\n"
 long_description += "Email: zhangxiaoyu@oneflow.org"
@@ -32,11 +34,11 @@ setuptools.setup(
     long_description_content_type="text/plain",
     url="https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx",
     packages=setuptools.find_packages(),
-    install_requires=['six', 'protobuf'],
+    install_requires=["six", "protobuf", "onnx", "onnx-simplifier", "onnxruntime-gpu"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    license='Apache 2.0'
+    license="Apache 2.0",
 )
