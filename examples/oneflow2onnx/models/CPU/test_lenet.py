@@ -18,6 +18,7 @@ import oneflow as flow
 import oneflow.nn as nn
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 import tempfile
+
 class LeNet(nn.Module):
     def __init__(self, num_classes: int = 1000) -> None:
         super(LeNet, self).__init__()

@@ -17,29 +17,27 @@ limitations under the License.
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-from flowvision.models import ModelCreator
+from flowvision.models.squeezenet import squeezenet1_0
 
 import tempfile
 
-shufflenet = ModelCreator.create_model("shufflenet_v2_x0_5", pretrained=False)
-shufflenet.eval()
 
-class shufflenetGraph(flow.nn.Graph):
+class SqueezeNetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = shufflenet
+        self.m = squeezenet1_0
 
     def build(self, x):
         out = self.m(x)
         return out
 
-def test_shufflenet():
+def test_squeezenet():
     
-    shufflenet_graph = shufflenetGraph()
-    shufflenet_graph._compile(flow.randn(1, 3, 224, 224))
-
+    squeezenet_graph = SqueezeNetGraph()
+    squeezenet_graph._compile(flow.randn(1, 3, 224, 224))
+    # print(squeezenet_graph._full_graph_proto)
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(shufflenet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(shufflenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
+        flow.save(squeezenet1_0.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(squeezenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", print_outlier=False)
 
-test_shufflenet()
+test_squeezenet()
