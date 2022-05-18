@@ -268,9 +268,10 @@ class AdaptiveAvgPoolOp:
         else:
             raise NotImplementedError("The current adaptive_pool2d op with this setting does not support conversion to onnx, please contact BBuf(zhangxiaoyu@oneflow.org)!")
 
-@flow_op(["avgpool_2d"], onnx_op="AveragePool")
+@flow_op(["avgpool_2d"], onnx_op="AveragePool") # Compatible with v0.7.0
 @flow_op(["maxpool_2d"], onnx_op="MaxPool") # Compatible with v0.7.0
 @flow_op(["max_pool_2d"], onnx_op="MaxPool")
+@flow_op(["avg_pool_2d"], onnx_op="AveragePool")
 class PoolOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
