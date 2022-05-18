@@ -15,9 +15,6 @@ limitations under the License.
 """
 
 import oneflow as flow
-from oneflow import Tensor
-import oneflow.nn as nn
-from typing import Callable, Any, List
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator

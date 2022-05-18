@@ -13,13 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-   
-from collections import namedtuple
-import warnings
 import oneflow as flow
-from oneflow import nn, Tensor
-from typing import Callable, Any, Optional, Tuple, List
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator
