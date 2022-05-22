@@ -137,4 +137,4 @@ def convert_to_onnx_and_check(
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
 
-    # cleanup()
+    cleanup()
