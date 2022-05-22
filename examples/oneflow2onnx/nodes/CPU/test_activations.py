@@ -39,6 +39,16 @@ class PReLUOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+hard_swish = flow.nn.Hardswish()
+
+class HardSwishOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = hard_swish
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 def test_relu():
     
@@ -48,6 +58,14 @@ def test_relu():
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(relu.state_dict(), tmpdirname)
         convert_to_onnx_and_check(relu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+
+def test_hard_swish():
+    hard_swish_graph = HardSwishOpGraph()
+    hard_swish_graph._compile(flow.randn(1, 3, 224, 224))
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(hard_swish.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(hard_swish_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", opset=14)
 
 def test_prelu_one_channels():
     
@@ -72,5 +90,6 @@ def test_prelu_n_channels():
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
+test_hard_swish()
 
 

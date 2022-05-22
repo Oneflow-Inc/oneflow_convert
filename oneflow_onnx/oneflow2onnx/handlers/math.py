@@ -267,6 +267,13 @@ class MinMaxOp:
         )
 
 
+
+@flow_op("hardswish", onnx_op="HardSwish")
+class HardSwish:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        pass
+
 class ClipOps:
     @classmethod
     def Version_1(cls, ctx, node, min_val=None, max_val=None, **kwargs):
@@ -307,6 +314,7 @@ class HardTanh(ClipOps):
         min_val = 0.0
         max_val = 6.0
         super().Version_1(ctx, node, min_val, max_val)
+
 
 @flow_op(["clip_by_scalar", "clip_by_scalar_min", "clip_by_scalar_max"], onnx_op="Clip")
 class ClipByValueOp(ClipOps):
