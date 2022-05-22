@@ -14,11 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import math
-from typing import Callable, Any, Optional, List
-
 import oneflow as flow
-from oneflow import nn, Tensor
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator
