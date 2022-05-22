@@ -23,6 +23,7 @@ from flowvision.models import ModelCreator
 import tempfile
 
 squeezenet = ModelCreator.create_model("squeezenet1_0", pretrained=False)
+squeezenet = squeezenet.to("cuda")
 squeezenet.eval()
 
 class SqueezeNet(flow.nn.Graph):
@@ -37,10 +38,10 @@ class SqueezeNet(flow.nn.Graph):
 def test_squeezenet():
     
     squeezenet_graph = SqueezeNet()
-    squeezenet_graph._compile(flow.randn(1, 3, 224, 224))
+    squeezenet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(squeezenet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(squeezenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
+        convert_to_onnx_and_check(squeezenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
 
 test_squeezenet()
