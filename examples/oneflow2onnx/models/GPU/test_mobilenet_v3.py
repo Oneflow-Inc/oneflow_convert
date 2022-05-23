@@ -23,6 +23,7 @@ from flowvision.models import ModelCreator
 import tempfile
 
 mobilenetv3 = ModelCreator.create_model("mobilenet_v3_small", pretrained=False)
+mobilenetv3.to("cuda")
 mobilenetv3.eval()
 
 class MobileNetV3(flow.nn.Graph):
@@ -37,10 +38,10 @@ class MobileNetV3(flow.nn.Graph):
 def test_mobilenetv3():
     
     mobilenetv3_graph = MobileNetV3()
-    mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224))
+    mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(mobilenetv3.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
+        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
 
 test_mobilenetv3()
