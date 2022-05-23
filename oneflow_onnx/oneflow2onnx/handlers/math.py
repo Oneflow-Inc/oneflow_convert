@@ -272,7 +272,22 @@ class MinMaxOp:
 class HardSwish:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        node1 = ctx.MakeNode(
+            "HardSigmoid", [node.input_tensor_names[0]], op_name_scope=node.name, name="hard_sigmoid", dtypes=dtypes, attr={"alpha": 1.0 / 6}
+        )
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode(
+            "Mul", [node.input_tensor_names[0], node1.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul"
+        )
+
+@flow_op("hardsigmoid", onnx_op="HardSigmoid")
+class HardSigmoid:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        node.attrs["alpha"] = 1.0 / 6
         pass
+
 
 class ClipOps:
     @classmethod

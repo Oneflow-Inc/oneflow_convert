@@ -241,6 +241,11 @@ class ConvOp:
     def Version_11(cls, ctx, node, **kwargs):
         # no change
         cls.Version_1(ctx, node, **kwargs)
+    
+    @classmethod
+    def Version_14(cls, ctx, node, **kwargs):
+        # no change
+        cls.Version_1(ctx, node, **kwargs)
 
 
 @flow_op("adaptive_avg_pool2d", onnx_op="AveragePool")

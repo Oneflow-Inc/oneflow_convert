@@ -41,6 +41,6 @@ def test_mobilenetv3():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(mobilenetv3.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", opset=14)
+        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", print_outlier=True)
 
 test_mobilenetv3()
