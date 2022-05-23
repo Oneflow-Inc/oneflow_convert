@@ -154,7 +154,8 @@ def _ConvConvertInputs(
         node.data_format = "NCHW"
 
 
-def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2):
+def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2, ceil_mode=False):
+    origin_padding = node.attrs["padding"]
     if dilations is None:
         dilations = [1] * spatial * 2
     pads = [0] * spatial * 2
@@ -173,12 +174,21 @@ def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2):
         input_shape = _SpatialMap(input_shape, constants.NHWC_TO_NCHW)
         output_shape = _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
     for i in range(spatial):
-        pad = (
-            (output_shape[i + 2] - 1) * strides[i]
-            + dilations[i] * (kernel_shape[i] - 1)
-            + 1
-            - input_shape[i + 2]
-        )
+        pad = 0
+        if ceil_mode == True:
+            if (input_shape[i + 2] + 2 * origin_padding[i] - dilations[i] * (kernel_shape[i] - 1) - 1) % strides[i] != 0:
+                pad = (
+                    (output_shape[i + 2] - 1) * strides[i]
+                    + dilations[i] * (kernel_shape[i] - 1)
+                    - input_shape[i + 2]
+                )
+        else:
+            pad = (
+                (output_shape[i + 2] - 1) * strides[i]
+                + dilations[i] * (kernel_shape[i] - 1)
+                + 1
+                - input_shape[i + 2]
+            )
         pad = max(pad, 0)
         pads[i + spatial] = pad // 2
         pads[i] = pad - pad // 2
@@ -229,6 +239,11 @@ class ConvOp:
 
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
+        # no change
+        cls.Version_1(ctx, node, **kwargs)
+    
+    @classmethod
+    def Version_14(cls, ctx, node, **kwargs):
         # no change
         cls.Version_1(ctx, node, **kwargs)
 
@@ -304,7 +319,7 @@ class PoolOp:
         node.attrs["strides"] = strides_flow
         conv_dims_attr(node, "dilations")
         if "padding" in node.attrs:
-            _AddPadding(ctx, node, kernel_shape_flow, strides_flow)
+            _AddPadding(ctx, node, kernel_shape_flow, strides_flow, ceil_mode=node.attrs["ceil_mode"])
         else:
             pads = node.attrs.get("padding_before", [0, 0]) + node.attrs.get(
                 "padding_after", [0, 0]

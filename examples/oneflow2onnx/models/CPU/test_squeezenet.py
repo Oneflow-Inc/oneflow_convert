@@ -16,33 +16,31 @@ limitations under the License.
 
 import oneflow as flow
 import oneflow.nn as nn
-from typing import Union, List, Dict, Any, cast
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator
 
 import tempfile
 
-vgg16 = ModelCreator.create_model("vgg16_bn", pretrained=False)
-vgg16 = vgg16.to("cuda")
-vgg16.eval()
+squeezenet = ModelCreator.create_model("squeezenet1_0", pretrained=False)
+squeezenet.eval()
 
-class vgg16Graph(flow.nn.Graph):
+class SqueezeNet(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = vgg16
+        self.m = squeezenet
 
     def build(self, x):
         out = self.m(x)
         return out
 
-def test_vgg16():
+def test_squeezenet():
     
-    vgg16_graph = vgg16Graph()
-    vgg16_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    squeezenet_graph = SqueezeNet()
+    squeezenet_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(vgg16.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
+        flow.save(squeezenet.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(squeezenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
 
-test_vgg16()
+test_squeezenet()

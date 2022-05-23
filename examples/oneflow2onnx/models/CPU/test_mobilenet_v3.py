@@ -16,33 +16,31 @@ limitations under the License.
 
 import oneflow as flow
 import oneflow.nn as nn
-from typing import Union, List, Dict, Any, cast
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator
 
 import tempfile
 
-vgg16 = ModelCreator.create_model("vgg16_bn", pretrained=False)
-vgg16 = vgg16.to("cuda")
-vgg16.eval()
+mobilenetv3 = ModelCreator.create_model("mobilenet_v3_small", pretrained=False)
+mobilenetv3.eval()
 
-class vgg16Graph(flow.nn.Graph):
+class MobileNetV3(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = vgg16
+        self.m = mobilenetv3
 
     def build(self, x):
         out = self.m(x)
         return out
 
-def test_vgg16():
+def test_mobilenetv3():
     
-    vgg16_graph = vgg16Graph()
-    vgg16_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+    mobilenetv3_graph = MobileNetV3()
+    mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(vgg16.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(vgg16_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
+        flow.save(mobilenetv3.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
 
-test_vgg16()
+test_mobilenetv3()
