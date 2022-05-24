@@ -44,4 +44,14 @@ def test_mobilenetv3():
         flow.save(mobilenetv3.state_dict(), tmpdirname)
         convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
 
+def test_mobilenetv3_opset14():
+    
+    mobilenetv3_graph = MobileNetV3()
+    mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(mobilenetv3.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(mobilenetv3_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu", opset=14)
+
 test_mobilenetv3()
+test_mobilenetv3_opset14()
