@@ -90,6 +90,22 @@ class BiasAdd(common.BroadcastOp):
         ctx.set_dtype(node.input_tensor_names[1], unsqueeze_dtype)
         super().Version_6(ctx, node, **kwargs)
 
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        axis = node.attrs["axis"]
+        unsqueeze_axes = []
+        x_rank = len(ctx.get_shape(node.input_tensor_names[0]))
+        for i in range(x_rank):
+            if axis != i:
+                unsqueeze_axes.append(i)
+        assert len(ctx.get_shape(node.input_tensor_names[1])) == 1
+        shape_node = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("shape"), np.array(unsqueeze_axes)
+        )
+        ctx.InsertNewNodeOnInput(
+            node, "Unsqueeze", [node.input_tensor_names[1], shape_node.output_tensor_names[0]]
+        )
+        super().Version_6(ctx, node, **kwargs)
 
 @flow_op(["leaky_relu", "softplus"], onnx_op=["LeakyRelu", "Softplus"])
 class DirectOpSinceOpset1:
@@ -280,6 +296,10 @@ class HardSwish:
         ctx.MakeNode(
             "Mul", [node.input_tensor_names[0], node1.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul"
         )
+    
+    @classmethod
+    def Version_14(cls, ctx, node, **kwargs):
+        pass
 
 @flow_op("hardsigmoid", onnx_op="HardSigmoid")
 class HardSigmoid:
