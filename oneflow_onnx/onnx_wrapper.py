@@ -87,7 +87,7 @@ class Node(object):
 
     @property
     def output_tensor_names(self):
-        return copy.deepcopy(self._output)
+        return self._output
 
     @output_tensor_names.setter
     def output_tensor_names(self, val):
