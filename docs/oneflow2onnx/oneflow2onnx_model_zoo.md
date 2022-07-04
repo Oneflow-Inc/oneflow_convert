@@ -6,5 +6,12 @@
 | 模型 | 来源 | operator version|
 |-------|--------|---------|
 | AlexNet | [OneFlow-AlexNet](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| InceptionV3 | [OneFlow-InceptionV3](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| LeNet | [OneFlow-LeNet](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
 | MobileNetV2 | [Oneflow-MobileNetV2](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| MobileNetV3 | [Oneflow-MobileNetV3](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| RepVGG | [OneFlow-RepVGG](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
 | ResNet50 | [OneFlow-ResNet50](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| ShuffleNetV2 | [OneFlow-ShuffleNetV2](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| SqueezeNet | [OneFlow-SqueezeNet](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
+| VGG16 | [OneFlow-VGG16](https://github.com/Oneflow-Inc/OneFlow-Benchmark/tree/master/Classification/cnns) |10|
