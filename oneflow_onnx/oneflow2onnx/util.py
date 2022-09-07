@@ -104,7 +104,7 @@ def compare_result(
 
 def convert_to_onnx_and_check(
     graph,
-    print_outlier=False,
+    print_outlier=True,
     explicit_init=False,
     external_data=False,
     ort_optimize=True,
