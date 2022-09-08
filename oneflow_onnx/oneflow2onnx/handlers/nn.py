@@ -432,7 +432,7 @@ class BatchNorm:
 
 @flow_op(
     ["layer_norm"],
-    flow_ibns=["x"],
+    flow_ibns=["x", "gamma", "beta"],
 )
 class LayerNorm:
     @classmethod
