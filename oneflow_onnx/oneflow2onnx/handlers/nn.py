@@ -429,3 +429,42 @@ class BatchNorm:
         # is_test was removed - no change for us
         cls.Version_6(ctx, node, **kwargs)
 
+
+@flow_op(
+    ["layer_norm"],
+    flow_ibns=["x"],
+)
+class LayerNorm:
+    @classmethod
+    def Version_17(cls, ctx, node, **kwargs):
+        node.op_type = "LayerNormalization"
+        # flow inputs: x
+        # flow outputs: y, mean, inv_variance
+        # flow attributes: begin_norm_axis, begin_params_axis, epsilon
+        # onnx inputs: X, Scale, B(optional) 
+        # onnx attributes: axis(-1), epsilon(1e-05), stash_type(1)
+        # onnx output: Y, Mean(optional), InvStdDev(optional)
+        
+        consumers = [
+            ctx.FindOutputConsumers(output_name)
+            for output_name in node.output_tensor_names[1:]
+        ]
+        if not any(consumers):
+            new_output = [node.output_tensor_names[0]]
+            node.output_tensor_names = new_output
+
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        input_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
+        epsilon = node.attrs.get("epsilon", None)
+        node.attrs["epsilon"] = epsilon
+        axis = node.attrs.get("begin_norm_axis", None)
+        node.attrs["axis"] = axis
+
+        scale_node = ctx.MakeConst("Scale", np.array([1.0], dtype=input_dtype))
+        node.input_tensor_names.append(scale_node.output_tensor_names[0])
+        
+        if len(input_shape) == 4:
+            _ConvConvertInputs(ctx, node, with_kernel=False)
+        else:
+            # for [n, c] batch_norm
+            pass
