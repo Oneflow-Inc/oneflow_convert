@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import os
-import tempfile
+import shutil
 import numpy as np
 import oneflow as flow
 import onnxruntime as ort
@@ -62,12 +62,13 @@ def export_onnx_model(
     graph,
     external_data=False,
     opset=None,
-    flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    if flow_weight_dir is None or os.path.exists(flow_weight_dir) == False:
-        raise RuntimeError('Please specify the correct model path!')
+    flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
+    if os.path.exists(flow_weight_dir):
+        shutil.rmtree(flow_weight_dir)
+    flow.save(graph.state_dict(), flow_weight_dir)
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
@@ -80,8 +81,8 @@ def export_onnx_model(
     )
 
     def cleanup():
-        if os.path.exists(onnx_model_path):
-            os.remove(onnx_model_path)
+        if os.path.exists(flow_weight_dir):
+            shutil.rmtree(flow_weight_dir)
 
     return onnx_model_path, cleanup
 
@@ -105,17 +106,15 @@ def compare_result(
 def convert_to_onnx_and_check(
     graph,
     print_outlier=True,
-    explicit_init=False,
     external_data=False,
     ort_optimize=True,
     opset=None,
-    flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
     device="cpu",
 ):
     onnx_model_path, cleanup = export_onnx_model(
-        graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
+        graph, external_data, opset, onnx_model_path, dynamic_batch_size
     )
 
 

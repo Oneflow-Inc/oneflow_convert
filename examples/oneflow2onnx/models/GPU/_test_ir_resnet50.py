@@ -247,7 +247,7 @@ def test_resnet50():
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(model_module.state_dict(), tmpdirname)
         convert_to_onnx_and_check(
-            model_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True, device="gpu")
+            model_graph, onnx_model_path="/tmp", print_outlier=True, device="gpu")
 
 if __name__ == "__main__":
     test_resnet50()

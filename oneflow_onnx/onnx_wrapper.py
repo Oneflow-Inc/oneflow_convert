@@ -861,7 +861,7 @@ class Graph(object):
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
         key = ".".join(node.output_tensor_names[0].split(".")[1:])
-        tensor_value = self._param_dict[key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+        tensor_value = self._param_dict["m"][key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
         return tensor_value
 
     def get_shape(self, name):

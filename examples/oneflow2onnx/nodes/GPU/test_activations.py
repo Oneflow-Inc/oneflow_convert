@@ -70,7 +70,7 @@ def test_relu():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(relu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(relu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp", device="gpu")
 
 def test_hard_swish():
     hard_swish_graph = HardSwishOpGraph()
@@ -78,7 +78,7 @@ def test_hard_swish():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(hard_swish_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", opset=14, device="gpu")
+        convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14, device="gpu")
 
 def test_hard_sigmoid():
     hard_sigmoid_graph = HardSigmoidOpGraph()
@@ -86,7 +86,7 @@ def test_hard_sigmoid():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(hard_sigmoid_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp", device="gpu")
 
 def test_prelu_one_channels():
     
@@ -95,7 +95,7 @@ def test_prelu_one_channels():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(prelu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(prelu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 def test_prelu_n_channels():
     
@@ -105,7 +105,7 @@ def test_prelu_n_channels():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(prelu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(prelu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
 test_prelu_one_channels()

@@ -243,10 +243,8 @@ def test_resnet50():
     model_graph = ModelGraph(model_module)
     model_graph._compile(flow.randn(1, 3, 112, 112))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(model_module.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(
-            model_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", print_outlier=True)
+    convert_to_onnx_and_check(
+        model_graph, onnx_model_path="/tmp", print_outlier=True)
 
 if __name__ == "__main__":
     test_resnet50()
