@@ -113,7 +113,7 @@ def convert_to_onnx_and_check(
     external_data=False,
     ort_optimize=True,
     opset=None,
-    flow_weight_dir = None,
+    flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
     device="cpu",
