@@ -308,6 +308,29 @@ class HardSigmoid:
         node.attrs["alpha"] = 1.0 / 6
         pass
 
+@flow_op("arange", onnx_op="Range")
+class Arange:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        if node.attrs['dtype'] == 1:
+            starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_start"]))
+            node.input_tensor_names.append(starts.output_tensor_names[0])
+            limits = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("limit"), np.array(node.attrs["float_limit"]))
+            node.input_tensor_names.append(limits.output_tensor_names[0])
+            delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["float_delta"]))
+            node.input_tensor_names.append(delta.output_tensor_names[0])
+        else:
+            starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["integer_start"]))
+            node.input_tensor_names.append(starts.output_tensor_names[0])
+            limits = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("limit"), np.array(node.attrs["integer_limit"]))
+            node.input_tensor_names.append(limits.output_tensor_names[0])
+            delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["integer_delta"]))
+            node.input_tensor_names.append(delta.output_tensor_names[0])
+
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
 
 class ClipOps:
     @classmethod

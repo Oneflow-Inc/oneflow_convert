@@ -104,7 +104,7 @@ def compare_result(
 
 def convert_to_onnx_and_check(
     graph,
-    print_outlier=False,
+    print_outlier=True,
     explicit_init=False,
     external_data=False,
     ort_optimize=True,
@@ -128,10 +128,17 @@ def convert_to_onnx_and_check(
             ipt_dict, onnx_res = run_onnx(
             onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
             )
+        
         if device=="gpu":
-            oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))     
+            if len(ipt_dict) == 0:
+                oneflow_res = graph()
+            else:
+                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))     
         else:
-            oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
+            if len(ipt_dict) == 0:
+                oneflow_res = graph()
+            else:
+                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.numpy()
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
