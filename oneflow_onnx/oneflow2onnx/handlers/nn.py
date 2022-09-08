@@ -453,7 +453,6 @@ class LayerNorm:
             new_output = [node.output_tensor_names[0]]
             node.output_tensor_names = new_output
 
-        input_shape = ctx.get_shape(node.input_tensor_names[0])
         input_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
         epsilon = node.attrs.get("epsilon", None)
         node.attrs["epsilon"] = epsilon
@@ -462,9 +461,4 @@ class LayerNorm:
 
         scale_node = ctx.MakeConst("Scale", np.array([1.0], dtype=input_dtype))
         node.input_tensor_names.append(scale_node.output_tensor_names[0])
-        
-        if len(input_shape) == 4:
-            _ConvConvertInputs(ctx, node, with_kernel=False)
-        else:
-            # for [n, c] batch_norm
-            pass
+
