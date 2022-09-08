@@ -42,6 +42,6 @@ def test_squeezenet():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(squeezenet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(squeezenet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", device="gpu")
+        convert_to_onnx_and_check(squeezenet_graph, onnx_model_path=".", device="gpu")
 
 test_squeezenet()

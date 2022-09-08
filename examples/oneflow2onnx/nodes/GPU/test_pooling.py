@@ -45,6 +45,6 @@ def test_pool():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(pool.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(pool_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(pool_graph, onnx_model_path="/tmp", device="gpu")
 
 test_pool()

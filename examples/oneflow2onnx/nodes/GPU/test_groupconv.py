@@ -44,6 +44,6 @@ def test_group_conv2d():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(group_conv_module.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(group_conv_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(group_conv_graph, onnx_model_path="/tmp", device="gpu")
 
 test_group_conv2d()

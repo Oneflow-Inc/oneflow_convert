@@ -100,7 +100,7 @@ The meaning of each parameter is as follows:
 
 3. opset: specify the version of the conversion model (int, default is 10)
 
-4. flow_weight_dir: path to save OneFlow model weights
+4. flow_weight_dir: path to save OneFlow model weights (If it is empty, the weight of the current graph itself will be used directly)
 
 5. onnx_model_path: save path for exported ONNX models
 

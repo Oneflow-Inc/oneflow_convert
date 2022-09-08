@@ -51,11 +51,8 @@ def test_math_ops():
     
     math_ops_graph = MathOpGraph()
     math_ops_graph._compile(flow.randn(1, 3, 224, 224))
-    # print(math_ops_graph._full_graph_proto)
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(math_ops.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(math_ops_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp")
 
 test_math_ops()
 

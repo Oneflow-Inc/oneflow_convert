@@ -66,34 +66,26 @@ def test_relu():
     relu_graph = ReLUOpGraph()
     relu_graph._compile(flow.randn(1, 3, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(relu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(relu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp")
 
 def test_hard_swish():
     hard_swish_graph = HardSwishOpGraph()
     hard_swish_graph._compile(flow.randn(1, 3, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(hard_swish_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", opset=14)
+    convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14)
 
 def test_hard_sigmoid():
     hard_sigmoid_graph = HardSigmoidOpGraph()
     hard_sigmoid_graph._compile(flow.randn(1, 3, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(hard_sigmoid_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp")
 
 def test_prelu_one_channels():
     
     prelu_graph = PReLUOpGraph()
     prelu_graph._compile(flow.randn(1, 1, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(prelu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp")
 
 def test_prelu_n_channels():
     
@@ -101,9 +93,7 @@ def test_prelu_n_channels():
     channels=random.randint(2,10)
     prelu_graph._compile(flow.randn(1, channels, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(prelu_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp")
 
 
 test_prelu_one_channels()

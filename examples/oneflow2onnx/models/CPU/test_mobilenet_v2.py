@@ -36,9 +36,7 @@ def test_mobilenetv2():
     
     mobilenetv2_graph = MobileNetV2Graph()
     mobilenetv2_graph._compile(flow.randn(1, 3, 224, 224))
-    # print(mobilenetv2_graph._full_graph_proto)
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(mobilenetv2.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(mobilenetv2_graph, flow_weight_dir=tmpdirname, onnx_model_path=".")
+
+    convert_to_onnx_and_check(mobilenetv2_graph, onnx_model_path=".")
 
 test_mobilenetv2()

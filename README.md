@@ -85,7 +85,6 @@ from oneflow_onnx.oneflow2onnx.util import export_onnx_model
 export_onnx_model(graph,
                   external_data=False, 
                   opset=None, 
-                  flow_weight_dir=None, 
                   onnx_model_path="/tmp", 
                   dynamic_batch_size=False)
 ```
@@ -97,7 +96,7 @@ export_onnx_model(graph,
 
 3. opset: 指定转换模型的版本 ( int，默认为 10 )
 
-4. flow_weight_dir: OneFlow 模型权重的保存路径
+4. flow_weight_dir: OneFlow 模型权重的保存路径（如果为空则会直接使用当前 graph 本身的权重）
 
 5. onnx_model_path: 导出的 ONNX 模型保存路径
 
@@ -166,7 +165,6 @@ resnet34_graph._compile(flow.randn(1, 3, 224, 224))
 
 # 导出为 ONNX 模型并进行检查
 convert_to_onnx_and_check(resnet34_graph, 
-                          flow_weight_dir=MODEL_PARAMS, 
                           onnx_model_path="./", 
                           print_outlier=True,
                           dynamic_batch_size=True)
