@@ -25,7 +25,7 @@ class Squeeze(flow.nn.Module):
         return flow.squeeze(x, dim=1)
 
 squeeze = Squeeze()
-
+squeeze = squeeze.to("cuda")
 class SqueezeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -38,8 +38,8 @@ class SqueezeOpGraph(flow.nn.Graph):
 def test_squeeze():
     
     squeeze_graph = SqueezeOpGraph()
-    squeeze_graph._compile(flow.randn(2, 1, 2, 1, 2))
+    squeeze_graph._compile(flow.randn(2, 1, 2, 1, 2).to("cuda"))
 
-    convert_to_onnx_and_check(squeeze_graph, onnx_model_path="/tmp", opset=11)
+    convert_to_onnx_and_check(squeeze_graph, onnx_model_path="/tmp", opset=11, device="gpu")
 
 test_squeeze()

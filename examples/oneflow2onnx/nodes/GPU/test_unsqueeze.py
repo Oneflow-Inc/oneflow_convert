@@ -17,29 +17,29 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-class Squeeze(flow.nn.Module):
+class Unsqueeze(flow.nn.Module):
     def __init__(self) -> None:
-        super(Squeeze, self).__init__()
+        super(Unsqueeze, self).__init__()
     
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        return flow.squeeze(x, dim=1)
+        return flow.unsqueeze(x, dim=1)
 
-squeeze = Squeeze()
-
-class SqueezeOpGraph(flow.nn.Graph):
+unsqueeze = Unsqueeze()
+unsqueeze = unsqueeze.to("cuda")
+class UnsqueezeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = squeeze
+        self.m = unsqueeze
 
     def build(self, x):
         return self.m(x)
 
 
-def test_squeeze():
+def test_unsqueeze():
     
-    squeeze_graph = SqueezeOpGraph()
-    squeeze_graph._compile(flow.randn(2, 1, 2, 1, 2))
+    unsqueeze_graph = UnsqueezeOpGraph()
+    unsqueeze_graph._compile(flow.randn(1, 2, 3, 4).to("cuda"))
 
-    convert_to_onnx_and_check(squeeze_graph, onnx_model_path="/tmp", opset=11)
+    convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=11, device="gpu")
 
-test_squeeze()
+test_unsqueeze()

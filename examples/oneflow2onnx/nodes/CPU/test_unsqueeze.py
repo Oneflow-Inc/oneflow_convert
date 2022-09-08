@@ -40,8 +40,6 @@ def test_unsqueeze():
     unsqueeze_graph = UnsqueezeOpGraph()
     unsqueeze_graph._compile(flow.randn(1, 2, 3, 4))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(unsqueeze.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(unsqueeze_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", opset=11)
+    convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=11)
 
 test_unsqueeze()
