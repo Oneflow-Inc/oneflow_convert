@@ -308,6 +308,18 @@ class HardSigmoid:
         node.attrs["alpha"] = 1.0 / 6
         pass
 
+@flow_op("scalar_pow", onnx_op="Pow")
+class ScalarPow:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        np_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
+        if node.attrs['has_float_operand']:
+            y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_operand"]).astype(np_dtype))
+            node.input_tensor_names.append(y.output_tensor_names[0])
+        else:
+            y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["int_operand"]).astype(np_dtype))
+            node.input_tensor_names.append(y.output_tensor_names[0])
+
 @flow_op("arange", onnx_op="Range")
 class Arange:
     @classmethod
