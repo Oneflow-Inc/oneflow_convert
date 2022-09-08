@@ -454,8 +454,6 @@ class LayerNorm:
             node.output_tensor_names = new_output
 
         input_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
-        epsilon = node.attrs.get("epsilon", None)
-        node.attrs["epsilon"] = epsilon
         axis = node.attrs.get("begin_norm_axis", None)
         node.attrs["axis"] = axis
 
