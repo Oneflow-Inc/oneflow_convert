@@ -41,8 +41,6 @@ def test_matmul():
     matmul_graph = matmulOpGraph()
     matmul_graph._compile(flow.randn(1, 20))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(matmul.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(matmul_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(matmul_graph, onnx_model_path="/tmp")
 
 test_matmul()

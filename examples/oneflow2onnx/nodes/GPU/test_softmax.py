@@ -44,6 +44,6 @@ def test_softmax():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(softmax.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(softmax_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(softmax_graph, onnx_model_path="/tmp", device="gpu")
 
 test_softmax()

@@ -43,6 +43,6 @@ def test_concat():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(concat.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(concat_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(concat_graph, onnx_model_path="/tmp", device="gpu")
 
 test_concat()

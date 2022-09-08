@@ -43,6 +43,6 @@ def test_resnet():
     # print(resnet_graph._full_graph_proto)
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(resnet.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(resnet_graph, flow_weight_dir=tmpdirname, onnx_model_path=".", print_outlier=False, device="gpu")
+        convert_to_onnx_and_check(resnet_graph, onnx_model_path=".", print_outlier=False, device="gpu")
 
 test_resnet()

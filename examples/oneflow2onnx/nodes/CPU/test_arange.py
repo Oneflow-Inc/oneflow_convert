@@ -40,8 +40,6 @@ def test_arange():
     arange_graph = ArangeOpGraph()
     arange_graph._compile()
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(arange.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(arange_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp", opset=11)
+    convert_to_onnx_and_check(arange_graph, onnx_model_path="/tmp", opset=11)
 
 test_arange()

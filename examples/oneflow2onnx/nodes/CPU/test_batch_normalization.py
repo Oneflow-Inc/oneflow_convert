@@ -43,8 +43,6 @@ def test_batchnorm():
     batchnorm_graph = BatchNormOpGraph()
     batchnorm_graph._compile(flow.randn(1, 3, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(batchnorm.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(batchnorm_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(batchnorm_graph, onnx_model_path="/tmp")
 
 test_batchnorm()

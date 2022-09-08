@@ -42,8 +42,6 @@ def test_pool():
     pool_graph = poolOpGraph()
     pool_graph._compile(flow.randn(1, 3, 224, 224))
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(pool.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(pool_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(pool_graph, onnx_model_path="/tmp")
 
 test_pool()
