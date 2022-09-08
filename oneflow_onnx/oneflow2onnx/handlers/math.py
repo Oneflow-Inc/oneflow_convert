@@ -47,6 +47,8 @@ class BroadcastOp(common.BroadcastOp):
 
 @flow_op("scalar_mul", "Mul")
 @flow_op("scalar_add", "Add")
+@flow_op("scalar_div", "Div")
+@flow_op("scalar_sub", "Sub")
 class ScalarBinaryOp:
     @classmethod
     def Version_6(cls, ctx, node, **kwargs):
