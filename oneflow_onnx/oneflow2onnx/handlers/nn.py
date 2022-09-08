@@ -437,6 +437,7 @@ class BatchNorm:
 class LayerNorm:
     @classmethod
     def Version_17(cls, ctx, node, **kwargs):
+        # NOTE: oneflow op: layer_norm used to inference, layer_norm_addine used to train
         node.op_type = "LayerNormalization"
         # flow inputs: x
         # flow outputs: y, mean, inv_variance
