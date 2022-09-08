@@ -429,3 +429,10 @@ class BatchNorm:
         # is_test was removed - no change for us
         cls.Version_6(ctx, node, **kwargs)
 
+
+@flow_op("upsample_nearest_2d", onnx_op="Resize")
+class UpSampleNearest2D:
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        print(node.attrs)
+        pass
