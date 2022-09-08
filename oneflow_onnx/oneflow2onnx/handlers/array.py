@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import logging
-from sre_parse import ESCAPES
 import sys
 
 import numpy as np
