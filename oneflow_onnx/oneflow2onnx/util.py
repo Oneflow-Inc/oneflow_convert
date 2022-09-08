@@ -62,10 +62,14 @@ def export_onnx_model(
     graph,
     external_data=False,
     opset=None,
+    flow_weight_dir = None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
-    flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
+    flow_weight_clean_flag = False
+    if flow_weight_dir is None:
+        flow_weight_clean_flag = True
+        flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
     if os.path.exists(flow_weight_dir):
         shutil.rmtree(flow_weight_dir)
     flow.save(graph.state_dict(), flow_weight_dir)
@@ -81,7 +85,7 @@ def export_onnx_model(
     )
 
     def cleanup():
-        if os.path.exists(flow_weight_dir):
+        if os.path.exists(flow_weight_dir) and flow_weight_clean_flag:
             shutil.rmtree(flow_weight_dir)
 
     return onnx_model_path, cleanup
@@ -109,12 +113,13 @@ def convert_to_onnx_and_check(
     external_data=False,
     ort_optimize=True,
     opset=None,
+    flow_weight_dir = None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
     device="cpu",
 ):
     onnx_model_path, cleanup = export_onnx_model(
-        graph, external_data, opset, onnx_model_path, dynamic_batch_size
+        graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
     )
 
 

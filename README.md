@@ -96,9 +96,11 @@ export_onnx_model(graph,
 
 3. opset: 指定转换模型的版本 ( int，默认为 10 )
 
-4. onnx_model_path: 导出的 ONNX 模型保存路径
+4. flow_weight_dir: OneFlow 模型权重的保存路径（如果为空则会直接使用当前 graph 本身的权重）
 
-5. dynamic_batch_size: 导出的 ONNX 模型是否支持动态 batch，默认为False
+5. onnx_model_path: 导出的 ONNX 模型保存路径
+
+6. dynamic_batch_size: 导出的 ONNX 模型是否支持动态 batch，默认为False
 
 
 另外，oneflow-onnx 还提供了一个名为 `convert_to_onnx_and_check` 的函数，用于转换并检查转换出的 ONNX 模型。其中的检查指的是将同样的输入分别送入原本的 OneFlow 模型和转换后的 ONNX 模型，然后比较两个输出中对应的每个数值之差是否在合理的误差范围内。

@@ -87,6 +87,7 @@ from oneflow_onnx.oneflow2onnx.util import export_onnx_model
 export_onnx_model(graph,
                   external_data=False, 
                   opset=None, 
+                  flow_weight_dir=None, 
                   onnx_model_path="/tmp", 
                   dynamic_batch_size=False)
 ```
@@ -99,9 +100,11 @@ The meaning of each parameter is as follows:
 
 3. opset: specify the version of the conversion model (int, default is 10)
 
-4. onnx_model_path: save path for exported ONNX models
+4. flow_weight_dir: path to save OneFlow model weights (If it is empty, the weight of the current graph itself will be used directly)
 
-5. dynamic_batch_size: whether the exported ONNX model supports dynamic batch, default is False
+5. onnx_model_path: save path for exported ONNX models
+
+6. dynamic_batch_size: whether the exported ONNX model supports dynamic batch, default is False
 
 
 In addition, oneflow-onnx provides a function called `convert_to_onnx_and_check` to convert and meanwhile check the converted ONNX model. The check process will pass the same input to the original OneFlow model and the converted ONNX model respectively, and then compare the difference between each value in the two outputs to see if they are same within a relative range.
@@ -170,6 +173,7 @@ resnet34_graph._compile(flow.randn(1, 3, 224, 224))
 
 # Export as ONNX model and check
 convert_to_onnx_and_check(resnet34_graph, 
+                          flow_weight_dir=MODEL_PARAMS, 
                           onnx_model_path="./", 
                           print_outlier=True,
                           dynamic_batch_size=True)
