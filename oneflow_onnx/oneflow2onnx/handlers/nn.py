@@ -433,6 +433,21 @@ class BatchNorm:
 @flow_op("upsample_nearest_2d", onnx_op="Resize")
 class UpSampleNearest2D:
     @classmethod
+    def version_10(cls, ctx, node, **kwargs):
+        node.attrs["mode"] = "nearest"
+        if len(node.attrs["output_size"]) == 0:
+            scales = [1.0, 1.0]
+            scales.append(node.attrs["height_scale"])
+            scales.append(node.attrs["width_scale"])
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
+            node.input_tensor_names.append(scales_node.output_tensor_names[0])
+        else:
+            raise NotImplementedError("Opset 10 don't support specify output_size attribute!")
+
+    @classmethod
     def Version_13(cls, ctx, node, **kwargs):
         node.attrs["coordinate_transformation_mode"] = "half_pixel"
         node.attrs["mode"] = "nearest"
