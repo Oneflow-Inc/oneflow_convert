@@ -28,6 +28,15 @@ class ReLUOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+silu = flow.nn.SiLU()
+class SiLUOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = silu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
 
 prelu = flow.nn.PReLU()
 class PReLUOpGraph(flow.nn.Graph):
@@ -68,6 +77,13 @@ def test_relu():
 
     convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp")
 
+def test_silu():
+    
+    silu_graph = SiLUOpGraph()
+    silu_graph._compile(flow.randn(1, 3, 224, 224))
+
+    convert_to_onnx_and_check(silu_graph, onnx_model_path="/tmp")
+
 def test_hard_swish():
     hard_swish_graph = HardSwishOpGraph()
     hard_swish_graph._compile(flow.randn(1, 3, 224, 224))
@@ -99,6 +115,7 @@ def test_prelu_n_channels():
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
+test_silu()
 test_hard_swish()
 test_hard_sigmoid()
 

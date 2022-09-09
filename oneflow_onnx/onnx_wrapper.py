@@ -26,6 +26,7 @@ from __future__ import absolute_import
 import collections
 import copy
 import logging
+from typing import OrderedDict
 import six
 import numpy as np
 import oneflow
@@ -861,10 +862,13 @@ class Graph(object):
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
         key = ".".join(node.output_tensor_names[0].split(".")[1:])
-        try:
-            tensor_value = self._param_dict["m"][key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
-        except:
-             tensor_value = self._param_dict[key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+        if len(list(self._param_dict.keys())) > 1:
+            tensor_value = self._param_dict[key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+        else:
+            try:
+                tensor_value = self._param_dict[list(self._param_dict.keys())[0]][key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+            except:
+                tensor_value = self._param_dict[key[:key.rfind("out")-1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
         return tensor_value
 
     def get_shape(self, name):
