@@ -301,6 +301,23 @@ class HardSwish:
     def Version_14(cls, ctx, node, **kwargs):
         pass
 
+@flow_op("silu", onnx_op="Mul")
+class HardSwish:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        sigmoid_node = ctx.MakeNode(
+            "Sigmoid", [node.input_tensor_names[0]], op_name_scope=node.name, name="sigmoid", dtypes=dtypes
+        )
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode(
+            "Mul", [node.input_tensor_names[0], sigmoid_node.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul"
+        )
+    
+    @classmethod
+    def Version_10(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+
 @flow_op("hardsigmoid", onnx_op="HardSigmoid")
 class HardSigmoid:
     @classmethod
