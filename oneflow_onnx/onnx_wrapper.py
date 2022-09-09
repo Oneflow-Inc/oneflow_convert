@@ -408,7 +408,6 @@ class Graph(object):
 
         self._model_save_dir = model_save_dir
         self._param_dict = oneflow.load(self._model_save_dir)
-        self.flow_param_dict = self._param_dict
         self._output_shapes = output_shapes
         self._opset = util.FindOpset(opset)
         self._flow_nodes_by_name = flow_nodes
