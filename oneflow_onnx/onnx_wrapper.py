@@ -384,6 +384,7 @@ class Graph(object):
     def __init__(
         self,
         nodes,
+        flow_nodes,
         model_save_dir,
         output_shapes=None,
         dtypes=None,
@@ -408,6 +409,7 @@ class Graph(object):
         self._param_dict = oneflow.load(self._model_save_dir)
         self._output_shapes = output_shapes
         self._opset = util.FindOpset(opset)
+        self._flow_nodes_by_name = flow_nodes
 
         if extra_opset is not None:
             util.MakeSure(isinstance(extra_opset, list), "invalid extra_opset")
@@ -794,6 +796,11 @@ class Graph(object):
     def get_node_by_name(self, name):
         """Get node by name."""
         ret = self._nodes_by_name.get(name)
+        return ret
+
+    def get_flow_node_by_name(self, name):
+        """Get OneFlow op node by name."""
+        ret = self._flow_nodes_by_name.get(name)
         return ret
 
     def set_node_by_name(self, node):
