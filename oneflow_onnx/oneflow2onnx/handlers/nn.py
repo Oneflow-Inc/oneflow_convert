@@ -433,7 +433,7 @@ class BatchNorm:
 @flow_op("upsample_nearest_2d", onnx_op="Resize")
 class UpSampleNearest2D:
     @classmethod
-    def version_10(cls, ctx, node, **kwargs):
+    def Version_10(cls, ctx, node, **kwargs):
         node.attrs["mode"] = "nearest"
         if len(node.attrs["output_size"]) == 0:
             scales = [1.0, 1.0]
@@ -446,6 +446,7 @@ class UpSampleNearest2D:
             node.input_tensor_names.append(scales_node.output_tensor_names[0])
         else:
             raise NotImplementedError("Opset 10 don't support specify output_size attribute!")
+
 
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):

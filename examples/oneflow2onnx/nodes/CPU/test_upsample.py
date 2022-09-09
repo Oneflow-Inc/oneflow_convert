@@ -38,9 +38,9 @@ class UpsampleNearest2DOpGraph(flow.nn.Graph):
 
 def test_upsample_nearest_2d():
     
-    unsqueeze_graph = UpsampleNearest2DOpGraph()
-    unsqueeze_graph._compile(flow.randn(1, 1, 2, 2))
+    upsample_nearest2d_graph = UpsampleNearest2DOpGraph()
+    upsample_nearest2d_graph._compile(flow.randn(1, 1, 2, 2))
 
-    convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=13)
+    convert_to_onnx_and_check(upsample_nearest2d_graph, onnx_model_path="/tmp", opset=10)
 
 test_upsample_nearest_2d()
