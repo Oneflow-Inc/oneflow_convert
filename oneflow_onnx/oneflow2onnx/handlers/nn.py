@@ -461,3 +461,54 @@ class LayerNorm:
         scale_node = ctx.MakeConst("Scale", np.array([1.0], dtype=input_dtype))
         node.input_tensor_names.append(scale_node.output_tensor_names[0])
 
+@flow_op("upsample_nearest_2d", onnx_op="Resize")
+class UpSampleNearest2D:
+    @classmethod
+    def Version_10(cls, ctx, node, **kwargs):
+        node.attrs["mode"] = "nearest"
+        if len(node.attrs["output_size"]) == 0:
+            scales = [1.0, 1.0]
+            scales.append(node.attrs["height_scale"])
+            scales.append(node.attrs["width_scale"])
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
+            node.input_tensor_names.append(scales_node.output_tensor_names[0])
+        else:
+            raise NotImplementedError("Opset 10 don't support specify output_size attribute!")
+
+
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        node.attrs["coordinate_transformation_mode"] = "half_pixel"
+        node.attrs["mode"] = "nearest"
+        node.attrs["nearest_mode"] = "round_prefer_floor"
+        # onnx support nchw
+        node.input_tensor_names.append("")
+        if len(node.attrs["output_size"]) == 0:
+            scales = [1.0, 1.0]
+            scales.append(node.attrs["height_scale"])
+            scales.append(node.attrs["width_scale"])
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
+            node.input_tensor_names.append(scales_node.output_tensor_names[0])
+            node.input_tensor_names.append("")
+        else:
+            node_sizes = node.attrs["output_size"]
+            node.input_tensor_names.append("")
+            node.input_tensor_names.append("")
+            sizes = []
+            input_shape = ctx.get_shape(node.input_tensor_names[0])
+            sizes.append(input_shape[0])
+            sizes.append(input_shape[1])
+            sizes.append(node_sizes[0])
+            sizes.append(node_sizes[1])
+            sizes_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("sizes"),
+                np.array(sizes).astype(np.int64),
+            )
+            node.input_tensor_names.append(sizes_node.output_tensor_names[0])
+

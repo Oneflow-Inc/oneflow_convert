@@ -26,6 +26,7 @@ from __future__ import absolute_import
 import collections
 import copy
 import logging
+import tempfile
 from typing import OrderedDict
 import six
 import numpy as np
@@ -384,6 +385,7 @@ class Graph(object):
     def __init__(
         self,
         nodes,
+        flow_nodes,
         model_save_dir,
         output_shapes=None,
         dtypes=None,
@@ -408,6 +410,7 @@ class Graph(object):
         self._param_dict = oneflow.load(self._model_save_dir)
         self._output_shapes = output_shapes
         self._opset = util.FindOpset(opset)
+        self._flow_nodes_by_name = flow_nodes
 
         if extra_opset is not None:
             util.MakeSure(isinstance(extra_opset, list), "invalid extra_opset")
@@ -687,6 +690,7 @@ class Graph(object):
         # NOTE: shape inference for some ops need the input values of the op, e.g., Reshape
         # op needs the "Shape" value to infer output shape.
         initializers = []
+        tmp_dirs = []
         for i, inp in enumerate(node.input_nodes):
             if inp is None:
                 if not self.is_empty_input(node.input_tensor_names[i]):
@@ -698,9 +702,17 @@ class Graph(object):
                         )
                 continue
             if inp.is_const():
-                tensor = util.TensorProtoFromNumpy(
-                    inp.get_tensor_value(as_list=False), name=inp.output_tensor_names[0]
-                )
+                tensor_value = inp.get_tensor_value(as_list=False)
+                if tensor_value.size * tensor_value.itemsize > 128 * 1024 * 1024: #128 MB
+                    tmp_dir = tempfile.TemporaryDirectory()
+                    tmp_dirs.append(tmp_dir)
+                    tensor = util.TensorProtoFromNumpy(
+                        tensor_value, name=inp.output_tensor_names[0], external_data=True, export_path=tmp_dir.name
+                    )
+                else:
+                    tensor = util.TensorProtoFromNumpy(
+                        tensor_value, name=inp.output_tensor_names[0]
+                    )
                 initializers.append(tensor)
 
         input_shapes = [self.get_shape(i) for i in node.input_tensor_names]
@@ -794,6 +806,11 @@ class Graph(object):
     def get_node_by_name(self, name):
         """Get node by name."""
         ret = self._nodes_by_name.get(name)
+        return ret
+
+    def get_flow_node_by_name(self, name):
+        """Get OneFlow op node by name."""
+        ret = self._flow_nodes_by_name.get(name)
         return ret
 
     def set_node_by_name(self, node):

@@ -64,6 +64,7 @@ def FlowToOnnxNaive(graph, shape_override):
     op_cnt = collections.Counter()
     attr_cnt = collections.Counter()
     onnx_nodes = []
+    flow_nodes = {}
 
     def is_user_op(node):
         return node.WhichOneof("op_type") == "user_conf"
@@ -176,11 +177,12 @@ def FlowToOnnxNaive(graph, shape_override):
                 op_type, input_names, output_names, name=node.name, **attr 
             )
             onnx_nodes.append(onnx_node)
+            flow_nodes[node.name] = node
         except Exception as ex:
             logger.error("pass1 convert failed for %s, ex=%s", node, ex)
             raise
 
-    return onnx_nodes, op_cnt, attr_cnt, dtypes, shape_override
+    return onnx_nodes, flow_nodes, op_cnt, attr_cnt, dtypes, shape_override
 
 
 def FlowOnnxMapping(g, ops_mapping):
@@ -309,11 +311,11 @@ def ProcessFlowGraph(
     if shape_override is None:
         shape_override = {}
 
-    (onnx_nodes, op_cnt, attr_cnt, dtypes, output_shapes,) = FlowToOnnxNaive(
+    (onnx_nodes, flow_nodes, op_cnt, attr_cnt, dtypes, output_shapes,) = FlowToOnnxNaive(
         flow_graph, shape_override
     )
 
-    g = Graph(onnx_nodes, model_save_dir, output_shapes, dtypes, opset, extra_opset,)
+    g = Graph(onnx_nodes, flow_nodes, model_save_dir, output_shapes, dtypes, opset, extra_opset,)
 
     # create ops mapping for the desired opsets
     ops_mapping = handler.flow_op.CreateMapping(g.opset, g.extra_opset)
