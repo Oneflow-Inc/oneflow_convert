@@ -942,7 +942,6 @@ class Var:
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         keepdim_mean = 0 if origin_dim is None else keepdim
 
-
         if origin_dim is None:
             dim = []            
             for i in range(len(input_shape)):
@@ -960,8 +959,6 @@ class Var:
             t_mean = reduce_mean_node.output_tensor_names[0]
             for i in range(len(origin_dim)):
                 num_elements *= input_shape[i]
-
-
         
         sub_node = ctx.MakeNode(
             "Sub", [node.input_tensor_names[0], t_mean], op_name_scope=node.name, name="sub", dtypes=dtypes
