@@ -930,7 +930,7 @@ class GreaterLessEqual:
         ctx.set_dtype(new_node.output_tensor_names[0], ctx.get_dtype(output_name))
 
 
-@flow_op("var", onnx_op="Div")
+@flow_op(["var"])
 class Var:
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
@@ -962,8 +962,7 @@ class Var:
             for i in range(len(origin_dim)):
                 num_elements *= input_shape[i]
 
-                
-        print("dim:%s; unbiased:%s; keepdim:%s" %(origin_dim, unbiased, keepdim))
+
         
         sub_node = ctx.MakeNode(
             "Sub", [node.input_tensor_names[0], t_mean], op_name_scope=node.name, name="sub", dtypes=dtypes
@@ -973,24 +972,27 @@ class Var:
             "Mul", [sub_v, sub_v], op_name_scope=node.name, name="mul", dtypes=dtypes
         )
         sqr_sub = mul_node.output_tensor_names[0]
-        var_node = ctx.MakeNode(
+        if unbiased == 1:
+            correction = 1
+
+        ctx.RemoveNode(node.name)
+        if correction != 0:
+            var_node = ctx.MakeNode(
                 "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": keepdim_mean}
             )
-        var = var_node.output_tensor_names[0]
-        if unbiased is None:
-            correction = 1
-        if correction != 0:
+            var = var_node.output_tensor_names[0]
             scalar_node = ctx.MakeConst(
                 oneflow._oneflow_internal.UniqueStr("scalar"), np.array([num_elements]).astype(np.float32)
             )
-            one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("constant"), np.array([num_elements]).astype(np.float32))
+            one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("constant"), np.array([1]).astype(np.float32))
             num_elements = scalar_node.output_tensor_names[0]
             mul = ctx.MakeNode("Mul", [var, num_elements])
             sub = ctx.MakeNode("Sub", [num_elements, one.output_tensor_names[0]])
-            ctx.RemoveNode(node.name)
             var = ctx.MakeNode("Div", [mul.output_tensor_names[0], sub.output_tensor_names[0]], outputs=[node.output_tensor_names[0]])
-
-
+        else:
+            var_node = ctx.MakeNode(
+                "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": keepdim_mean}, outputs=[node.output_tensor_names[0]]
+            )
         
 
         
