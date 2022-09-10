@@ -17,33 +17,30 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-class MathOps(flow.nn.Module):
+class Var(flow.nn.Module):
     def __init__(self) -> None:
-        super(MathOps, self).__init__()
+        super(Var, self).__init__()
     
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         y = flow.var(x, dim=None, unbiased=True, keepdim=True)
         return y
 
-
-
-math_ops = MathOps()
-math_ops = math_ops.to("cuda")
-class MathOpGraph(flow.nn.Graph):
+var_module = Var()
+var_module = var_module.to("cuda")
+class VarOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = math_ops
+        self.m = var_module
 
     def build(self, x):
         out = self.m(x)
         return out
 
-
-def test_math_ops():
+def test_var():
     
-    math_ops_graph = MathOpGraph()
-    math_ops_graph._compile(flow.arange(48, dtype=flow.float32).reshape(2, 2, 3, 4).to("cuda"))
-    convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp", opset=13, device="gpu")
+    var_op_graph = VarOpGraph()
+    var_op_graph._compile(flow.arange(48, dtype=flow.float32).reshape(2, 2, 3, 4).to("cuda"))
+    convert_to_onnx_and_check(var_op_graph, onnx_model_path="/tmp", opset=13, device="gpu")
 
-test_math_ops()
+test_var()
 
