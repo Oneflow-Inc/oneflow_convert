@@ -302,7 +302,7 @@ class HardSwish:
         pass
 
 @flow_op("silu", onnx_op="Mul")
-class HardSwish:
+class Silu:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         dtypes = node.output_dtypes

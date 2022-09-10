@@ -28,7 +28,6 @@ class MathOps(flow.nn.Module):
 
 
 math_ops = MathOps()
-math_ops = math_ops.to("cuda")
 class MathOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -42,8 +41,8 @@ class MathOpGraph(flow.nn.Graph):
 def test_math_ops():
     
     math_ops_graph = MathOpGraph()
-    math_ops_graph._compile(flow.arange(48, dtype=flow.float32).reshape(2, 2, 3, 4).to("cuda"))
-    convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp", opset=13, device="gpu")
+    math_ops_graph._compile(flow.arange(48, dtype=flow.float32).reshape(2, 2, 3, 4))
+    convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp", opset=13)
 
 test_math_ops()
 
