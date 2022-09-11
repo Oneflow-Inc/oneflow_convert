@@ -303,7 +303,7 @@ class HardSwish:
         pass
 
 @flow_op("silu", onnx_op="Mul")
-class HardSwish:
+class Silu:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         dtypes = node.output_dtypes
@@ -930,3 +930,63 @@ class GreaterLessEqual:
         ctx.CopyShape(output_name, new_node.output_tensor_names[0])
         ctx.set_dtype(new_node.output_tensor_names[0], ctx.get_dtype(output_name))
 
+
+@flow_op(["var"])
+class Var:
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        origin_dim = node.attrs.get("dim", None)
+        unbiased = node.attrs.get("unbiased", None)
+        keepdim = node.attrs.get("keepdim", None)
+        num_elements = 1
+        dtypes = node.output_dtypes
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        keepdim_mean = 0 if origin_dim is None else keepdim
+
+        if origin_dim is None:
+            dim = []            
+            for i in range(len(input_shape)):
+                num_elements *= input_shape[i]
+                dim.append(i)
+            reduce_mean_node = ctx.MakeNode(
+                "ReduceMean", [node.input_tensor_names[0]], op_name_scope=node.name, name="reduce_mean", dtypes=dtypes, attr={"axes":dim, "keepdims": 0}
+            )
+            t_mean = reduce_mean_node.output_tensor_names[0]
+            
+        else:
+            reduce_mean_node = ctx.MakeNode(
+                "ReduceMean", [node.input_tensor_names[0]], op_name_scope=node.name, name="reduce_mean", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": 1}
+            )
+            t_mean = reduce_mean_node.output_tensor_names[0]
+            for i in range(len(origin_dim)):
+                num_elements *= input_shape[i]
+        
+        sub_node = ctx.MakeNode(
+            "Sub", [node.input_tensor_names[0], t_mean], op_name_scope=node.name, name="sub", dtypes=dtypes
+        )
+        sub_v = sub_node.output_tensor_names[0]
+        mul_node = ctx.MakeNode(
+            "Mul", [sub_v, sub_v], op_name_scope=node.name, name="mul", dtypes=dtypes
+        )
+        sqr_sub = mul_node.output_tensor_names[0]
+        if unbiased is None:
+            unbiased = False
+
+        ctx.RemoveNode(node.name)
+        if unbiased:
+            var_node = ctx.MakeNode(
+                "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": keepdim_mean}
+            )
+            var = var_node.output_tensor_names[0]
+            scalar_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scalar"), np.array([num_elements]).astype(np.float32)
+            )
+            one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("constant"), np.array([1]).astype(np.float32))
+            num_elements = scalar_node.output_tensor_names[0]
+            mul = ctx.MakeNode("Mul", [var, num_elements])
+            sub = ctx.MakeNode("Sub", [num_elements, one.output_tensor_names[0]])
+            var = ctx.MakeNode("Div", [mul.output_tensor_names[0], sub.output_tensor_names[0]], outputs=[node.output_tensor_names[0]])
+        else:
+            var_node = ctx.MakeNode(
+                "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": keepdim_mean}, outputs=[node.output_tensor_names[0]]
+            )
