@@ -27,13 +27,10 @@ from oneflow_onnx import util
 
 
 class GraphOptimizerBase(object):
-    """optimizer graph to improve performance
-    """
+    """optimizer graph to improve performance"""
 
     def __init__(self):
-        self._logger = logging.getLogger(
-            ".".join(__name__.split(".")[:-1] + [self.__class__.__name__])
-        )
+        self._logger = logging.getLogger(".".join(__name__.split(".")[:-1] + [self.__class__.__name__]))
         self._graph_been_opt = False
 
     @property
@@ -49,7 +46,7 @@ class GraphOptimizerBase(object):
         self._graph_been_opt = value
 
     def Optimize(self, graph):
-        """ optimize graph, return optimized graph. """
+        """optimize graph, return optimized graph."""
         before = graph.DumpNodeStatistics()
 
         graph = self._Optimize(graph)
@@ -61,7 +58,7 @@ class GraphOptimizerBase(object):
         return graph
 
     def _Optimize(self, graph):
-        """ Derived class should override this function. """
+        """Derived class should override this function."""
         raise NotImplementedError
 
     @staticmethod
@@ -85,11 +82,5 @@ class GraphOptimizerBase(object):
     def _PrintStatDiff(self, before, after):
         diff = copy.deepcopy(after)
         diff.subtract(before)
-        diff = [
-            "{} {} ({}->{})".format(
-                k, str(v) if v < 0 else "+" + str(v), before.get(k, 0), after.get(k, 0)
-            )
-            for k, v in sorted(diff.items())
-            if v != 0
-        ]
+        diff = ["{} {} ({}->{})".format(k, str(v) if v < 0 else "+" + str(v), before.get(k, 0), after.get(k, 0)) for k, v in sorted(diff.items()) if v != 0]
         self.logger.debug(", ".join(diff) if diff else "no change")

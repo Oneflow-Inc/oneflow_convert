@@ -17,6 +17,7 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Conv2d(flow.nn.Module):
     def __init__(self) -> None:
         super(Conv2d, self).__init__()
@@ -25,8 +26,11 @@ class Conv2d(flow.nn.Module):
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.conv(x)
 
+
 conv_module = Conv2d()
 conv_module = conv_module.to("cuda")
+
+
 class Conv2dOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -38,12 +42,13 @@ class Conv2dOpGraph(flow.nn.Graph):
 
 
 def test_conv2d():
-    
+
     conv_graph = Conv2dOpGraph()
     conv_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(conv_module.state_dict(), tmpdirname)
         convert_to_onnx_and_check(conv_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_conv2d()

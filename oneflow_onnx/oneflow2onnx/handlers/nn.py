@@ -53,16 +53,16 @@ def _ConvConvertInputs(
     output_indices=None,
 ):
     """Convert input and kernel from oneflow to onnx. This maybe require to
-        to insert transpose ops for input, kernel and output unless they are constants
-        and we can transpose the constant.
-        We transpose inputs and the kernel if the input is in NHWC
-        Outputs are transposed if the format is NHWC.
-        Some convolutions like depthwise_conv2d require a reshape of the kernel.
-        Args:
-            ctx: the parent graph
-            node: node of the convolution op
-            with_kernel: transpose the kernel
-            new_kernel_shape: reshape the kernel
+    to insert transpose ops for input, kernel and output unless they are constants
+    and we can transpose the constant.
+    We transpose inputs and the kernel if the input is in NHWC
+    Outputs are transposed if the format is NHWC.
+    Some convolutions like depthwise_conv2d require a reshape of the kernel.
+    Args:
+        ctx: the parent graph
+        node: node of the convolution op
+        with_kernel: transpose the kernel
+        new_kernel_shape: reshape the kernel
     """
 
     if input_indices is None:
@@ -74,10 +74,7 @@ def _ConvConvertInputs(
         # transpose input if needed, no need to record shapes on input
         for idx in input_indices:
             parent = node.input_nodes[idx]
-            if (
-                node.input_nodes[idx].is_const()
-                and len(ctx.FindOutputConsumers(node.input_tensor_names[1])) == 1
-            ):
+            if node.input_nodes[idx].is_const() and len(ctx.FindOutputConsumers(node.input_tensor_names[1])) == 1:
                 # if input is a constant, transpose that one if we are the only consumer
                 val = parent.get_tensor_value(as_list=False)
                 parent.set_tensor_value(val.transpose(constants.NHWC_TO_NCHW))
@@ -129,9 +126,7 @@ def _ConvConvertInputs(
                 transpose = ctx.InsertNewNodeOnInput(node, "Transpose", input_name)
                 transpose.attrs["perm"] = constants.NHWC_TO_NCHW
                 transpose.skip_conversion = True
-                new_shape = _SpatialMap(
-                    ctx.get_shape(input_name), constants.NHWC_TO_NCHW
-                )
+                new_shape = _SpatialMap(ctx.get_shape(input_name), constants.NHWC_TO_NCHW)
                 ctx.set_shape(transpose.output_tensor_names[0], new_shape)
 
     # transpose outputs if needed
@@ -140,17 +135,13 @@ def _ConvConvertInputs(
             output_name = node.output_tensor_names[idx]
             output_shape = ctx.get_shape(node.output_tensor_names[idx])
             op_name = oneflow._oneflow_internal.UniqueStr(node.name)
-            transpose = ctx.InsertNewNodeOnOutput(
-                "Transpose", output_name, name=op_name
-            )
+            transpose = ctx.InsertNewNodeOnOutput("Transpose", output_name, name=op_name)
             transpose.attrs["perm"] = constants.NCHW_TO_NHWC
             transpose.skip_conversion = True
             # set NHWC shape to transpose node output_tensor_names
             ctx.set_shape(transpose.output_tensor_names[0], output_shape)
             # Transpose NHWC shape back to NCHW shape for current ONNX conv node output
-            ctx.set_shape(
-                output_name, _SpatialMap(output_shape, constants.NHWC_TO_NCHW)
-            )
+            ctx.set_shape(output_name, _SpatialMap(output_shape, constants.NHWC_TO_NCHW))
         node.data_format = "NCHW"
 
 
@@ -177,23 +168,13 @@ def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2, cei
         pad = 0
         if ceil_mode == True:
             if (input_shape[i + 2] + 2 * origin_padding[i] - dilations[i] * (kernel_shape[i] - 1) - 1) % strides[i] != 0:
-                pad = (
-                    (output_shape[i + 2] - 1) * strides[i]
-                    + dilations[i] * (kernel_shape[i] - 1)
-                    - input_shape[i + 2]
-                )
+                pad = (output_shape[i + 2] - 1) * strides[i] + dilations[i] * (kernel_shape[i] - 1) - input_shape[i + 2]
         else:
-            pad = (
-                (output_shape[i + 2] - 1) * strides[i]
-                + dilations[i] * (kernel_shape[i] - 1)
-                + 1
-                - input_shape[i + 2]
-            )
+            pad = (output_shape[i + 2] - 1) * strides[i] + dilations[i] * (kernel_shape[i] - 1) + 1 - input_shape[i + 2]
         pad = max(pad, 0)
         pads[i + spatial] = pad // 2
         pads[i] = pad - pad // 2
     node.attrs["pads"] = pads
-
 
 
 def conv_dims_attr(node, name, new_name=None):
@@ -241,7 +222,7 @@ class ConvOp:
     def Version_11(cls, ctx, node, **kwargs):
         # no change
         cls.Version_1(ctx, node, **kwargs)
-    
+
     @classmethod
     def Version_14(cls, ctx, node, **kwargs):
         # no change
@@ -270,7 +251,7 @@ class AdaptiveAvgPoolOp:
         #               @AttrType.INTS strides)
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         h, w = input_shape[2], input_shape[3]
-        output_size = node.attrs['output_size']
+        output_size = node.attrs["output_size"]
         out_h, out_w = output_size[0], output_size[1]
         if h % out_h == 0 and w % out_w == 0:
             kernel_shape_flow = np.array([h / out_h, w / out_w], dtype=np.int64)
@@ -283,8 +264,9 @@ class AdaptiveAvgPoolOp:
         else:
             raise NotImplementedError("The current adaptive_pool2d op with this setting does not support conversion to onnx, please contact BBuf(zhangxiaoyu@oneflow.org)!")
 
-@flow_op(["avgpool_2d"], onnx_op="AveragePool") # Compatible with v0.7.0
-@flow_op(["maxpool_2d"], onnx_op="MaxPool") # Compatible with v0.7.0
+
+@flow_op(["avgpool_2d"], onnx_op="AveragePool")  # Compatible with v0.7.0
+@flow_op(["maxpool_2d"], onnx_op="MaxPool")  # Compatible with v0.7.0
 @flow_op(["max_pool_2d"], onnx_op="MaxPool")
 @flow_op(["avg_pool_2d"], onnx_op="AveragePool")
 class PoolOp:
@@ -321,9 +303,7 @@ class PoolOp:
         if "padding" in node.attrs:
             _AddPadding(ctx, node, kernel_shape_flow, strides_flow, ceil_mode=node.attrs["ceil_mode"])
         else:
-            pads = node.attrs.get("padding_before", [0, 0]) + node.attrs.get(
-                "padding_after", [0, 0]
-            )
+            pads = node.attrs.get("padding_before", [0, 0]) + node.attrs.get("padding_after", [0, 0])
             node.attrs["pads"] = pads
 
 
@@ -336,11 +316,7 @@ class Pad:
         paddings = padding_before + padding_after
         node.attrs["pads"] = paddings
         node.attrs["mode"] = "constant"
-        const_val = (
-            node.attrs["integral_constant_value"]
-            if util.is_integral_onnx_dtype(ctx.get_dtype(node.input_tensor_names[0]))
-            else node.attrs["floating_constant_value"]
-        )
+        const_val = node.attrs["integral_constant_value"] if util.is_integral_onnx_dtype(ctx.get_dtype(node.input_tensor_names[0])) else node.attrs["floating_constant_value"]
         node.attrs["value"] = const_val
 
     @classmethod
@@ -352,11 +328,7 @@ class Pad:
         padding_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), paddings)
         node.input_tensor_names.append(padding_node.output_tensor_names[0])
         dtype = ctx.get_dtype(node.input_tensor_names[0])
-        const_val = (
-            node.attrs["integral_constant_value"]
-            if util.is_integral_onnx_dtype(dtype)
-            else node.attrs["floating_constant_value"]
-        )
+        const_val = node.attrs["integral_constant_value"] if util.is_integral_onnx_dtype(dtype) else node.attrs["floating_constant_value"]
         const_val = np.array(const_val).astype(util.Onnx2NumpyDtype(dtype))
         const_val_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("const"), const_val)
         node.input_tensor_names.append(const_val_node.output_tensor_names[0])
@@ -378,19 +350,14 @@ class BatchNorm:
         # detach unused outputs. While we could let the unused outputs dangle,
         # some runtimes like pytorch/caffe2 do complain about it.
         if node.attrs["training"]:
-            raise NotImplementedError(
-                "We only support inference mode ONNX BatchNormalization now"
-            )
-        consumers = [
-            ctx.FindOutputConsumers(output_name)
-            for output_name in node.output_tensor_names[1:]
-        ]
+            raise NotImplementedError("We only support inference mode ONNX BatchNormalization now")
+        consumers = [ctx.FindOutputConsumers(output_name) for output_name in node.output_tensor_names[1:]]
         if not any(consumers):
             new_output = [node.output_tensor_names[0]]
             node.output_tensor_names = new_output
 
         input_shape = ctx.get_shape(node.input_tensor_names[0])
-        
+
         if len(input_shape) == 4:
             _ConvConvertInputs(ctx, node, with_kernel=False)
         else:
@@ -404,9 +371,7 @@ class BatchNorm:
 
         if mean_shape != scale_shape:
             new_mean_value = np.array(
-                np.resize(
-                    node.input_nodes[3].get_tensor_value(as_list=False), scale_shape
-                ),
+                np.resize(node.input_nodes[3].get_tensor_value(as_list=False), scale_shape),
                 dtype=val_type,
             )
             new_mean_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
@@ -415,9 +380,7 @@ class BatchNorm:
 
         if var_shape != scale_shape:
             new_var_value = np.array(
-                np.resize(
-                    node.input_nodes[4].get_tensor_value(as_list=False), scale_shape
-                ),
+                np.resize(node.input_nodes[4].get_tensor_value(as_list=False), scale_shape),
                 dtype=val_type,
             )
             new_val_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
@@ -446,7 +409,6 @@ class UpSampleNearest2D:
             node.input_tensor_names.append(scales_node.output_tensor_names[0])
         else:
             raise NotImplementedError("Opset 10 don't support specify output_size attribute!")
-
 
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
@@ -480,4 +442,3 @@ class UpSampleNearest2D:
                 np.array(sizes).astype(np.int64),
             )
             node.input_tensor_names.append(sizes_node.output_tensor_names[0])
-

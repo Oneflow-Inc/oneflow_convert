@@ -30,14 +30,8 @@ def run_onnx(
     ort_optimize: bool = True,
 ) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
     ort_sess_opt = ort.SessionOptions()
-    ort_sess_opt.graph_optimization_level = (
-        ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
-        if ort_optimize
-        else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
-    )
-    sess = ort.InferenceSession(
-        onnx_model_path, sess_options=ort_sess_opt, providers=providers
-    )
+    ort_sess_opt.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED if ort_optimize else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+    sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt, providers=providers)
     assert len(sess.get_outputs()) == 1
     assert len(sess.get_inputs()) <= 1
 
@@ -46,9 +40,7 @@ def run_onnx(
     if ipt_dict is None:
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
-            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
-                np.float32
-            )
+            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(np.float32)
             ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
@@ -62,7 +54,7 @@ def export_onnx_model(
     graph,
     external_data=False,
     opset=None,
-    flow_weight_dir = None,
+    flow_weight_dir=None,
     onnx_model_path="/tmp",
     dynamic_batch_size=False,
 ):
@@ -73,7 +65,7 @@ def export_onnx_model(
         if os.path.exists(flow_weight_dir):
             shutil.rmtree(flow_weight_dir)
         flow.save(graph.state_dict(), flow_weight_dir)
-    
+
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
@@ -119,26 +111,19 @@ def convert_to_onnx_and_check(
     dynamic_batch_size=False,
     device="cpu",
 ):
-    onnx_model_path, cleanup = export_onnx_model(
-        graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size
-    )
-
+    onnx_model_path, cleanup = export_onnx_model(graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size)
 
     if dynamic_batch_size != True:
-        if ort.__version__>'1.9.0':
-            ipt_dict, onnx_res = run_onnx(
-            onnx_model_path, ["TensorrtExecutionProvider","CUDAExecutionProvider","CPUExecutionProvider"], ort_optimize=ort_optimize
-            )
+        if ort.__version__ > "1.9.0":
+            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider"], ort_optimize=ort_optimize)
         else:
-            ipt_dict, onnx_res = run_onnx(
-            onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize
-            )
-        
-        if device=="gpu":
+            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize)
+
+        if device == "gpu":
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
             else:
-                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))     
+                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))
         else:
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
@@ -147,6 +132,5 @@ def convert_to_onnx_and_check(
         if not isinstance(oneflow_res, np.ndarray):
             oneflow_res = oneflow_res.numpy()
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
-
 
     # cleanup()

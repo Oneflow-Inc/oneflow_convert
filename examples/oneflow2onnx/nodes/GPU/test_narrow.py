@@ -17,15 +17,19 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Narrow(flow.nn.Module):
     def __init__(self) -> None:
         super(Narrow, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return flow.narrow(x, 0, 0, 2)
 
+
 narrow = Narrow()
 narrow = narrow.to("cuda")
+
+
 class NarrowOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -36,10 +40,11 @@ class NarrowOpGraph(flow.nn.Graph):
 
 
 def test_narrow():
-    
+
     narrow_graph = NarrowOpGraph()
     narrow_graph._compile(flow.randn(3, 4, 5, 6).to("cuda"))
 
     convert_to_onnx_and_check(narrow_graph, onnx_model_path="/tmp", opset=11, device="gpu")
+
 
 test_narrow()

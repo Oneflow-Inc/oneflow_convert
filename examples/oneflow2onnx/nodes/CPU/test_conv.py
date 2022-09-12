@@ -17,6 +17,7 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Conv2d(flow.nn.Module):
     def __init__(self) -> None:
         super(Conv2d, self).__init__()
@@ -25,7 +26,10 @@ class Conv2d(flow.nn.Module):
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.conv(x)
 
+
 conv_module = Conv2d()
+
+
 class Conv2dOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -37,14 +41,15 @@ class Conv2dOpGraph(flow.nn.Graph):
 
 
 def test_conv2d():
-    
+
     conv_graph = Conv2dOpGraph()
     conv_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(conv_graph, onnx_model_path="/tmp")
 
+
 def test_conv2d_flow_weight_dir():
-    
+
     conv_graph = Conv2dOpGraph()
     conv_graph._compile(flow.randn(1, 3, 224, 224))
 
@@ -52,8 +57,9 @@ def test_conv2d_flow_weight_dir():
         flow.save(conv_module.state_dict(), tmpdirname)
         convert_to_onnx_and_check(conv_graph, flow_weight_dir=tmpdirname, onnx_model_path="/tmp")
 
+
 def test_conv2d_opset14():
-    
+
     conv_graph = Conv2dOpGraph()
     conv_graph._compile(flow.randn(1, 3, 224, 224))
 
@@ -63,4 +69,3 @@ def test_conv2d_opset14():
 test_conv2d()
 test_conv2d_flow_weight_dir()
 test_conv2d_opset14()
-

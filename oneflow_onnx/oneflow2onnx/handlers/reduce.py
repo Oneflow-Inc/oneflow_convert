@@ -49,9 +49,7 @@ class ReduceOpBase:
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         if input_shape is None:
             if any([val < 0 for val in axes]):
-                raise ValueError(
-                    "reduce_op: cannot have negative axis because we don't know input rank"
-                )
+                raise ValueError("reduce_op: cannot have negative axis because we don't know input rank")
         else:
             input_rank = len(ctx.get_shape(node.input_tensor_names[0]))
             axes = [val + input_rank if val < 0 else val for val in axes]

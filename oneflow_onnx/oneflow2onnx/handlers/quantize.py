@@ -51,11 +51,7 @@ class MinMaxObserver:
         input_node: Node = node.input_nodes[0]
         input_np: np.ndarray = input_node.get_tensor_value(as_list=False)
 
-        input_np = (
-            input_np.flatten()
-            if formula == "cambricon" or per_layer
-            else input_np.reshape((input_np.shape[0], -1))
-        )
+        input_np = input_np.flatten() if formula == "cambricon" or per_layer else input_np.reshape((input_np.shape[0], -1))
 
         def get_min_or_max_value(get_min: bool, pre_func: Optional[Callable] = None):
             data = input_np.copy()
@@ -130,9 +126,7 @@ class MovingAverageMinMaxObserver:
             elif scheme == "affine":
                 denominator = 2.0 ** bit - 1
                 scale = (moving_max_np - moving_min_np) / denominator
-                zero_point = (
-                    (-np.round(moving_min_np / scale)).astype(np.uint8).flatten()
-                )
+                zero_point = (-np.round(moving_min_np / scale)).astype(np.uint8).flatten()
             else:
                 raise ValueError("invalid quantization scheme: " + scheme)
 

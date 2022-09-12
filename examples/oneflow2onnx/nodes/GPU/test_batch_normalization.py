@@ -17,18 +17,22 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class BatchNorm(flow.nn.Module):
     def __init__(self) -> None:
         super(BatchNorm, self).__init__()
         self.bn = flow.nn.BatchNorm2d(3)
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         y = self.bn(x)
         return y
 
+
 batchnorm = BatchNorm()
 batchnorm.eval()
 batchnorm = batchnorm.to("cuda")
+
+
 class BatchNormOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -40,12 +44,13 @@ class BatchNormOpGraph(flow.nn.Graph):
 
 
 def test_batchnorm():
-    
+
     batchnorm_graph = BatchNormOpGraph()
     batchnorm_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(batchnorm.state_dict(), tmpdirname)
         convert_to_onnx_and_check(batchnorm_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_batchnorm()

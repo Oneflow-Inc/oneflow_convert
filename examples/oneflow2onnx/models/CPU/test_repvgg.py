@@ -19,6 +19,7 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 import tempfile
 
+
 def conv_bn(in_channels, out_channels, kernel_size, stride, padding, groups=1):
     result = nn.Sequential()
     result.add_module(
@@ -110,11 +111,7 @@ class RepVGGBlock(nn.Module):
                 padding_mode=padding_mode,
             )
         else:
-            self.rbr_identity = (
-                nn.BatchNorm2d(num_features=in_channels)
-                if out_channels == in_channels and stride == 1
-                else None
-            )
+            self.rbr_identity = nn.BatchNorm2d(num_features=in_channels) if out_channels == in_channels and stride == 1 else None
             self.rbr_dense = conv_bn(
                 in_channels=in_channels,
                 out_channels=out_channels,
@@ -141,9 +138,7 @@ class RepVGGBlock(nn.Module):
         else:
             id_out = self.rbr_identity(inputs)
 
-        return self.nonlinearity(
-            self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out)
-        )
+        return self.nonlinearity(self.se(self.rbr_dense(inputs) + self.rbr_1x1(inputs) + id_out))
 
 
 class RepVGG(nn.Module):
@@ -178,18 +173,10 @@ class RepVGG(nn.Module):
             use_se=self.use_se,
         )
         self.cur_layer_idx = 1
-        self.stage1 = self._make_stage(
-            int(64 * width_multiplier[0]), num_blocks[0], stride=2
-        )
-        self.stage2 = self._make_stage(
-            int(128 * width_multiplier[1]), num_blocks[1], stride=2
-        )
-        self.stage3 = self._make_stage(
-            int(256 * width_multiplier[2]), num_blocks[2], stride=2
-        )
-        self.stage4 = self._make_stage(
-            int(512 * width_multiplier[3]), num_blocks[3], stride=2
-        )
+        self.stage1 = self._make_stage(int(64 * width_multiplier[0]), num_blocks[0], stride=2)
+        self.stage2 = self._make_stage(int(128 * width_multiplier[1]), num_blocks[1], stride=2)
+        self.stage3 = self._make_stage(int(256 * width_multiplier[2]), num_blocks[2], stride=2)
+        self.stage4 = self._make_stage(int(512 * width_multiplier[3]), num_blocks[3], stride=2)
         self.gap = nn.AvgPool2d(7)
         self.linear = nn.Linear(int(512 * width_multiplier[3]), num_classes)
 
@@ -371,8 +358,10 @@ def create_RepVGG_D2se(deploy=False):
         use_se=True,
     )
 
+
 repvgg = create_RepVGG_B2g4()
 repvgg.eval()
+
 
 class RepVGGGraph(flow.nn.Graph):
     def __init__(self):
@@ -383,11 +372,13 @@ class RepVGGGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_repvgg():
-    
+
     repvgg_graph = RepVGGGraph()
     repvgg_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(repvgg_graph, onnx_model_path="/tmp")
+
 
 test_repvgg()

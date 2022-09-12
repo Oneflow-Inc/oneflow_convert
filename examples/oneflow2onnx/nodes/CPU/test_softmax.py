@@ -17,15 +17,19 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Softmax(flow.nn.Module):
     def __init__(self) -> None:
         super(Softmax, self).__init__()
         self.softmax = flow.nn.Softmax(dim=1)
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.softmax(x)
 
+
 softmax = Softmax()
+
+
 class softmaxOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -37,10 +41,11 @@ class softmaxOpGraph(flow.nn.Graph):
 
 
 def test_softmax():
-    
+
     softmax_graph = softmaxOpGraph()
     softmax_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(softmax_graph, onnx_model_path="/tmp")
+
 
 test_softmax()

@@ -33,8 +33,7 @@ _KeyToGroupNodes = namedtuple("key", "type input")
 
 
 class MergeDuplicatedNodesOptimizer(GraphOptimizerBase):
-    """Remove duplicate nodes.
-    """
+    """Remove duplicate nodes."""
 
     def __init__(self):
         super(MergeDuplicatedNodesOptimizer, self).__init__()
@@ -68,9 +67,7 @@ class MergeDuplicatedNodesOptimizer(GraphOptimizerBase):
             # default const of graph input cannot be merged
             if node.is_graph_input_default_const():
                 continue
-            res[_KeyToGroupNodes(node.op_type, tuple(node.input_tensor_names))].append(
-                node
-            )
+            res[_KeyToGroupNodes(node.op_type, tuple(node.input_tensor_names))].append(node)
         return res
 
     def _DelNodesIfDuplicated(self, nodes_group, graph):
@@ -113,9 +110,7 @@ class MergeDuplicatedNodesOptimizer(GraphOptimizerBase):
             # if one of the output is graph's output then it can't be deleted
             if set(node_to_delete.output_tensor_names).intersection(set(graph.outputs)):
                 continue
-            for old_input, new_input in zip(
-                node_to_delete.output_tensor_names, node_to_retain.output_tensor_names
-            ):
+            for old_input, new_input in zip(node_to_delete.output_tensor_names, node_to_retain.output_tensor_names):
                 graph.ReplaceAllInputs(graph.get_nodes(), old_input, new_input)
             graph.RemoveNode(node_to_delete.name)
             self._graph_can_be_Optimized = True

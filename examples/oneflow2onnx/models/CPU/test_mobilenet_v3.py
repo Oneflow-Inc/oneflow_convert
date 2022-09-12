@@ -25,6 +25,7 @@ import tempfile
 mobilenetv3 = ModelCreator.create_model("mobilenet_v3_small", pretrained=False)
 mobilenetv3.eval()
 
+
 class MobileNetV3(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -34,11 +35,13 @@ class MobileNetV3(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_mobilenetv3():
-    
+
     mobilenetv3_graph = MobileNetV3()
     mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(mobilenetv3_graph, onnx_model_path=".")
+
 
 test_mobilenetv3()

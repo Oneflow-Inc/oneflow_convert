@@ -38,8 +38,7 @@ def _register_func(op_type):
 
 
 class BackToBackOptimizer(GraphOptimizerBase):
-    """Remove back-to-back nodes e.g. 'Cast'
-    """
+    """Remove back-to-back nodes e.g. 'Cast'"""
 
     def __init__(self):  # pylint: disable=useless-super-delegation
         super(BackToBackOptimizer, self).__init__()
@@ -196,9 +195,7 @@ class BackToBackOptimizer(GraphOptimizerBase):
             return []
 
         node2_consumers = g.FindOutputConsumers(node2.output_tensor_names[0])
-        g.ReplaceAllInputs(
-            node2_consumers, node2.output_tensor_names[0], node.input_tensor_names[0]
-        )
+        g.ReplaceAllInputs(node2_consumers, node2.output_tensor_names[0], node.input_tensor_names[0])
         g.RemoveNode(node.name)
         g.RemoveNode(node2.name)
         return []

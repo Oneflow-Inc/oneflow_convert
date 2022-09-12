@@ -82,21 +82,17 @@ def _RegisterAllSchemasWithHistory():
     name_domain_version_schema_map = defaultdict(lambda: defaultdict(dict))
     for s in onnx_schemas:
         schema = OnnxOpSchema.FromOnnxSchema(s)
-        name_domain_version_schema_map[schema.name][schema.domain][
-            schema.since_version
-        ] = schema
+        name_domain_version_schema_map[schema.name][schema.domain][schema.since_version] = schema
 
     ordered_map = defaultdict(lambda: defaultdict(OrderedDict))
     for name, domain_version_schema_map in name_domain_version_schema_map.items():
         for domain, version_schema_map in domain_version_schema_map.items():
-            ordered_map[name][domain] = OrderedDict(
-                sorted(version_schema_map.items(), key=lambda x: -x[0])
-            )
+            ordered_map[name][domain] = OrderedDict(sorted(version_schema_map.items(), key=lambda x: -x[0]))
     return ordered_map
 
 
 def _ParseDomainOpsetVersions(schemas):
-    """ Get max opset version among all schemas within each domain. """
+    """Get max opset version among all schemas within each domain."""
     domain_opset_versions = dict()
     for domain_version_schema_map in schemas.values():
         for domain, version_schema_map in domain_version_schema_map.items():
@@ -105,9 +101,7 @@ def _ParseDomainOpsetVersions(schemas):
             if domain not in domain_opset_versions:
                 domain_opset_versions[domain] = int(max_version)
             else:
-                domain_opset_versions[domain] = max(
-                    domain_opset_versions[domain], int(max_version)
-                )
+                domain_opset_versions[domain] = max(domain_opset_versions[domain], int(max_version))
     return domain_opset_versions
 
 
@@ -135,9 +129,7 @@ def get_max_supported_opset_version(domain=None):
     return _domain_opset_versions.get(domain, None)
 
 
-def InferOnnxShapeDtype(
-    node, opset_version, input_shapes, input_dtypes, initializers=None
-):
+def InferOnnxShapeDtype(node, opset_version, input_shapes, input_dtypes, initializers=None):
     """
     Infer shapes and dtypes for outputs of the node.
     Sometimes, shape inference needs the values of node's inputs, so initializers are used.
@@ -157,9 +149,7 @@ def InferOnnxShapeDtype(
         if attr_graphs:
             for attr_name, sub_graph in attr_graphs.items():
                 copied_sub_graph = copy.deepcopy(sub_graph)
-                graph_proto = copied_sub_graph.MakeGraph(
-                    "graph for " + node.name + " " + attr_name
-                )
+                graph_proto = copied_sub_graph.MakeGraph("graph for " + node.name + " " + attr_name)
                 attr.append(helper.make_attribute(attr_name, graph_proto))
         attr.extend(node.attrs_onnx.values())
         if attr:
@@ -172,9 +162,7 @@ def InferOnnxShapeDtype(
         inputs.append(util.MakeOnnxInputsOutputs(inp, dtype, shape))
     for output in node.output_tensor_names:
         outputs.append(util.MakeOnnxInputsOutputs(output, TensorProto.UNDEFINED, None))
-    graph_proto = helper.make_graph(
-        [BuildOnnxOp(node)], "infer-graph", inputs, outputs, initializer=initializers
-    )
+    graph_proto = helper.make_graph([BuildOnnxOp(node)], "infer-graph", inputs, outputs, initializer=initializers)
     imp = OperatorSetIdProto()
     imp.version = opset_version
     model_proto = helper.make_model(graph_proto, opset_imports=[imp])
@@ -201,10 +189,7 @@ def InferOnnxShapeDtype(
             dtypes[output.name] = TensorProto.UNDEFINED
         # 0 in shapes of onnx means unknown which is -1 in our convertor
         if tensor_type.HasField("shape"):
-            shapes[output.name] = [
-                dim.dim_value if dim.dim_value != 0 else util.ONNX_UNKNOWN_DIMENSION
-                for dim in tensor_type.shape.dim
-            ]
+            shapes[output.name] = [dim.dim_value if dim.dim_value != 0 else util.ONNX_UNKNOWN_DIMENSION for dim in tensor_type.shape.dim]
         else:
             shapes[output.name] = None
     output_shapes = []

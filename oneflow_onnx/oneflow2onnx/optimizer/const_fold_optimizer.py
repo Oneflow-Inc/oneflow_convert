@@ -76,12 +76,10 @@ class ConstFoldOptimizer(GraphOptimizerBase):
         return False
 
     def _FoldNode(self, node, graph):
-        """ if node's input are all const and it's not graph's output then it can be fold.
-            if node can be fold True will be return indicating that graph is changed
+        """if node's input are all const and it's not graph's output then it can be fold.
+        if node can be fold True will be return indicating that graph is changed
         """
-        if self._AllInputsAreConst(node.input_nodes) and not self._IsGraphOutput(
-            node, graph
-        ):
+        if self._AllInputsAreConst(node.input_nodes) and not self._IsGraphOutput(node, graph):
             process_func = _func_map.get(node.op_type, None)
             if process_func:
                 const_outputs = process_func(node, graph)
@@ -112,13 +110,9 @@ class ConstFoldOptimizer(GraphOptimizerBase):
         )
         for old_input, val in zip(node.output_tensor_names, vals):
             const_node = graph.MakeConst(oneflow._oneflow_internal.UniqueStr("const_fold_opt"), val)
-            graph.set_dtype(
-                const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype)
-            )
+            graph.set_dtype(const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype))
             graph.set_shape(const_node.output_tensor_names[0], val.shape)
-            graph.ReplaceAllInputs(
-                graph.get_nodes(), old_input, const_node.output_tensor_names[0]
-            )
+            graph.ReplaceAllInputs(graph.get_nodes(), old_input, const_node.output_tensor_names[0])
         graph.RemoveNode(node.name)
 
     @staticmethod

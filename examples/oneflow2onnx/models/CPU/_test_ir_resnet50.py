@@ -5,9 +5,7 @@ from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 import tempfile
 
 
-def conv3x3(
-    in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1
-) -> nn.Conv2d:
+def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """3x3 convolution with padding"""
     return nn.Conv2d(
         in_planes,
@@ -41,17 +39,24 @@ class IBasicBlock(nn.Module):
     ):
         super(IBasicBlock, self).__init__()
         if groups != 1 or base_width != 64:
-            raise ValueError(
-                "BasicBlock only supports groups=1 and base_width=64")
+            raise ValueError("BasicBlock only supports groups=1 and base_width=64")
         if dilation > 1:
-            raise NotImplementedError(
-                "Dilation > 1 not supported in BasicBlock")
-        self.bn1 = nn.BatchNorm2d(inplanes, eps=1e-05,)
+            raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
+        self.bn1 = nn.BatchNorm2d(
+            inplanes,
+            eps=1e-05,
+        )
         self.conv1 = conv3x3(inplanes, planes)
-        self.bn2 = nn.BatchNorm2d(planes, eps=1e-05,)
+        self.bn2 = nn.BatchNorm2d(
+            planes,
+            eps=1e-05,
+        )
         self.prelu = nn.PReLU(planes)
         self.conv2 = conv3x3(planes, planes, stride)
-        self.bn3 = nn.BatchNorm2d(planes, eps=1e-05,)
+        self.bn3 = nn.BatchNorm2d(
+            planes,
+            eps=1e-05,
+        )
         self.downsample = downsample
         self.stride = stride
 
@@ -91,32 +96,22 @@ class IResNet(nn.Module):
         if replace_stride_with_dilation is None:
             replace_stride_with_dilation = [False, False, False]
         if len(replace_stride_with_dilation) != 3:
-            raise ValueError(
-                "replace_stride_with_dilation should be None "
-                "or a 3-element tuple, got {}".format(
-                    replace_stride_with_dilation)
-            )
+            raise ValueError("replace_stride_with_dilation should be None " "or a 3-element tuple, got {}".format(replace_stride_with_dilation))
         self.groups = groups
         self.base_width = width_per_group
-        self.conv1 = nn.Conv2d(
-            3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
-        )
+        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(self.inplanes, eps=1e-05)
         self.prelu = nn.PReLU(self.inplanes)
         self.layer1 = self._make_layer(block, 64, layers[0], stride=2)
-        self.layer2 = self._make_layer(
-            block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0]
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
+        self.bn2 = nn.BatchNorm2d(
+            512 * block.expansion,
+            eps=1e-05,
         )
-        self.layer3 = self._make_layer(
-            block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1]
-        )
-        self.layer4 = self._make_layer(
-            block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2]
-        )
-        self.bn2 = nn.BatchNorm2d(512 * block.expansion, eps=1e-05,)
         self.dropout = nn.Dropout(p=dropout, inplace=True)
-        self.fc = nn.Linear(512 * block.expansion *
-                            self.fc_scale, num_features)
+        self.fc = nn.Linear(512 * block.expansion * self.fc_scale, num_features)
         self.features = nn.BatchNorm1d(num_features, eps=1e-05)
         nn.init.constant_(self.features.weight, 1.0)
         self.features.weight.requires_grad = False
@@ -142,7 +137,10 @@ class IResNet(nn.Module):
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
                 conv1x1(self.inplanes, planes * block.expansion, stride),
-                nn.BatchNorm2d(planes * block.expansion, eps=1e-05,),
+                nn.BatchNorm2d(
+                    planes * block.expansion,
+                    eps=1e-05,
+                ),
             )
         layers = []
         layers.append(
@@ -196,33 +194,23 @@ def _iresnet(arch, block, layers, pretrained, progress, **kwargs):
 
 
 def iresnet18(pretrained=False, progress=True, **kwargs):
-    return _iresnet(
-        "iresnet18", IBasicBlock, [2, 2, 2, 2], pretrained, progress, **kwargs
-    )
+    return _iresnet("iresnet18", IBasicBlock, [2, 2, 2, 2], pretrained, progress, **kwargs)
 
 
 def iresnet34(pretrained=False, progress=True, **kwargs):
-    return _iresnet(
-        "iresnet34", IBasicBlock, [3, 4, 6, 3], pretrained, progress, **kwargs
-    )
+    return _iresnet("iresnet34", IBasicBlock, [3, 4, 6, 3], pretrained, progress, **kwargs)
 
 
 def iresnet50(pretrained=False, progress=True, **kwargs):
-    return _iresnet(
-        "iresnet50", IBasicBlock, [3, 4, 14, 3], pretrained, progress, **kwargs
-    )
+    return _iresnet("iresnet50", IBasicBlock, [3, 4, 14, 3], pretrained, progress, **kwargs)
 
 
 def iresnet100(pretrained=False, progress=True, **kwargs):
-    return _iresnet(
-        "iresnet100", IBasicBlock, [3, 13, 30, 3], pretrained, progress, **kwargs
-    )
+    return _iresnet("iresnet100", IBasicBlock, [3, 13, 30, 3], pretrained, progress, **kwargs)
 
 
 def iresnet200(pretrained=False, progress=True, **kwargs):
-    return _iresnet(
-        "iresnet200", IBasicBlock, [6, 26, 60, 6], pretrained, progress, **kwargs
-    )
+    return _iresnet("iresnet200", IBasicBlock, [6, 26, 60, 6], pretrained, progress, **kwargs)
 
 
 class ModelGraph(flow.nn.Graph):
@@ -243,8 +231,8 @@ def test_resnet50():
     model_graph = ModelGraph(model_module)
     model_graph._compile(flow.randn(1, 3, 112, 112))
 
-    convert_to_onnx_and_check(
-        model_graph, onnx_model_path="/tmp", print_outlier=True)
+    convert_to_onnx_and_check(model_graph, onnx_model_path="/tmp", print_outlier=True)
+
 
 if __name__ == "__main__":
     test_resnet50()
