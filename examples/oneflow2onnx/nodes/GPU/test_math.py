@@ -23,6 +23,7 @@ class MathOps(flow.nn.Module):
         super(MathOps, self).__init__()
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
+        x = x / 1
         y1 = x * x
         y2 = y1 / x
         y2 = y2 - x

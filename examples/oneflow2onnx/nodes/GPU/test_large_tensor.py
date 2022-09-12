@@ -18,45 +18,36 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 
-class MathOps(flow.nn.Module):
+class LargeTensor(flow.nn.Module):
     def __init__(self) -> None:
-        super(MathOps, self).__init__()
+        super(LargeTensor, self).__init__()
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        x = x / 1
-        y1 = x * x
-        y2 = y1 / x
-        y2 = y2 - x
-        y2 = y2 + x
-        y2 = flow.abs(y2)
-        y2 = flow.ceil(y2)
-        y3 = flow.clip(x, -1.0, 1.0)
-        y3 = flow.acos(y3)
-        y3 = flow.pow(y3, 2.0)
-        y2 = y2 + y3
-
-        return y2
+        return flow.ones((64, 1024, 1024), device="cuda") + flow.zeros((64, 1024, 1024), device="cuda") + x
 
 
-math_ops = MathOps()
+large_tensor = LargeTensor()
+large_tensor = large_tensor.to("cuda")
 
 
-class MathOpGraph(flow.nn.Graph):
+class LargeTensorOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = math_ops
+        self.m = large_tensor
 
     def build(self, x):
         out = self.m(x)
         return out
 
 
-def test_math_ops():
+def test_large_tensor():
 
-    math_ops_graph = MathOpGraph()
-    math_ops_graph._compile(flow.randn(1, 3, 224, 224))
+    graph = LargeTensorOpGraph()
+    graph._compile(flow.randn(1024, 1024).to("cuda"))
 
-    convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        flow.save(graph.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(graph, print_outlier=False, onnx_model_path="/tmp", device="gpu")
 
 
-test_math_ops()
+test_large_tensor()
