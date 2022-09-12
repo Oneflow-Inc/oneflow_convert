@@ -930,7 +930,7 @@ class GreaterLessEqual:
         ctx.set_dtype(new_node.output_tensor_names[0], ctx.get_dtype(output_name))
 
 
-@flow_op("var", onnx_op="Div")
+@flow_op("var")
 class Var:
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
