@@ -99,11 +99,7 @@ def FlowToOnnxNaive(graph, shape_override):
                         ipts.append(val.s[0])
                         break
                 else:
-                    raise ValueError(
-                        "ibn {} of node {} (type {}) not found".format(
-                            ibn, node.name, get_op_type(node)
-                        )
-                    )
+                    raise ValueError("ibn {} of node {} (type {}) not found".format(ibn, node.name, get_op_type(node)))
             return ipts
         else:
             conf = get_op_conf(node)
@@ -136,11 +132,7 @@ def FlowToOnnxNaive(graph, shape_override):
                         outputs.append(val.s[0])
                         break
                 else:
-                    raise ValueError(
-                        "obn {} of node {} (type {}) not found".format(
-                            obn, node.name, get_op_type(node)
-                        )
-                    )
+                    raise ValueError("obn {} of node {} (type {}) not found".format(obn, node.name, get_op_type(node)))
         else:
             conf = get_op_conf(node)
             # it cannot cover all legacy op but it's enough
@@ -173,9 +165,7 @@ def FlowToOnnxNaive(graph, shape_override):
             op_type = get_op_type(node)
             input_names = get_inputs(node)
             output_names = get_outputs(node)
-            onnx_node = helper.make_node(
-                op_type, input_names, output_names, name=node.name, **attr 
-            )
+            onnx_node = helper.make_node(op_type, input_names, output_names, name=node.name, **attr)
             onnx_nodes.append(onnx_node)
             flow_nodes[node.name] = node
         except Exception as ex:
@@ -216,9 +206,7 @@ def FlowOnnxMapping(g, ops_mapping):
             func(g, node, **kwargs)
             node.skip_conversion = True
         except Exception as ex:
-            logger.error(
-                "Failed to convert node %s\n%s", node.name, node.summary, exc_info=1
-            )
+            logger.error("Failed to convert node %s\n%s", node.name, node.summary, exc_info=1)
             exceptions.append(ex)
 
     return mapped_op, unmapped_op, exceptions
@@ -234,6 +222,7 @@ def TopologicalSort(g, continue_on_error):
         except:  # pylint: disable=bare-except
             # if we continue on error, ignore graph cycles so we can report all missing ops
             pass
+
 
 def Export(
     graph: Callable,
@@ -261,21 +250,12 @@ def Export(
     assert os.getenv("ENABLE_USER_OP") != "False"
     assert os.path.isdir(model_save_dir)
     job = graph._full_graph_proto
-    onnx_graph = ProcessFlowGraph(
-        job,
-        model_save_dir,
-        continue_on_error=continue_on_error,
-        opset=opset,
-        extra_opset=extra_opset,
-        shape_override=shape_override,
-    )
+    onnx_graph = ProcessFlowGraph(job, model_save_dir, continue_on_error=continue_on_error, opset=opset, extra_opset=extra_opset, shape_override=shape_override,)
     onnx_graph = optimizer.OptimizeGraph(onnx_graph)
-    model_proto = onnx_graph.MakeModel(
-        "tmp", onnx_filename, external_data=external_data
-    )
+    model_proto = onnx_graph.MakeModel("tmp", onnx_filename, external_data=external_data)
 
     if dynamic_batch_size == True:
-        model_proto.graph.input[0].type.tensor_type.shape.dim[0].dim_param = 'None'
+        model_proto.graph.input[0].type.tensor_type.shape.dim[0].dim_param = "None"
 
     with open(onnx_filename, "wb") as f:
         try:
@@ -287,33 +267,22 @@ def Export(
                 )
             )
     return
-            
 
 
 def ProcessFlowGraph(
-    flow_graph,
-    model_save_dir,
-    continue_on_error=False,
-    opset=None,
-    extra_opset=None,
-    shape_override=None,
+    flow_graph, model_save_dir, continue_on_error=False, opset=None, extra_opset=None, shape_override=None,
 ):
     opset = util.FindOpset(opset)
     logger.info("Using opset <onnx, %s>", opset)
     if opset > schemas.get_max_supported_opset_version():
         logger.warning(
-            "Currently installed onnx package %s is too low to support opset %s, "
-            "please upgrade onnx package to avoid potential conversion issue.",
-            util.get_onnx_version(),
-            opset,
+            "Currently installed onnx package %s is too low to support opset %s, " "please upgrade onnx package to avoid potential conversion issue.", util.get_onnx_version(), opset,
         )
 
     if shape_override is None:
         shape_override = {}
 
-    (onnx_nodes, flow_nodes, op_cnt, attr_cnt, dtypes, output_shapes,) = FlowToOnnxNaive(
-        flow_graph, shape_override
-    )
+    (onnx_nodes, flow_nodes, op_cnt, attr_cnt, dtypes, output_shapes,) = FlowToOnnxNaive(flow_graph, shape_override)
 
     g = Graph(onnx_nodes, flow_nodes, model_save_dir, output_shapes, dtypes, opset, extra_opset,)
 
@@ -334,12 +303,6 @@ def ProcessFlowGraph(
 
     g.UpdateProto()
 
-    logger.debug(
-        "Summay Stats:\n"
-        "\toneflow ops: {}\n"
-        "\toneflow attr: {}\n"
-        "\tonnx mapped: {}\n"
-        "\tonnx unmapped: {}".format(op_cnt, attr_cnt, mapped_op, unmapped_op)
-    )
+    logger.debug("Summay Stats:\n" "\toneflow ops: {}\n" "\toneflow attr: {}\n" "\tonnx mapped: {}\n" "\tonnx unmapped: {}".format(op_cnt, attr_cnt, mapped_op, unmapped_op))
 
     return g
