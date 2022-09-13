@@ -48,7 +48,6 @@ class BroadcastOp(common.BroadcastOp):
 @flow_op("scalar_mul", "Mul")
 @flow_op("scalar_add", "Add")
 @flow_op("scalar_div", "Div")
-@flow_op("scalar_sub", "Sub")
 class ScalarBinaryOp:
     @classmethod
     def Version_6(cls, ctx, node, **kwargs):
@@ -943,8 +942,6 @@ class Var:
         dtypes = node.output_dtypes
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         keepdim_mean = 0 if origin_dim is None else keepdim
-        correction = 0
-
 
         if origin_dim is None:
             dim = []            
@@ -963,8 +960,6 @@ class Var:
             t_mean = reduce_mean_node.output_tensor_names[0]
             for i in range(len(origin_dim)):
                 num_elements *= input_shape[i]
-
-
         
         sub_node = ctx.MakeNode(
             "Sub", [node.input_tensor_names[0], t_mean], op_name_scope=node.name, name="sub", dtypes=dtypes
@@ -974,11 +969,11 @@ class Var:
             "Mul", [sub_v, sub_v], op_name_scope=node.name, name="mul", dtypes=dtypes
         )
         sqr_sub = mul_node.output_tensor_names[0]
-        if unbiased == 1:
-            correction = 1
+        if unbiased is None:
+            unbiased = False
 
         ctx.RemoveNode(node.name)
-        if correction != 0:
+        if unbiased:
             var_node = ctx.MakeNode(
                 "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes":origin_dim, "keepdims": keepdim_mean}
             )
