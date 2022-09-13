@@ -17,14 +17,17 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Arange(flow.nn.Module):
     def __init__(self) -> None:
         super(Arange, self).__init__()
-    
+
     def forward(self) -> flow.Tensor:
         return flow.arange(0, 5).to("cuda")
 
+
 arange = Arange()
+
 
 class ArangeOpGraph(flow.nn.Graph):
     def __init__(self):
@@ -36,12 +39,13 @@ class ArangeOpGraph(flow.nn.Graph):
 
 
 def test_arange():
-    
+
     arange_graph = ArangeOpGraph()
     arange_graph._compile()
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(arange.state_dict(), tmpdirname)
         convert_to_onnx_and_check(arange_graph, onnx_model_path="/tmp", opset=11)
+
 
 test_arange()

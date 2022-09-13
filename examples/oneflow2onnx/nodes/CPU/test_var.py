@@ -17,15 +17,19 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Var(flow.nn.Module):
     def __init__(self) -> None:
         super(Var, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         y = flow.var(x, dim=None, unbiased=True, keepdim=True)
         return y
 
+
 var_module = Var()
+
+
 class VarOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -35,11 +39,12 @@ class VarOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_var():
-    
+
     var_op_graph = VarOpGraph()
     var_op_graph._compile(flow.arange(48, dtype=flow.float32).reshape(2, 2, 3, 4))
     convert_to_onnx_and_check(var_op_graph, onnx_model_path="/tmp", opset=13)
 
-test_var()
 
+test_var()

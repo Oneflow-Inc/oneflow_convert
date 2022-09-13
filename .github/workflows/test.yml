@@ -54,6 +54,7 @@ jobs:
           docker run $extra_docker_args \
             ${{ env.image_tag }} \
             /miniconda3/bin/conda run --no-capture-output -n base /bin/bash ci/test.sh
+            /miniconda3/bin/conda run --no-capture-output -n base /bin/bash ci/test_black_fmt.sh
       - name: Remove container
         if: always()
         run: |

@@ -24,6 +24,7 @@ import tempfile
 shufflenet = ModelCreator.create_model("shufflenet_v2_x0_5", pretrained=False)
 shufflenet.eval()
 
+
 class shufflenetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -33,11 +34,13 @@ class shufflenetGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_shufflenet():
-    
+
     shufflenet_graph = shufflenetGraph()
     shufflenet_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(shufflenet_graph, onnx_model_path=".")
+
 
 test_shufflenet()

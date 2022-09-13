@@ -17,14 +17,18 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class ConCat(flow.nn.Module):
     def __init__(self) -> None:
         super(ConCat, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return flow.cat([x, x, x], dim=1)
 
+
 concat = ConCat()
+
+
 class ConCatOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -36,10 +40,11 @@ class ConCatOpGraph(flow.nn.Graph):
 
 
 def test_concat():
-    
+
     concat_graph = ConCatOpGraph()
     concat_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(concat_graph, onnx_model_path="/tmp")
+
 
 test_concat()
