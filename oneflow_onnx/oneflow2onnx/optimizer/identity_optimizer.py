@@ -60,9 +60,7 @@ class IdentityOptimizer(GraphOptimizerBase):
     @staticmethod
     def _HandleNonGraphOutputIdentity(graph, identity):
         graph.ReplaceAllInputs(
-            graph.get_nodes(),
-            identity.output_tensor_names[0],
-            identity.input_tensor_names[0],
+            graph.get_nodes(), identity.output_tensor_names[0], identity.input_tensor_names[0],
         )
         graph.RemoveNode(identity.name)
         return True
@@ -91,9 +89,7 @@ class IdentityOptimizer(GraphOptimizerBase):
             return False
 
         graph.RemoveNode(identity.name)
-        new_output = [
-            output_id if o == input_id else o for o in input_node.output_tensor_names
-        ]
+        new_output = [output_id if o == input_id else o for o in input_node.output_tensor_names]
         input_node.output_tensor_names = new_output
 
         graph.set_shape(output_id, output_shape)

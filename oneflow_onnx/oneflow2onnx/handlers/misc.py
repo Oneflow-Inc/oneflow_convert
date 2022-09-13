@@ -39,8 +39,7 @@ class DirectOp:
 
 
 @flow_op(
-    ["distribute_split", "distribute_concat", "distribute_clone", "distribute_add"],
-    "Identity",
+    ["distribute_split", "distribute_concat", "distribute_clone", "distribute_add"], "Identity",
 )
 class BoxingOp:
     @classmethod
