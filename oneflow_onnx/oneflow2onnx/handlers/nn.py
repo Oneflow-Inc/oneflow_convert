@@ -223,7 +223,7 @@ def conv_dims_attr(node, name, conv_ndim=2, new_name=None):
                 n, c, h, w = dims
         dims = [h, w]
     else:
-        print("conv3d not support yet!")
+        raise NotImplementedError("'conv3d' not support convert yet!")
     node.attrs[new_name] = dims
     return dims
 
