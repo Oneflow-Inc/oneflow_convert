@@ -27,6 +27,7 @@ vgg16 = ModelCreator.create_model("vgg16_bn", pretrained=False)
 vgg16 = vgg16.to("cuda")
 vgg16.eval()
 
+
 class vgg16Graph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -36,13 +37,15 @@ class vgg16Graph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_vgg16():
-    
+
     vgg16_graph = vgg16Graph()
     vgg16_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(vgg16.state_dict(), tmpdirname)
         convert_to_onnx_and_check(vgg16_graph, onnx_model_path=".", device="gpu")
+
 
 test_vgg16()

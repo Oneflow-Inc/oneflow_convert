@@ -23,6 +23,7 @@ import tempfile
 inceptionv3 = ModelCreator.create_model("inception_v3", pretrained=False)
 inceptionv3.eval()
 
+
 class inceptionv3Graph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -32,11 +33,13 @@ class inceptionv3Graph(flow.nn.Graph):
         out, aux = self.m(x)
         return out
 
+
 def test_inceptionv3():
-    
+
     inceptionv3_graph = inceptionv3Graph()
     inceptionv3_graph._compile(flow.randn(1, 3, 299, 299))
 
     convert_to_onnx_and_check(inceptionv3_graph, onnx_model_path=".", print_outlier=True)
+
 
 test_inceptionv3()

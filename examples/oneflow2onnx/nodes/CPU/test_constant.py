@@ -17,14 +17,18 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Constant(flow.nn.Module):
     def __init__(self) -> None:
         super(Constant, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return flow.ones((2, 3)) + flow.zeros((2, 3))
 
+
 constant = Constant()
+
+
 class constantOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -36,10 +40,11 @@ class constantOpGraph(flow.nn.Graph):
 
 
 def test_constant():
-    
+
     constant_graph = constantOpGraph()
     constant_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(constant_graph, onnx_model_path="/tmp")
+
 
 test_constant()
