@@ -79,18 +79,14 @@ class ConstFoldOptimizer(GraphOptimizerBase):
         """ if node's input are all const and it's not graph's output then it can be fold.
             if node can be fold True will be return indicating that graph is changed
         """
-        if self._AllInputsAreConst(node.input_nodes) and not self._IsGraphOutput(
-            node, graph
-        ):
+        if self._AllInputsAreConst(node.input_nodes) and not self._IsGraphOutput(node, graph):
             process_func = _func_map.get(node.op_type, None)
             if process_func:
                 const_outputs = process_func(node, graph)
                 self._ReplaceNodeWithConst(node, graph, const_outputs)
                 return True
             self.logger.debug(
-                "need to add function to fold op %s whose op_type is %s",
-                node.name,
-                node.op_type,
+                "need to add function to fold op %s whose op_type is %s", node.name, node.op_type,
             )
         return False
 
@@ -107,18 +103,13 @@ class ConstFoldOptimizer(GraphOptimizerBase):
     @staticmethod
     def _ReplaceNodeWithConst(node, graph, vals):
         util.MakeSure(
-            len(node.output_tensor_names) == len(vals),
-            "length of node outputs and const vals should be same",
+            len(node.output_tensor_names) == len(vals), "length of node outputs and const vals should be same",
         )
         for old_input, val in zip(node.output_tensor_names, vals):
             const_node = graph.MakeConst(oneflow._oneflow_internal.UniqueStr("const_fold_opt"), val)
-            graph.set_dtype(
-                const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype)
-            )
+            graph.set_dtype(const_node.output_tensor_names[0], util.Numpy2OnnxDtype(val.dtype))
             graph.set_shape(const_node.output_tensor_names[0], val.shape)
-            graph.ReplaceAllInputs(
-                graph.get_nodes(), old_input, const_node.output_tensor_names[0]
-            )
+            graph.ReplaceAllInputs(graph.get_nodes(), old_input, const_node.output_tensor_names[0])
         graph.RemoveNode(node.name)
 
     @staticmethod
@@ -149,8 +140,7 @@ class ConstFoldOptimizer(GraphOptimizerBase):
         else:
             axes = node.input_nodes[1].get_tensor_value(as_list=False)
         util.MakeSure(
-            all(axis >= 0 for axis in axes),
-            "onnx spec says it only supports positive axis",
+            all(axis >= 0 for axis in axes), "onnx spec says it only supports positive axis",
         )
         shape_in = const_val.shape
         dims_out = len(shape_in) + len(axes)

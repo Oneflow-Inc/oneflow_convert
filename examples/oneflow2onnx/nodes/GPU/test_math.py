@@ -17,10 +17,11 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class MathOps(flow.nn.Module):
     def __init__(self) -> None:
         super(MathOps, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         x = x / 1
         y1 = x * x
@@ -37,9 +38,10 @@ class MathOps(flow.nn.Module):
         return y2
 
 
-
 math_ops = MathOps()
 math_ops = math_ops.to("cuda")
+
+
 class MathOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -51,7 +53,7 @@ class MathOpGraph(flow.nn.Graph):
 
 
 def test_math_ops():
-    
+
     math_ops_graph = MathOpGraph()
     math_ops_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
     # print(math_ops_graph._full_graph_proto)
@@ -60,5 +62,5 @@ def test_math_ops():
         flow.save(math_ops.state_dict(), tmpdirname)
         convert_to_onnx_and_check(math_ops_graph, onnx_model_path="/tmp", device="gpu")
 
-test_math_ops()
 
+test_math_ops()

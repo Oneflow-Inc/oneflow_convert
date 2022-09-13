@@ -69,12 +69,8 @@ class GraphBuilder(object):
             data = self.ConvertToInput(kwargs.pop("data"))
             starts = self.ConvertToInput(kwargs.pop("starts"), dtype=np.int64)
             ends = self.ConvertToInput(kwargs.pop("ends"), dtype=np.int64)
-            axes = self.ConvertToInput(
-                kwargs.pop("axes", None), is_optional=True, dtype=np.int64
-            )
-            steps = self.ConvertToInput(
-                kwargs.pop("steps", None), is_optional=True, dtype=np.int64
-            )
+            axes = self.ConvertToInput(kwargs.pop("axes", None), is_optional=True, dtype=np.int64)
+            steps = self.ConvertToInput(kwargs.pop("steps", None), is_optional=True, dtype=np.int64)
             inputs = [data, starts, ends, axes, steps]
 
         # pro-process inputs and attr
@@ -100,19 +96,10 @@ class GraphBuilder(object):
             for input_data in inputs[1:]:
                 if input_data != util.ONNX_EMPTY_INPUT:
                     util.MakeSure(
-                        dtype == self.graph.get_dtype(input_data),
-                        "dtype should be same",
+                        dtype == self.graph.get_dtype(input_data), "dtype should be same",
                     )
 
-        return self.graph.MakeNode(
-            op_type="Slice",
-            inputs=inputs,
-            attr=attr,
-            name=name,
-            outputs=outputs,
-            shapes=shapes,
-            dtypes=dtypes,
-        ).output[0]
+        return self.graph.MakeNode(op_type="Slice", inputs=inputs, attr=attr, name=name, outputs=outputs, shapes=shapes, dtypes=dtypes,).output[0]
 
     def ConvertToInput(self, tensor, is_optional=False, dtype=None):
         """in ONNX, input shold come from node, so it must be a string"""
@@ -123,13 +110,9 @@ class GraphBuilder(object):
 
         res = tensor
         if isinstance(tensor, list):
-            res = self.graph.MakeConst(
-                oneflow._oneflow_internal.UniqueStr("const_slice"), np.array(tensor, dtype)
-            ).output[0]
+            res = self.graph.MakeConst(oneflow._oneflow_internal.UniqueStr("const_slice"), np.array(tensor, dtype)).output[0]
 
-        util.MakeSure(
-            isinstance(res, str), "input is a dynamic input, so a str is needed"
-        )
+        util.MakeSure(isinstance(res, str), "input is a dynamic input, so a str is needed")
 
         return res
 

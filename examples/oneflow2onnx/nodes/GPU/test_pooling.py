@@ -17,17 +17,21 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Pool(flow.nn.Module):
     def __init__(self) -> None:
         super(Pool, self).__init__()
         self.max_pool2d = flow.nn.MaxPool2d(kernel_size=3, padding=1, stride=1)
         self.avg_pool2d = flow.nn.AvgPool2d(kernel_size=3, padding=1, stride=1)
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.max_pool2d(x) + self.avg_pool2d(x)
 
+
 pool = Pool()
 pool = pool.to("cuda")
+
+
 class poolOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,12 +43,13 @@ class poolOpGraph(flow.nn.Graph):
 
 
 def test_pool():
-    
+
     pool_graph = poolOpGraph()
     pool_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(pool.state_dict(), tmpdirname)
         convert_to_onnx_and_check(pool_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_pool()

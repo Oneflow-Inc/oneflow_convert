@@ -17,14 +17,18 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Transpose(flow.nn.Module):
     def __init__(self) -> None:
         super(Transpose, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return flow.transpose(x, 1, 2)
 
+
 transpose = Transpose()
+
+
 class transposeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -36,10 +40,11 @@ class transposeOpGraph(flow.nn.Graph):
 
 
 def test_transpose():
-    
+
     transpose_graph = transposeOpGraph()
     transpose_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(transpose_graph, onnx_model_path="/tmp")
+
 
 test_transpose()

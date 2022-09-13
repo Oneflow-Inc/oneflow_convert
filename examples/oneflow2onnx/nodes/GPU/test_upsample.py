@@ -17,16 +17,19 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class UpsampleNearest2D(flow.nn.Module):
     def __init__(self) -> None:
         super(UpsampleNearest2D, self).__init__()
         self.m = flow.nn.UpsamplingNearest2d(scale_factor=2)
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.m(x)
 
+
 upsample_nearest_2d = UpsampleNearest2D()
 upsample_nearest_2d.to("cuda")
+
 
 class UpsampleNearest2DOpGraph(flow.nn.Graph):
     def __init__(self):
@@ -38,10 +41,11 @@ class UpsampleNearest2DOpGraph(flow.nn.Graph):
 
 
 def test_upsample_nearest_2d():
-    
+
     unsqueeze_graph = UpsampleNearest2DOpGraph()
     unsqueeze_graph._compile(flow.randn(1, 1, 2, 2).to("cuda"))
 
     convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=13, device="gpu")
+
 
 test_upsample_nearest_2d()

@@ -18,6 +18,8 @@ import oneflow as flow
 import oneflow.nn as nn
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 import tempfile
+
+
 class LeNet(nn.Module):
     def __init__(self, num_classes: int = 1000) -> None:
         super(LeNet, self).__init__()
@@ -31,11 +33,7 @@ class LeNet(nn.Module):
             nn.Conv2d(in_channels=16, out_channels=120, kernel_size=5, stride=1),
             nn.Tanh(),
         )
-        self.classifier = nn.Sequential(
-            nn.Linear(in_features=120, out_features=84),
-            nn.Tanh(),
-            nn.Linear(in_features=84, out_features=num_classes),
-        )
+        self.classifier = nn.Sequential(nn.Linear(in_features=120, out_features=84), nn.Tanh(), nn.Linear(in_features=84, out_features=num_classes),)
 
     def forward(self, x):
         x = self.feature_extractor(x)
@@ -43,9 +41,11 @@ class LeNet(nn.Module):
         logits = self.classifier(x)
         return logits
 
+
 lenet = LeNet()
 lenet = lenet.to("cuda")
 lenet.eval()
+
 
 class LenetGraph(flow.nn.Graph):
     def __init__(self):
@@ -56,13 +56,15 @@ class LenetGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_lenet():
-    
+
     lenet_graph = LenetGraph()
     lenet_graph._compile(flow.randn(1, 3, 32, 32).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(lenet.state_dict(), tmpdirname)
         convert_to_onnx_and_check(lenet_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_lenet()

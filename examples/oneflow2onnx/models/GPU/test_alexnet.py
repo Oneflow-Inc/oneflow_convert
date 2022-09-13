@@ -26,6 +26,7 @@ alexnet = ModelCreator.create_model("alexnet", pretrained=False)
 alexnet = alexnet.to("cuda")
 alexnet.eval()
 
+
 class AlexNetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -35,13 +36,15 @@ class AlexNetGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_alexnet():
-    
+
     alexnet_graph = AlexNetGraph()
     alexnet_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(alexnet.state_dict(), tmpdirname)
         convert_to_onnx_and_check(alexnet_graph, onnx_model_path=".", device="gpu")
+
 
 test_alexnet()
