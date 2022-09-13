@@ -72,7 +72,12 @@ def export_onnx_model(
         flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
         if os.path.exists(flow_weight_dir):
             shutil.rmtree(flow_weight_dir)
-        flow.save(graph.state_dict(), flow_weight_dir)
+        if graph._is_global_view:    
+            # save global tensor model
+            flow.save(graph.state_dict(), flow_weight_dir, global_dst_rank=0)
+        else:
+            # save local tensor model
+            flow.save(graph.state_dict(), flow_weight_dir)
     
     onnx_model_dir = onnx_model_path
     onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
