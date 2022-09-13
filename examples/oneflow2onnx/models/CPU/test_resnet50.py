@@ -23,6 +23,8 @@ import tempfile
 
 resnet = ModelCreator.create_model("resnet50", pretrained=False)
 resnet.eval()
+
+
 class ResNetGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -32,11 +34,13 @@ class ResNetGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_resnet():
-    
+
     resnet_graph = ResNetGraph()
     resnet_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(resnet_graph, onnx_model_path=".", print_outlier=False)
+
 
 test_resnet()

@@ -61,9 +61,7 @@ def _WrapConcatWithCast(ctx, node):
         output_name = node.output_tensor_names[0]
         # cast each inputs to float
         for i, inp in enumerate(node.input_nodes):
-            input_cast = ctx.InsertNewNodeOnInput(
-                node, "Cast", node.input_tensor_names[i]
-            )
+            input_cast = ctx.InsertNewNodeOnInput(node, "Cast", node.input_tensor_names[i])
             input_cast.attrs["to"] = onnx_pb.TensorProto.FLOAT
             ctx.set_dtype(input_cast.output_tensor_names[0], onnx_pb.TensorProto.FLOAT)
         next_nodes = ctx.FindOutputConsumers(node.output_tensor_names[0])
@@ -86,9 +84,7 @@ class Reshape:
             onnx_pb.TensorProto.INT16,
             onnx_pb.TensorProto.INT64,
         ]
-        shape_node = ctx.MakeConst(
-            oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None)
-        )
+        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None))
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
             # onnx reshape can handle the type - done
@@ -103,14 +99,11 @@ class Reshape:
         next_nodes = ctx.FindOutputConsumers(node.output_tensor_names[0])
         if len(next_nodes) != 1 or next_nodes[0].op_type != "Cast":
             op_name = oneflow._oneflow_internal.UniqueStr(node.name)
-            output_cast = ctx.InsertNewNodeOnOutput(
-                "Cast", node.output_tensor_names[0], name=op_name
-            )
+            output_cast = ctx.InsertNewNodeOnOutput("Cast", node.output_tensor_names[0], name=op_name)
             output_cast.attrs["to"] = dtype
             ctx.set_dtype(output_cast.output_tensor_names[0], dtype)
-            ctx.CopyShape(
-                node.output_tensor_names[0], output_cast.output_tensor_names[0]
-            )
+            ctx.CopyShape(node.output_tensor_names[0], output_cast.output_tensor_names[0])
+
 
 @flow_op("flatten", "Flatten")
 class Flatten:
@@ -121,7 +114,7 @@ class Flatten:
         assert dtype == 1, f"onnx opset version 1/9 only support float32 data_type!"
         assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
         node.attrs["axis"] = start_dim
-    
+
     @classmethod
     def Version_9(cls, ctx, node, **kwargs):
         start_dim = node.attrs.get("start_dim", 1)
@@ -135,12 +128,13 @@ class Flatten:
         start_dim = node.attrs.get("start_dim", 1)
         assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
         node.attrs["axis"] = start_dim
-    
+
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
         start_dim = node.attrs.get("start_dim", 1)
         assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
         node.attrs["axis"] = start_dim
+
 
 @flow_op("squeeze", "Squeeze")
 class Squeeze:
@@ -163,18 +157,17 @@ class Squeeze:
         # Opset 11 supports negative axis, but core logic is same
         cls.Version_1(ctx, node, **kwargs)
 
+
 @flow_op("expand_dims", "Unsqueeze")
 class ExpandDimsOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         axis = node.attrs.get("axis", None)
-        
-        axis_node = ctx.MakeConst(
-            oneflow._oneflow_internal.UniqueStr("axis"), np.array(axis)
-        )
+
+        axis_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axis"), np.array(axis))
 
         node.input_tensor_names.append(axis_node.output_tensor_names[0])
-    
+
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
         # Opset 11 supports negative axis, but core logic is same
@@ -237,16 +230,16 @@ class Slice:
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         for i in range(len(input_shape)):
             slice_axes.append(i)
-        
+
         axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64))
         node.input_tensor_names.append(axes.output_tensor_names[0])
         steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64))
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
-
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
+
 
 @flow_op("narrow", "Slice")
 class Narrow:
@@ -280,10 +273,10 @@ class Narrow:
         steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_steps"), np.array(slice_steps).astype(np.int64))
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
-
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
+
 
 @flow_op("gather_nd", onnx_op="GatherND", flow_ibns=["params", "indices"])
 class GatherND:
@@ -316,6 +309,7 @@ class Identity:
     def Version_1(cls, ctx, node, **kwargs):
         pass
 
+
 @flow_op("constant", "Constant")
 class Constant:
     @classmethod
@@ -334,4 +328,3 @@ class Constant:
             ctx.MakeConst(output_name, values)
         else:
             ctx.MakeConst(output_name, values)
-

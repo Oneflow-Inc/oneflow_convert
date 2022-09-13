@@ -26,6 +26,7 @@ mobilenetv3 = ModelCreator.create_model("mobilenet_v3_small", pretrained=False)
 mobilenetv3.to("cuda")
 mobilenetv3.eval()
 
+
 class MobileNetV3(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -35,8 +36,9 @@ class MobileNetV3(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_mobilenetv3():
-    
+
     mobilenetv3_graph = MobileNetV3()
     mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
@@ -44,14 +46,16 @@ def test_mobilenetv3():
         flow.save(mobilenetv3.state_dict(), tmpdirname)
         convert_to_onnx_and_check(mobilenetv3_graph, onnx_model_path=".", device="gpu")
 
+
 def test_mobilenetv3_opset14():
-    
+
     mobilenetv3_graph = MobileNetV3()
     mobilenetv3_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(mobilenetv3.state_dict(), tmpdirname)
         convert_to_onnx_and_check(mobilenetv3_graph, onnx_model_path=".", device="gpu", opset=14)
+
 
 test_mobilenetv3()
 test_mobilenetv3_opset14()

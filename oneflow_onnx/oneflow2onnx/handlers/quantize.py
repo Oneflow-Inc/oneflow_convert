@@ -51,11 +51,7 @@ class MinMaxObserver:
         input_node: Node = node.input_nodes[0]
         input_np: np.ndarray = input_node.get_tensor_value(as_list=False)
 
-        input_np = (
-            input_np.flatten()
-            if formula == "cambricon" or per_layer
-            else input_np.reshape((input_np.shape[0], -1))
-        )
+        input_np = input_np.flatten() if formula == "cambricon" or per_layer else input_np.reshape((input_np.shape[0], -1))
 
         def get_min_or_max_value(get_min: bool, pre_func: Optional[Callable] = None):
             data = input_np.copy()
@@ -103,9 +99,7 @@ class MinMaxObserver:
 
 
 @flow_op(
-    "moving_average_min_max_observer",
-    flow_ibns=["in", "current_train_step", "moving_max", "moving_min"],
-    flow_obns=["scale", "zero_point"],
+    "moving_average_min_max_observer", flow_ibns=["in", "current_train_step", "moving_max", "moving_min"], flow_obns=["scale", "zero_point"],
 )
 class MovingAverageMinMaxObserver:
     @classmethod
@@ -130,9 +124,7 @@ class MovingAverageMinMaxObserver:
             elif scheme == "affine":
                 denominator = 2.0 ** bit - 1
                 scale = (moving_max_np - moving_min_np) / denominator
-                zero_point = (
-                    (-np.round(moving_min_np / scale)).astype(np.uint8).flatten()
-                )
+                zero_point = (-np.round(moving_min_np / scale)).astype(np.uint8).flatten()
             else:
                 raise ValueError("invalid quantization scheme: " + scheme)
 
@@ -149,9 +141,7 @@ class MovingAverageMinMaxObserver:
 
 
 @flow_op(
-    "fake_quantization",
-    onnx_op="QuantizeLinear",
-    flow_ibns=["in", "scale", "zero_point"],
+    "fake_quantization", onnx_op="QuantizeLinear", flow_ibns=["in", "scale", "zero_point"],
 )
 class FakeQuantization:
     @classmethod
@@ -160,11 +150,7 @@ class FakeQuantization:
         if formula == "cambricon":
             raise ValueError("invalid quantization formula: " + formula)
 
-        dequant_node = ctx.InsertNewNodeOnOutput(
-            "DequantizeLinear",
-            node.output_tensor_names[0],
-            name=oneflow._oneflow_internal.UniqueStr(node.name),
-        )
+        dequant_node = ctx.InsertNewNodeOnOutput("DequantizeLinear", node.output_tensor_names[0], name=oneflow._oneflow_internal.UniqueStr(node.name),)
         if opset < 13:
             scale_shape = ctx.get_shape(node.input_tensor_names[1])
             if not (len(scale_shape) == 1 and scale_shape[0] == 1):
@@ -181,8 +167,7 @@ class FakeQuantization:
         ]
 
         ctx.set_dtype(
-            dequant_node.output_tensor_names[0],
-            ctx.get_dtype(node.input_tensor_names[0]),
+            dequant_node.output_tensor_names[0], ctx.get_dtype(node.input_tensor_names[0]),
         )
         ctx.CopyShape(node.output_tensor_names[0], dequant_node.output_tensor_names[0])
 

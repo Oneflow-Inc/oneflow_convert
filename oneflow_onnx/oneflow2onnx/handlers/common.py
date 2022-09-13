@@ -38,12 +38,7 @@ class BroadcastOp:
         shape0 = ctx.get_shape(node.input_tensor_names[0])
         shape1 = ctx.get_shape(node.input_tensor_names[1])
         if shape0 != shape1:
-            if (
-                shape0
-                and shape1
-                and len(shape0) < len(shape1)
-                and node.op_type in ["Mul", "Add"]
-            ):
+            if shape0 and shape1 and len(shape0) < len(shape1) and node.op_type in ["Mul", "Add"]:
                 tmp = node.input_tensor_names[0]
                 node.input_tensor_names[0] = node.input_tensor_names[1]
                 node.input_tensor_names[1] = tmp

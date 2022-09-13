@@ -148,9 +148,7 @@ def MakeOnnxInputsOutputs(name, elem_type, shape, **kwargs):
     """
     if elem_type is None:
         elem_type = onnx_pb.TensorProto.UNDEFINED
-    return helper.make_tensor_value_info(
-        name, elem_type, MakeOnnxShape(shape), **kwargs
-    )
+    return helper.make_tensor_value_info(name, elem_type, MakeOnnxShape(shape), **kwargs)
 
 
 def FindOpset(opset):
@@ -213,9 +211,7 @@ def GenerateValidFilename(s):
     return "".join([c if c.isalpha() or c.isdigit() else "_" for c in s])
 
 
-def TensorProtoFromNumpy(
-    arr: np.ndarray, name=None, external_data=False, export_path=None
-):
+def TensorProtoFromNumpy(arr: np.ndarray, name=None, external_data=False, export_path=None):
     if name is None:
         name = oneflow._oneflow_internal.UniqueStr("tensor_")
     tp = numpy_helper.from_array(arr, name)
