@@ -196,21 +196,34 @@ def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2, cei
 
 
 
-def conv_dims_attr(node, name, new_name=None):
+def conv_dims_attr(node, name, conv_ndim=2, new_name=None):
     if new_name is None:
         new_name = name
     dims = node.attrs.get(name, None)
     if not dims:
         return None
-    if len(dims) == 2:
-        h, w = dims
-        c = n = 1
-    else:
-        if node.is_nhwc():
-            n, h, w, c = dims
+    if conv_ndim == 1:
+        if len(dims) == 1:
+            h = dims[0]
+            c = n = 1
         else:
-            n, c, h, w = dims
-    dims = [h, w]
+            if node.is_nhwc():
+                n, h, c = dims
+            else:
+                n, c, h = dims
+        dims = [h]
+    elif conv_ndim==2:
+        if len(dims) == 2:
+            h, w = dims
+            c = n = 1
+        else:
+            if node.is_nhwc():
+                n, h, w, c = dims
+            else:
+                n, c, h, w = dims
+        dims = [h, w]
+    else:
+        raise NotImplementedError("'conv3d' not support convert yet!")
     node.attrs[new_name] = dims
     return dims
 
@@ -220,8 +233,35 @@ def conv_kernel_shape(ctx, node, input_idx, spatial=2):
     return node.attrs["kernel_shape"]
 
 
+@flow_op(["conv1d"], flow_ibns=["in", "weight"])
+class Conv1dOp:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        # T output = Conv1D(T input, T filter, @list(int) strides, @bool use_cudnn_on_gpu,
+        #                       @string padding, @string data_format)
+        # T Y = Conv(T X, T W, T B, @AttrType.STRING auto_pad, @AttrType.INTS dilations, @AttrType.INT group,
+        #                       @AttrType.INTS kernel_shape, @AttrType.INTS pads, @AttrType.INTS strides)
+        node.op_type = "Conv"
+        kernel_shape = conv_kernel_shape(ctx, node, 1, spatial=1)
+        node.attrs["group"] = node.attrs.get("groups", 1)
+        node.attrs["dilations"] = node.attrs.get("dilation_rate", [1])
+        strides = conv_dims_attr(node, "strides", conv_ndim=1)
+        dilations = conv_dims_attr(node, "dilations", conv_ndim=1)
+        node.attrs["pads"] = node.attrs.get("padding_before", [0]) * 2
+        _ConvConvertInputs(ctx, node, with_kernel=True)
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        # no change
+        cls.Version_1(ctx, node, **kwargs)
+    
+    @classmethod
+    def Version_14(cls, ctx, node, **kwargs):
+        # no change
+        cls.Version_1(ctx, node, **kwargs)
+
 @flow_op(["conv2d"], flow_ibns=["in", "weight"])
-class ConvOp:
+class Conv2dOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         # T output = Conv2D(T input, T filter, @list(int) strides, @bool use_cudnn_on_gpu,
@@ -246,7 +286,6 @@ class ConvOp:
     def Version_14(cls, ctx, node, **kwargs):
         # no change
         cls.Version_1(ctx, node, **kwargs)
-
 
 @flow_op("adaptive_avg_pool2d", onnx_op="AveragePool")
 class AdaptiveAvgPoolOp:
