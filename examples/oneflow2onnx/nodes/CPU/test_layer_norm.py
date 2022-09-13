@@ -45,4 +45,5 @@ def test_layernorm():
 
     convert_to_onnx_and_check(layernorm_graph, onnx_model_path="/tmp", opset=17)
 
-test_layernorm()
+# NOTE: cpu layernorm has some bug
+# test_layernorm()

@@ -496,8 +496,7 @@ class LayerNorm:
         input_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
         axis = node.attrs.get("begin_norm_axis", None)
         node.attrs["axis"] = axis
-
-        scale_node = ctx.MakeConst("Scale", np.array([1.0], dtype=input_dtype))
+        scale_node = ctx.MakeConst(node.input_tensor_names[0] + "_layer_norm_scale", np.array([1.0], dtype=input_dtype))
         node.input_tensor_names.append(scale_node.output_tensor_names[0])
 
 @flow_op("upsample_nearest_2d", onnx_op="Resize")
