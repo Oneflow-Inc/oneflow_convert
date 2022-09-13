@@ -272,6 +272,8 @@ def Export(
 def ProcessFlowGraph(
     flow_graph, model_save_dir, continue_on_error=False, opset=None, extra_opset=None, shape_override=None,
 ):
+    if opset is None:
+        opset = 17
     opset = util.FindOpset(opset)
     logger.info("Using opset <onnx, %s>", opset)
     if opset > schemas.get_max_supported_opset_version():
