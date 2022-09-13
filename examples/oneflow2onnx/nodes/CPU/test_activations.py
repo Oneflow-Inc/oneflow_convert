@@ -19,6 +19,8 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 relu = flow.nn.ReLU()
+
+
 class ReLUOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -29,7 +31,22 @@ class ReLUOpGraph(flow.nn.Graph):
         return out
 
 
+silu = flow.nn.SiLU()
+
+
+class SiLUOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = silu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
 prelu = flow.nn.PReLU()
+
+
 class PReLUOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,7 +56,9 @@ class PReLUOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 hard_swish = flow.nn.Hardswish()
+
 
 class HardSwishOpGraph(flow.nn.Graph):
     def __init__(self):
@@ -50,7 +69,9 @@ class HardSwishOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 hard_sigmoid = flow.nn.Hardsigmoid()
+
 
 class HardSigmoidOpGraph(flow.nn.Graph):
     def __init__(self):
@@ -61,12 +82,22 @@ class HardSigmoidOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 def test_relu():
-    
+
     relu_graph = ReLUOpGraph()
     relu_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp")
+
+
+def test_silu():
+
+    silu_graph = SiLUOpGraph()
+    silu_graph._compile(flow.randn(1, 3, 224, 224))
+
+    convert_to_onnx_and_check(silu_graph, onnx_model_path="/tmp")
+
 
 def test_hard_swish():
     hard_swish_graph = HardSwishOpGraph()
@@ -74,23 +105,26 @@ def test_hard_swish():
 
     convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14)
 
+
 def test_hard_sigmoid():
     hard_sigmoid_graph = HardSigmoidOpGraph()
     hard_sigmoid_graph._compile(flow.randn(1, 3, 224, 224))
 
     convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp")
 
+
 def test_prelu_one_channels():
-    
+
     prelu_graph = PReLUOpGraph()
     prelu_graph._compile(flow.randn(1, 1, 224, 224))
 
     convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp")
 
+
 def test_prelu_n_channels():
-    
+
     prelu_graph = PReLUOpGraph()
-    channels=random.randint(2,10)
+    channels = random.randint(2, 10)
     prelu_graph._compile(flow.randn(1, channels, 224, 224))
 
     convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp")
@@ -99,7 +133,6 @@ def test_prelu_n_channels():
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
+test_silu()
 test_hard_swish()
 test_hard_sigmoid()
-
-

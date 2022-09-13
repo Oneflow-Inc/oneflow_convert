@@ -17,15 +17,19 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class Slice(flow.nn.Module):
     def __init__(self) -> None:
         super(Slice, self).__init__()
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return x[:, :1, :, :]
 
+
 slice = Slice()
 slice = slice.to("cuda")
+
+
 class sliceOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -37,7 +41,7 @@ class sliceOpGraph(flow.nn.Graph):
 
 
 def test_slice():
-    
+
     slice_graph = sliceOpGraph()
     slice_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
     # print(slice_graph._full_graph_proto)
@@ -45,5 +49,6 @@ def test_slice():
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(slice.state_dict(), tmpdirname)
         convert_to_onnx_and_check(slice_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_slice()

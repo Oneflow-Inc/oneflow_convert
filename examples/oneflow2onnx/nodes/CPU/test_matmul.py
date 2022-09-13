@@ -17,6 +17,7 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class MatMul(flow.nn.Module):
     def __init__(self) -> None:
         super(MatMul, self).__init__()
@@ -25,7 +26,10 @@ class MatMul(flow.nn.Module):
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return self.matmul(x)
 
+
 matmul = MatMul()
+
+
 class matmulOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -37,10 +41,11 @@ class matmulOpGraph(flow.nn.Graph):
 
 
 def test_matmul():
-    
+
     matmul_graph = matmulOpGraph()
     matmul_graph._compile(flow.randn(1, 20))
 
     convert_to_onnx_and_check(matmul_graph, onnx_model_path="/tmp")
+
 
 test_matmul()

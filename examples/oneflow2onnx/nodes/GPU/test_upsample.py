@@ -18,34 +18,34 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 
-class AddN(flow.nn.Module):
+class UpsampleNearest2D(flow.nn.Module):
     def __init__(self) -> None:
-        super(AddN, self).__init__()
+        super(UpsampleNearest2D, self).__init__()
+        self.m = flow.nn.UpsamplingNearest2d(scale_factor=2)
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        y = x + x + x
-        return y
+        return self.m(x)
 
 
-addn = AddN()
+upsample_nearest_2d = UpsampleNearest2D()
+upsample_nearest_2d.to("cuda")
 
 
-class AddNOpGraph(flow.nn.Graph):
+class UpsampleNearest2DOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = addn
+        self.m = upsample_nearest_2d
 
     def build(self, x):
-        out = self.m(x)
-        return out
+        return self.m(x)
 
 
-def test_addn():
+def test_upsample_nearest_2d():
 
-    addn_graph = AddNOpGraph()
-    addn_graph._compile(flow.randn(1, 3, 224, 224))
+    unsqueeze_graph = UpsampleNearest2DOpGraph()
+    unsqueeze_graph._compile(flow.randn(1, 1, 2, 2).to("cuda"))
 
-    convert_to_onnx_and_check(addn_graph, onnx_model_path="/tmp")
+    convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=13, device="gpu")
 
 
-test_addn()
+test_upsample_nearest_2d()

@@ -152,18 +152,12 @@ class BackToBackOptimizer(GraphOptimizerBase):
                 dtype = g.get_dtype(node2.output_tensor_names[0])
                 node2_consumers = g.FindOutputConsumers(node2.output_tensor_names[0])
                 g.ReplaceAllInputs(
-                    node2_consumers,
-                    node2.output_tensor_names[0],
-                    node.input_tensor_names[0],
+                    node2_consumers, node2.output_tensor_names[0], node.input_tensor_names[0],
                 )
                 g.RemoveNode(node2.name)
                 if set(node2.output_tensor_names) & set(g.outputs):
                     g.MakeNode(
-                        "Identity",
-                        [node.input_tensor_names[0]],
-                        outputs=node2.output_tensor_names,
-                        shapes=[shape],
-                        dtypes=[dtype],
+                        "Identity", [node.input_tensor_names[0]], outputs=node2.output_tensor_names, shapes=[shape], dtypes=[dtype],
                     )
             else:
                 node2.attrs["perm"] = [t1[i] for i in t2]
@@ -196,9 +190,7 @@ class BackToBackOptimizer(GraphOptimizerBase):
             return []
 
         node2_consumers = g.FindOutputConsumers(node2.output_tensor_names[0])
-        g.ReplaceAllInputs(
-            node2_consumers, node2.output_tensor_names[0], node.input_tensor_names[0]
-        )
+        g.ReplaceAllInputs(node2_consumers, node2.output_tensor_names[0], node.input_tensor_names[0])
         g.RemoveNode(node.name)
         g.RemoveNode(node2.name)
         return []
