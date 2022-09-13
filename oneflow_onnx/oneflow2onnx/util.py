@@ -35,9 +35,7 @@ def run_onnx(
         if ort_optimize
         else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     )
-    sess = ort.InferenceSession(
-        onnx_model_path, sess_options=ort_sess_opt, providers=providers
-    )
+    sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt, providers=providers)
     assert len(sess.get_outputs()) == 1
     assert len(sess.get_inputs()) <= 1
 
@@ -46,9 +44,7 @@ def run_onnx(
     if ipt_dict is None:
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
-            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(
-                np.float32
-            )
+            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(np.float32)
             ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
@@ -69,9 +65,7 @@ def export_onnx_model(
     flow_weight_clean_flag = False
     if flow_weight_dir is None:
         flow_weight_clean_flag = True
-        flow_weight_dir = os.path.join(
-            "/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model")
-        )
+        flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
         if os.path.exists(flow_weight_dir):
             shutil.rmtree(flow_weight_dir)
         if graph._is_global_view:
@@ -127,23 +121,14 @@ def convert_to_onnx_and_check(
     device="cpu",
 ):
     onnx_model_path, cleanup = export_onnx_model(
-        graph,
-        external_data,
-        opset,
-        flow_weight_dir,
-        onnx_model_path,
-        dynamic_batch_size,
+        graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size,
     )
 
     if dynamic_batch_size != True:
         if ort.__version__ > "1.9.0":
             ipt_dict, onnx_res = run_onnx(
                 onnx_model_path,
-                [
-                    "TensorrtExecutionProvider",
-                    "CUDAExecutionProvider",
-                    "CPUExecutionProvider",
-                ],
+                ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",],
                 ort_optimize=ort_optimize,
             )
         else:
@@ -155,9 +140,7 @@ def convert_to_onnx_and_check(
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
             else:
-                oneflow_res = graph(
-                    flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda")
-                )
+                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))
         else:
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
