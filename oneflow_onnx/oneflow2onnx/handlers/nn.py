@@ -419,6 +419,45 @@ class BatchNorm:
         cls.Version_6(ctx, node, **kwargs)
 
 
+@flow_op(["cublas_fused_mlp"])
+class CublasFusedMLP:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        n_inputs = len(node.input_tensor_names)
+        n_layers = n_inputs // 2
+        assert n_layers * 2 + 1 == n_inputs
+        assert n_layers >= 0
+        x = node.input_tensor_names[0]
+        weights = node.input_tensor_names[1 : n_layers + 1]
+        biases = node.input_tensor_names[n_layers + 1 :]
+        n_outputs = len(node.output_tensor_names)
+        assert n_outputs == n_inputs
+        y = node.output_tensor_names[0]
+        for output in node.output_tensor_names[1:]:
+            assert len(ctx.FindOutputConsumers(output)) == 0
+        skip_final_act = node.attrs["skip_final_activation"]
+        next_x = x
+        scope = node.name
+        output_shape = ctx.get_shape(y)
+        output_dtype = ctx.get_dtype(y)
+        ctx.RemoveNode(node.name)
+        for layer_idx in range(n_layers):
+            tranpose_node = ctx.MakeNode("Transpose", [weights[layer_idx]], op_name_scope=scope, name="transpose_{}".format(layer_idx))
+            matmul_node = ctx.MakeNode("MatMul", [next_x, tranpose_node.output_tensor_names[0]], op_name_scope=scope, name="matmul_{}".format(layer_idx))
+            bias_attrs = {}
+            if ctx.opset < 7:
+                bias_attrs = {"broadcast": 1}
+            bias_node = ctx.MakeNode("Add", [matmul_node.output_tensor_names[0], biases[layer_idx]], attr=bias_attrs, op_name_scope=scope, name="bias_{}".format(layer_idx))
+            if layer_idx != n_layers - 1 or (not skip_final_act):
+                relu_node = ctx.MakeNode("Relu", [bias_node.output_tensor_names[0]], op_name_scope=scope, name="relu_{}".format(layer_idx))
+                next_x = relu_node.output_tensor_names[0]
+            else:
+                next_x = bias_node.output_tensor_names[0]
+        ctx.MakeNode("Identity", [next_x], outputs=[y], op_name_scope=scope)
+        ctx.set_shape(y, output_shape)
+        ctx.set_dtype(y, output_dtype)
+
+
 @flow_op("upsample_nearest_2d", onnx_op="Resize")
 class UpSampleNearest2D:
     @classmethod
