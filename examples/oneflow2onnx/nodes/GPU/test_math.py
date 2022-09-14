@@ -34,6 +34,7 @@ class MathOps(flow.nn.Module):
         y3 = flow.acos(y3)
         y3 = flow.pow(y3, 2.0)
         y2 = y2 + y3
+        flow.minimum(y2, y3)
 
         return y2
 
