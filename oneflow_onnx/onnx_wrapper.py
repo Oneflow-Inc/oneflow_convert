@@ -636,7 +636,7 @@ class Graph(object):
                 if tensor_value.size * tensor_value.itemsize > 128 * 1024 * 1024:  # 128 MB
                     tmp_dir = tempfile.TemporaryDirectory()
                     tmp_dirs.append(tmp_dir)
-                    tensor = util.TensorProtoFromNumpy(tensor_value, name=inp.output_tensor_names[0], external_data=True, export_path=tmp_dir.name)
+                    tensor = util.TensorProtoFromNumpy(tensor_value, name=inp.output_tensor_names[0], external_data=True, export_path=tmp_dir.name,)
                 else:
                     tensor = util.TensorProtoFromNumpy(tensor_value, name=inp.output_tensor_names[0])
                 initializers.append(tensor)
@@ -783,8 +783,20 @@ class Graph(object):
         # TODO(daquexian): node.output_tensor_names[0] is "node_name/output_name", so this pathjoin doesn't work
         # on windows (where path separator is "\")
         key = ".".join(node.output_tensor_names[0].split(".")[1:])
+        # For Free Eager Tensor
+        if key == "":
+            key = node.output_tensor_names[0]
         if len(list(self._param_dict.keys())) > 1:
-            tensor_value = self._param_dict[key[: key.rfind("out") - 1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+            try:
+                tensor_value = self._param_dict[key[: key.rfind("out") - 1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+            except:
+                # For Eager Free Tensor
+                tensor_value = (
+                    self._param_dict[list(self._param_dict.keys())[0]][key[: key.rfind("out") - 1]]
+                    .numpy()
+                    .reshape(self.get_shape(tensor_name))
+                    .astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+                )
         else:
             try:
                 tensor_value = (
