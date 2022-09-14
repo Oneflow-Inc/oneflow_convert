@@ -49,6 +49,7 @@ FLOW_2_ONNX_DTYPE = {
     oneflow.int8: onnx_pb.TensorProto.INT8,
     oneflow.uint8: onnx_pb.TensorProto.UINT8,
     oneflow.float16: onnx_pb.TensorProto.FLOAT16,
+    oneflow.bool: onnx_pb.TensorProto.BOOL,
 }
 
 FLOW_PROTO_2_ONNX_DTYPE = {}
