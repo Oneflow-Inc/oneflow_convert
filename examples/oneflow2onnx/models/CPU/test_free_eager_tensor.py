@@ -28,4 +28,4 @@ class YOLOGraph(flow.nn.Graph):
 yolo_graph = YOLOGraph(m)
 yolo_graph._compile(flow.randn(1, 1, 3, 3))
 
-convert_to_onnx_and_check(yolo_graph, onnx_model_path="/tmp", print_outlier=True)
+# convert_to_onnx_and_check(yolo_graph, onnx_model_path="/tmp", print_outlier=True)

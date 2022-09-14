@@ -54,10 +54,16 @@ def export_onnx_model(
         flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
         if os.path.exists(flow_weight_dir):
             shutil.rmtree(flow_weight_dir)
-        flow.save(graph.state_dict(), flow_weight_dir)
+        if graph._is_global_view:
+            # save global tensor model
+            flow.save(graph.state_dict(), flow_weight_dir, global_dst_rank=0)
+        else:
+            # save local tensor model
+            flow.save(graph.state_dict(), flow_weight_dir)
 
     onnx_model_dir = onnx_model_path
-    onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
+    if os.path.isdir(onnx_model_path):
+        onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
         graph, flow_weight_dir, onnx_model_path, opset=opset, external_data=external_data, dynamic_batch_size=dynamic_batch_size,
     )
@@ -84,11 +90,11 @@ def compare_result(
 def convert_to_onnx_and_check(
     graph, print_outlier=True, external_data=False, ort_optimize=True, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False, device="cpu",
 ):
-    onnx_model_path, cleanup = export_onnx_model(graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size)
+    onnx_model_path, cleanup = export_onnx_model(graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size,)
 
     if dynamic_batch_size != True:
         if ort.__version__ > "1.9.0":
-            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider"], ort_optimize=ort_optimize)
+            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",], ort_optimize=ort_optimize,)
         else:
             ipt_dict, onnx_res = run_onnx(onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize)
 
