@@ -790,13 +790,18 @@ class Graph(object):
             try:
                 tensor_value = self._param_dict[key[: key.rfind("out") - 1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
             except:
-                # For Eager Free Tensor
-                tensor_value = (
-                    self._param_dict[list(self._param_dict.keys())[0]][key[: key.rfind("out") - 1]]
-                    .numpy()
-                    .reshape(self.get_shape(tensor_name))
-                    .astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
-                )
+                try:
+                    # 'model' && model.model.0.conv.bias/out
+                    tensor_value = (
+                        self._param_dict[list(self._param_dict.keys())[0]][key[: key.rfind("out") - 1]]
+                        .numpy()
+                        .reshape(self.get_shape(tensor_name))
+                        .astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+                    )
+                except:
+                    # 'model.model.24-FreeEagerTensor-247' & model.model.24-FreeEagerTensor-254/out
+                    key = node.output_tensor_names[0]
+                    tensor_value = self._param_dict[key[: key.rfind("out") - 1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
         else:
             try:
                 tensor_value = (
@@ -807,6 +812,7 @@ class Graph(object):
                 )
             except:
                 tensor_value = self._param_dict[key[: key.rfind("out") - 1]].numpy().reshape(self.get_shape(tensor_name)).astype(dtype=util.Onnx2NumpyDtype(self.get_dtype(tensor_name)))
+
         return tensor_value
 
     def get_shape(self, name):
