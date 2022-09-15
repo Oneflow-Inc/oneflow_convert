@@ -468,6 +468,34 @@ class MatMul:
             if val != 0:
                 raise ValueError(node.op_type + " attribute " + i + " is not supported")
 
+@flow_op(["broadcast_matmul"], "MatMul", flow_ibns=["a", "b"])
+class MatMul:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        transpose_a = node.attrs.get("transpose_a", 0)
+        transpose_b = node.attrs.get("transpose_b", 0)
+
+        if transpose_a != 0:
+            shape = ctx.get_shape(node.input_tensor_names[0])
+            if shape:
+                perm = list(range(0, len(shape)))
+                tmp = perm[-1]
+                perm[-1] = perm[-2]
+                perm[-2] = tmp
+                ctx.InsertNewNodeOnInput(node, "Transpose", node.input_tensor_names[0], perm=perm)
+
+        if transpose_b != 0:
+            shape = ctx.get_shape(node.input_tensor_names[1])
+            if shape:
+                perm = list(range(0, len(shape)))
+                tmp = perm[-1]
+                perm[-1] = perm[-2]
+                perm[-2] = tmp
+                ctx.InsertNewNodeOnInput(node, "Transpose", node.input_tensor_names[1], perm=perm)
+
+        # Optional<OneFlow_Tensor>:$_add_to_output if node.attrs["alpha"]:
+
+
 
 @flow_op("erf", onnx_op="Erf")
 class Erf:
