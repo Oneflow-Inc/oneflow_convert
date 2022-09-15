@@ -420,8 +420,7 @@ class BatchNorm:
 
 
 @flow_op(
-    ["layer_norm"],
-    flow_ibns=["x"],
+    ["layer_norm"], flow_ibns=["x"],
 )
 class LayerNorm:
     @classmethod
@@ -431,14 +430,11 @@ class LayerNorm:
         # flow inputs: x
         # flow outputs: y, mean, inv_variance
         # flow attributes: begin_norm_axis, begin_params_axis, epsilon
-        # onnx inputs: X, Scale, B(optional) 
+        # onnx inputs: X, Scale, B(optional)
         # onnx attributes: axis(-1), epsilon(1e-05), stash_type(1)
         # onnx output: Y, Mean(optional), InvStdDev(optional)
-        
-        consumers = [
-            ctx.FindOutputConsumers(output_name)
-            for output_name in node.output_tensor_names[1:]
-        ]
+
+        consumers = [ctx.FindOutputConsumers(output_name) for output_name in node.output_tensor_names[1:]]
         if not any(consumers):
             new_output = [node.output_tensor_names[0]]
             node.output_tensor_names = new_output
@@ -448,6 +444,7 @@ class LayerNorm:
         node.attrs["axis"] = axis
         scale_node = ctx.MakeConst(node.input_tensor_names[0] + "_layer_norm_scale", np.array([1.0], dtype=input_dtype))
         node.input_tensor_names.append(scale_node.output_tensor_names[0])
+
 
 @flow_op(["cublas_fused_mlp"])
 class CublasFusedMLP:

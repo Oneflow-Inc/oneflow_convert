@@ -17,17 +17,21 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
+
 class LayerNorm(flow.nn.Module):
     def __init__(self) -> None:
         super(LayerNorm, self).__init__()
         self.norm = flow.nn.LayerNorm([5, 10, 10], elementwise_affine=False)
-    
+
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         y = self.norm(x)
         return y
 
+
 layernorm = LayerNorm().to("cuda")
 layernorm.eval()
+
+
 class LayerNormOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -39,10 +43,11 @@ class LayerNormOpGraph(flow.nn.Graph):
 
 
 def test_layernorm():
-    
+
     layernorm_graph = LayerNormOpGraph()
     layernorm_graph._compile(flow.randn(20, 5, 10, 10).to("cuda"))
 
     convert_to_onnx_and_check(layernorm_graph, onnx_model_path="/tmp", opset=17, device="gpu")
+
 
 test_layernorm()
