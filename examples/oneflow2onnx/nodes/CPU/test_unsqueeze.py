@@ -38,12 +38,16 @@ class UnsqueezeOpGraph(flow.nn.Graph):
         return self.m(x)
 
 
-def test_unsqueeze():
-
+def test_unsqueeze_opset11():
     unsqueeze_graph = UnsqueezeOpGraph()
     unsqueeze_graph._compile(flow.randn(1, 2, 3, 4))
-
     convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=11)
 
 
-test_unsqueeze()
+def test_unsqueeze_opset13():
+    unsqueeze_graph = UnsqueezeOpGraph()
+    unsqueeze_graph._compile(flow.randn(1, 2, 3, 4))
+    convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=13)
+
+test_unsqueeze_opset11()
+test_unsqueeze_opset13()
