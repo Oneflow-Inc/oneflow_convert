@@ -17,10 +17,10 @@ import tempfile
 import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
-
 class MathOps(flow.nn.Module):
     def __init__(self) -> None:
         super(MathOps, self).__init__()
+        self.A = flow.randn(128, 224).to("cuda")
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         x = x / 1
@@ -35,6 +35,8 @@ class MathOps(flow.nn.Module):
         y3 = flow.pow(y3, 2.0)
         y2 = y2 + y3
 
+        B = x # shape: (1, 3, 224, 224)
+        flow.matmul(self.A, B)
         return y2
 
 
