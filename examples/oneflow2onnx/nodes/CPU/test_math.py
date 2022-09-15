@@ -37,7 +37,9 @@ class MathOps(flow.nn.Module):
         y2 = y2 + y3
 
         B = x # shape: (1, 3, 224, 224)
-        flow.matmul(self.A, B)
+        #flow.matmul(self.A, B)
+        flow.lt(x, 1)
+        flow.gt(x, 1)
         return y2
 
 
