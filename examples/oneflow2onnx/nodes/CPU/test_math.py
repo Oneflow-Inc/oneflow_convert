@@ -22,6 +22,7 @@ class MathOps(flow.nn.Module):
     def __init__(self) -> None:
         super(MathOps, self).__init__()
         self.A = flow.randn(128, 224)
+        self.indices = flow.tensor([0,2])
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         x = x / 1
@@ -40,6 +41,7 @@ class MathOps(flow.nn.Module):
         #flow.matmul(self.A, B)
         flow.lt(x, 1)
         flow.gt(x, 1)
+        #flow._C.gather(x, self.indices, 1)
         return y2
 
 

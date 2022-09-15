@@ -328,3 +328,13 @@ class Constant:
             ctx.MakeConst(output_name, values)
         else:
             ctx.MakeConst(output_name, values)
+
+@flow_op("gather", "Gather", flow_ibns=["in", "indicies"])
+class Gather:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        dtype = ctx.get_dtype(node.input_tensor_names[0])
+        assert dtype == 1, f"onnx opset version 1/9 only support int32/int64 data_type!"
+        # 这里的 dtype == 1 应该是 ONNX 中的枚举编号，哪里查看对应关系呢（float对应1， int32、int64呢）
+        # onnx 中的输入是 data, indicies，data 需要额外设置吗？
+        # onnx 中的 axis 还需要额外设置吗？
