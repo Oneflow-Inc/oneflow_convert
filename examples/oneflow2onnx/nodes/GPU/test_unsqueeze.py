@@ -44,11 +44,12 @@ def test_unsqueeze_opset11():
     unsqueeze_graph._compile(flow.randn(1, 2, 3, 4).to("cuda"))
     convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=11, device="gpu")
 
+
 def test_unsqueeze_opset13():
     unsqueeze_graph = UnsqueezeOpGraph()
     unsqueeze_graph._compile(flow.randn(1, 2, 3, 4).to("cuda"))
     convert_to_onnx_and_check(unsqueeze_graph, onnx_model_path="/tmp", opset=13, device="gpu")
 
+
 test_unsqueeze_opset11()
 test_unsqueeze_opset13()
-

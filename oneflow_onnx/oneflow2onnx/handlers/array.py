@@ -168,7 +168,7 @@ class ExpandDimsOp:
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
-    
+
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
         # Opset 11 supports negative axis, but core logic is same
