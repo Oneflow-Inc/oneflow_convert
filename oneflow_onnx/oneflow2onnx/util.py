@@ -62,7 +62,8 @@ def export_onnx_model(
             flow.save(graph.state_dict(), flow_weight_dir)
 
     onnx_model_dir = onnx_model_path
-    onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
+    if os.path.isdir(onnx_model_path):
+        onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
     Export(
         graph, flow_weight_dir, onnx_model_path, opset=opset, external_data=external_data, dynamic_batch_size=dynamic_batch_size,
     )
