@@ -180,9 +180,6 @@ class ExpandDimsOp:
         node.input_tensor_names.append(axis_node.output_tensor_names[0])
 
 
-import logging
-logger = logging.getLogger("yolov5")
-
 @flow_op("expand", "Expand")
 class ExpandOp:
     @classmethod
@@ -193,7 +190,6 @@ class ExpandOp:
 
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
-        logger.info(node.attrs)
         cls.Version_8(ctx, node, **kwargs)
 
 @flow_op("transpose", onnx_op="Transpose")
