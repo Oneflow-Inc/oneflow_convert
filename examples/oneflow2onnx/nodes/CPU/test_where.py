@@ -22,9 +22,7 @@ class WhereModule(flow.nn.Module):
     def __init__(self) -> None:
         super(WhereModule, self).__init__()
         self.y = flow.randn(1, 5)
-        self.condition = flow.tensor(
-            [[True, True, False, True, False]], dtype=flow.bool
-        )
+        self.condition = flow.tensor([[True, True, False, True, False]], dtype=flow.bool)
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         return flow.where(self.condition, x, self.y)

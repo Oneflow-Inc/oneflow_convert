@@ -270,6 +270,7 @@ class ScalarPow:
             y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["int_operand"]).astype(np_dtype))
             node.input_tensor_names.append(y.output_tensor_names[0])
 
+
 @flow_op("scalar_logical_less", onnx_op="Less")
 @flow_op("scalar_logical_greater", onnx_op="Greater")
 class ScalarPow:
@@ -283,6 +284,7 @@ class ScalarPow:
         elif node.attrs["has_int_operand"]:
             y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["int_operand"]).astype(np_dtype))
             node.input_tensor_names.append(y.output_tensor_names[0])
+
 
 @flow_op("arange", onnx_op="Range")
 class Arange:
