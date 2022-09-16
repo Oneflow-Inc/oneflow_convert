@@ -211,6 +211,8 @@ def _MakeMinOrMaxOp(ctx, op_type, inputs, outputs, output_shapes=None, output_dt
 
 @flow_op("broadcast_minimum", onnx_op="Min")
 @flow_op("broadcast_maximum", onnx_op="Max")
+@flow_op("elementwise_minimum", onnx_op="Min")
+@flow_op("elementwise_maximum", onnx_op="Max")
 class MinMaxOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
