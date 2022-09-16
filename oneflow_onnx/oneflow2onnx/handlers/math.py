@@ -275,6 +275,7 @@ class ScalarPow:
 class Arange:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
+
         if node.attrs["dtype"] == 1:
             starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_start"]))
             node.input_tensor_names.append(starts.output_tensor_names[0])
@@ -289,6 +290,7 @@ class Arange:
             node.input_tensor_names.append(limits.output_tensor_names[0])
             delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["integer_delta"]))
             node.input_tensor_names.append(delta.output_tensor_names[0])
+        ctx.set_dtype(node.output_tensor_names[0], ctx.get_dtype(node.input_tensor_names[0]))
 
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
