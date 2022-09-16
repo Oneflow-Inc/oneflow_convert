@@ -88,6 +88,9 @@ class Reshape:
         shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None))
         if node.attrs.get("shape") == []:
             shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array([]).astype(np.int64))
+
+        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None),)
+
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
             # onnx reshape can handle the type - done
@@ -239,18 +242,18 @@ class Concat:
 class Slice:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["start"]).astype(np.int64))
+        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["start"]).astype(np.int64),)
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop"), np.array(node.attrs["stop"]).astype(np.int64))
+        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop"), np.array(node.attrs["stop"]).astype(np.int64),)
         node.input_tensor_names.append(ends.output_tensor_names[0])
         slice_axes = []
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         for i in range(len(input_shape)):
             slice_axes.append(i)
 
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64))
+        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64),)
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64))
+        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64),)
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod
@@ -281,13 +284,13 @@ class Narrow:
                 slice_starts.append(0)
                 slice_ends.append(input_shape[i])
 
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_start"), np.array(slice_starts).astype(np.int64))
+        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_start"), np.array(slice_starts).astype(np.int64),)
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_length"), np.array(slice_ends).astype(np.int64))
+        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_length"), np.array(slice_ends).astype(np.int64),)
         node.input_tensor_names.append(ends.output_tensor_names[0])
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_axes"), np.array(slice_axes).astype(np.int64))
+        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_axes"), np.array(slice_axes).astype(np.int64),)
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_steps"), np.array(slice_steps).astype(np.int64))
+        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_steps"), np.array(slice_steps).astype(np.int64),)
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod
@@ -345,3 +348,26 @@ class Constant:
             ctx.MakeConst(output_name, values)
         else:
             ctx.MakeConst(output_name, values)
+
+
+@flow_op("gather", "Gather", flow_ibns=["in", "indices"])
+class Gather:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        dtype = ctx.get_dtype(node.input_tensor_names[1])
+        assert dtype == onnx_pb.TensorProto.INT32 or dtype == onnx_pb.TensorProto.INT64, "onnx gather only support int32/int64 indices."
+
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+
+
+@flow_op("where", "Where", flow_ibns=["condition", "x", "y"])
+class Where:
+    @classmethod
+    def Version_9(cls, ctx, node, **kwargs):
+        pass
+
+    @classmethod
+    def Version_16(cls, ctx, node, **kwargs):
+        pass
