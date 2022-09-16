@@ -163,16 +163,18 @@ class ExpandDimsOp:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         axis = node.attrs.get("axis", None)
-
-        axis_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axis"), np.array(axis))
-
-        node.input_tensor_names.append(axis_node.output_tensor_names[0])
+        node.attrs["axes"] = [axis]
 
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
         # Opset 11 supports negative axis, but core logic is same
         axis = node.attrs.get("axis", None)
-        node.attrs["axes"] = [axis]
+        axis_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axis"), np.array(axis))
+        node.input_tensor_names.append(axis_node.output_tensor_names[0])
 
 
 @flow_op("transpose", onnx_op="Transpose")
