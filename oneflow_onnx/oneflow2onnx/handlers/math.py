@@ -273,6 +273,21 @@ class ScalarPow:
             node.input_tensor_names.append(y.output_tensor_names[0])
 
 
+@flow_op("scalar_logical_less", onnx_op="Less")
+@flow_op("scalar_logical_greater", onnx_op="Greater")
+class ScalarPow:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        np_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
+        node.attrs["broadcast"] = 1
+        if node.attrs["has_float_operand"]:
+            y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_operand"]).astype(np_dtype))
+            node.input_tensor_names.append(y.output_tensor_names[0])
+        elif node.attrs["has_int_operand"]:
+            y = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["int_operand"]).astype(np_dtype))
+            node.input_tensor_names.append(y.output_tensor_names[0])
+
+
 @flow_op("arange", onnx_op="Range")
 class Arange:
     @classmethod
@@ -439,7 +454,7 @@ class Sign:
             raise ValueError("dtype " + str(node_dtype) + " is not supported in onnx for now")
 
 
-@flow_op(["matmul", "batch_matmul"], "MatMul", flow_ibns=["a", "b"])
+@flow_op(["matmul", "batch_matmul", "broadcast_matmul"], "MatMul", flow_ibns=["a", "b"])
 class MatMul:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):

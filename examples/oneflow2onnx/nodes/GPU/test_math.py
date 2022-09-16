@@ -21,6 +21,8 @@ from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 class MathOps(flow.nn.Module):
     def __init__(self) -> None:
         super(MathOps, self).__init__()
+        self.A = flow.randn(128, 224).to("cuda")
+        self.indices = flow.tensor([0, 2], dtype=flow.int64).to("cuda")
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
         x = x / 1
@@ -36,6 +38,11 @@ class MathOps(flow.nn.Module):
         y2 = y2 + y3
         flow.minimum(y2, y3)
 
+        B = x  # shape: (1, 3, 224, 224)
+        flow.matmul(self.A, B)  # (128, 224) x (1, 3, 224, 224)
+        flow.lt(x, 1)
+        flow.gt(x, 1)
+        flow._C.gather(x, self.indices, 1)
         return y2
 
 
