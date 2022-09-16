@@ -55,6 +55,7 @@ class ScalarBinaryOp:
         np_dtype = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[0]))
         scalar_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("scalar"), np.array([scalar_val]).astype(np_dtype))
         node.input_tensor_names.append(scalar_node.output_tensor_names[0])
+        ctx.set_dtype(node.output_tensor_names[0], ctx.get_dtype(node.input_tensor_names[0]))
 
 
 @flow_op("add_n", onnx_op="Sum")
@@ -277,11 +278,11 @@ class Arange:
     def Version_1(cls, ctx, node, **kwargs):
 
         if node.attrs["dtype"] == 1:
-            starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_start"]))
+            starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["float_start"]).astype(np.float32))
             node.input_tensor_names.append(starts.output_tensor_names[0])
-            limits = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("limit"), np.array(node.attrs["float_limit"]))
+            limits = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("limit"), np.array(node.attrs["float_limit"]).astype(np.float32))
             node.input_tensor_names.append(limits.output_tensor_names[0])
-            delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["float_delta"]))
+            delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["float_delta"]).astype(np.float32))
             node.input_tensor_names.append(delta.output_tensor_names[0])
         else:
             starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["integer_start"]))
@@ -290,7 +291,6 @@ class Arange:
             node.input_tensor_names.append(limits.output_tensor_names[0])
             delta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("delta"), np.array(node.attrs["integer_delta"]))
             node.input_tensor_names.append(delta.output_tensor_names[0])
-        ctx.set_dtype(node.output_tensor_names[0], ctx.get_dtype(node.input_tensor_names[0]))
 
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
