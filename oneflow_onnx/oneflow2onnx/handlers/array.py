@@ -89,7 +89,6 @@ class Reshape:
         if node.attrs.get("shape") == []:
             shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array([]).astype(np.int64))
 
-        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None),)
 
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
