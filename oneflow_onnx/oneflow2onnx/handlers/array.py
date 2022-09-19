@@ -89,7 +89,6 @@ class Reshape:
         if node.attrs.get("shape") == []:
             shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array([]).astype(np.int64))
 
-
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
             # onnx reshape can handle the type - done
@@ -193,6 +192,7 @@ class ExpandOp:
     @classmethod
     def Version_13(cls, ctx, node, **kwargs):
         cls.Version_8(ctx, node, **kwargs)
+
 
 @flow_op("transpose", onnx_op="Transpose")
 class Transpose:
