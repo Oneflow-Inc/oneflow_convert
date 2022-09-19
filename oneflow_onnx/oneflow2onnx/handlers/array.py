@@ -84,7 +84,11 @@ class Reshape:
             onnx_pb.TensorProto.INT16,
             onnx_pb.TensorProto.INT64,
         ]
-        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None),)
+
+        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(node.attrs.get("shape"), None))
+        if node.attrs.get("shape") == []:
+            shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array([]).astype(np.int64))
+
         node.input_tensor_names = node.input_tensor_names + [shape_node.name]
         if ctx.opset >= 8 or not need_casting:
             # onnx reshape can handle the type - done
@@ -175,6 +179,19 @@ class ExpandDimsOp:
         axis = node.attrs.get("axis", None)
         axis_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axis"), np.array(axis))
         node.input_tensor_names.append(axis_node.output_tensor_names[0])
+
+
+@flow_op("expand", "Expand")
+class ExpandOp:
+    @classmethod
+    def Version_8(cls, ctx, node, **kwargs):
+        shape = node.attrs.get("expand_shape")
+        shape_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(shape).astype(np.int64))
+        node.input_tensor_names.append(shape_node.output_tensor_names[0])
+
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        cls.Version_8(ctx, node, **kwargs)
 
 
 @flow_op("transpose", onnx_op="Transpose")

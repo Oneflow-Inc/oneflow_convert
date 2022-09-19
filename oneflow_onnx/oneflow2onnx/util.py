@@ -109,7 +109,10 @@ def convert_to_onnx_and_check(
             else:
                 oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
         if not isinstance(oneflow_res, np.ndarray):
-            oneflow_res = oneflow_res.numpy()
+            if flow.is_tensor(oneflow_res):
+                oneflow_res = oneflow_res.numpy()
+            else:
+                oneflow_res = oneflow_res[0].numpy()
         compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
     # cleanup()
