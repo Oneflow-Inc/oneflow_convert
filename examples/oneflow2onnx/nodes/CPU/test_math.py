@@ -36,6 +36,7 @@ class MathOps(flow.nn.Module):
         y3 = flow.acos(y3)
         y3 = flow.pow(y3, 2.0)
         y2 = y2 + y3
+        flow.minimum(y2, y3)
 
         B = x  # shape: (1, 3, 224, 224)
         flow.matmul(self.A, B)
