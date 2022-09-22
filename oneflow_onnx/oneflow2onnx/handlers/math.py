@@ -739,3 +739,32 @@ class Var:
             var_node = ctx.MakeNode(
                 "ReduceMean", [sqr_sub], op_name_scope=node.name, name="var", dtypes=dtypes, attr={"axes": origin_dim, "keepdims": keepdim_mean}, outputs=[node.output_tensor_names[0]]
             )
+
+
+@flow_op("fill_", onnx_op="Constant")
+class Fill:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        is_floating_value = node.attrs["is_floating_value"]
+        output_name = node.output_tensor_names[0]
+        out_shape = ctx.get_shape(output_name)
+
+        if is_floating_value:
+            values = np.full(shape=out_shape, fill_value=node.attrs["floating_value"], dtype=np.float32)
+        else:
+            values = np.full(shape=out_shape, fill_value=node.attrs["integral_value"], dtype=np.float32)
+
+        ctx.RemoveNode(node.name)
+        ctx.MakeConst(output_name, values)
+
+    @classmethod
+    def Version_9(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
+
+    @classmethod
+    def Version_13(cls, ctx, node, **kwargs):
+        cls.Version_1(ctx, node, **kwargs)
