@@ -338,6 +338,8 @@ class PoolOp:
         else:
             pads = node.attrs.get("padding_before", [0, 0]) + node.attrs.get("padding_after", [0, 0])
             node.attrs["pads"] = pads
+        if len(node.output_tensor_names) > 1 and len(ctx.FindOutputConsumers(node.output_tensor_names[1])) == 0:
+            ctx.RemoveOutput(node, node.output_tensor_names[1])
 
 
 @flow_op(["pad"], onnx_op="Pad")
