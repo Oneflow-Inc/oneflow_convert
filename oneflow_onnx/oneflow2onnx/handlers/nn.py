@@ -339,7 +339,8 @@ class PoolOp:
             pads = node.attrs.get("padding_before", [0, 0]) + node.attrs.get("padding_after", [0, 0])
             node.attrs["pads"] = pads
         # Delete index, for TensorRT inference
-        ctx.DeleteUnusedNodes(node.output_tensor_names[1])
+        if len(node.output_tensor_names) > 1:
+            ctx.RemoveOutput(node, node.output_tensor_names[1])
 
 
 @flow_op(["pad"], onnx_op="Pad")

@@ -1056,6 +1056,21 @@ class Graph(object):
                 break
         # don't remove output from parent since others might depend on it
         return True
+    
+    @staticmethod
+    def RemoveOutput(node, to_be_removed):
+        """Remove output from Node.
+        Args:
+            node: the node we expect the output on
+            to_be_removed: the node name we want to remove
+        """
+        assert isinstance(node, Node) and isinstance(to_be_removed, six.text_type)
+        for i, name in enumerate(node.output_tensor_names):
+            if name == to_be_removed:
+                del node.output_tensor_names[i]
+                break
+        # don't remove output from parent since others might depend on it
+        return True
 
     def InsertNewNodeOnInput(self, node, op_type, input_name, name=None, domain=None, **kwargs):
         """Create and insert a new node into the graph.
