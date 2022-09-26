@@ -1056,7 +1056,7 @@ class Graph(object):
                 break
         # don't remove output from parent since others might depend on it
         return True
-    
+
     @staticmethod
     def RemoveOutput(node, to_be_removed):
         """Remove output from Node.
