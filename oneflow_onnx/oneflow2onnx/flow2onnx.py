@@ -147,6 +147,7 @@ def FlowToOnnxNaive(graph, shape_override):
             outputs = ["{}/{}".format(node.name, output) for output in outputs]
         return outputs
 
+    print(graph.net.op)
     # minimal conversion of attributes
     for node in graph.net.op:
         attr = {}

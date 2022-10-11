@@ -57,7 +57,7 @@ class ScalarBinaryOp:
         node.input_tensor_names.append(scalar_node.output_tensor_names[0])
 
 
-@flow_op("add_n", onnx_op="Sum")
+@flow_op("add_n", onnx_op="Add")
 class AddN:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):

@@ -27,15 +27,21 @@ def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[Orde
     ort_sess_opt = ort.SessionOptions()
     ort_sess_opt.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED if ort_optimize else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt, providers=providers)
-    assert len(sess.get_outputs()) == 1
-    assert len(sess.get_inputs()) <= 1
 
     only_return_result = ipt_dict is not None
 
     if ipt_dict is None:
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
-            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape).astype(np.float32)
+            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape)
+            if ipt.type == 'tensor(int64)':
+                ipt_data = ipt_data.astype(np.int64)
+            elif ipt.type == 'tensor(float)':
+                ipt_data = ipt_data.astype(np.float32)
+            elif ipt.type == 'tensor(bool)':
+                ipt_data = ipt_data.astype(np.bool)
+            else:
+                raise NotImplementedError(f'{ipt.type} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
             ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
@@ -102,12 +108,41 @@ def convert_to_onnx_and_check(
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
             else:
-                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32).to("cuda"))
+                graph_input_tensor = []
+                for _, value in ipt_dict.items():
+                    value_tensor = None
+                    if value.dtype == 'int64':
+                        value_tensor = flow.tensor(value, dtype=flow.int64, device="cpu")
+                    elif value.dtype == 'float':
+                        value_tensor = flow.tensor(value, dtype=flow.float32, device="cpu")
+                    elif value.dtype == 'bool':
+                        value_tensor = flow.tensor(value, dtype=flow.bool, device="cpu")
+                    else:
+                        raise NotImplementedError(f'{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
+                    graph_input_tensor.append(value_tensor)
+
+                oneflow_res = graph(graph_input_tensor)
         else:
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
             else:
-                oneflow_res = graph(flow.tensor(*ipt_dict.values(), dtype=flow.float32))
+                graph_input_tensor = []
+                for _, value in ipt_dict.items():
+                    value_tensor = None
+                    if value.dtype == 'int64':
+                        value_tensor = flow.tensor(value, dtype=flow.int64, device="cpu")
+                    elif value.dtype == 'float':
+                        value_tensor = flow.tensor(value, dtype=flow.float32, device="cpu")
+                    elif value.dtype == 'bool':
+                        value_tensor = flow.tensor(value, dtype=flow.bool, device="cpu")
+                    else:
+                        raise NotImplementedError(f'{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
+                    graph_input_tensor.append(value_tensor)
+
+                    print(value_tensor.shape)
+                oneflow_res = graph(graph_input_tensor)
+
+                oneflow_res = graph(value_tensor)
         if not isinstance(oneflow_res, np.ndarray):
             if flow.is_tensor(oneflow_res):
                 oneflow_res = oneflow_res.numpy()
