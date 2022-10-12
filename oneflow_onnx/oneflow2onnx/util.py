@@ -139,7 +139,6 @@ def convert_to_onnx_and_check(
                         raise NotImplementedError(f'{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
                     graph_input_tensor.append(value_tensor)
 
-                    print(value_tensor.shape)
                 oneflow_res = graph(graph_input_tensor)
 
                 oneflow_res = graph(value_tensor)

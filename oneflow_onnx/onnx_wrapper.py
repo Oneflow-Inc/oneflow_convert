@@ -562,6 +562,7 @@ class Graph(object):
         remained_dtypes = {}
         remained_shapes = {}
         remained_sub_graphs = {}
+        cnt = 0
         for op in ops:
             for op_output in op.output_tensor_names:
                 # this check should be removed once we make sure all output tensors have dtype/shape.
@@ -920,7 +921,13 @@ class Graph(object):
             doc: text for doc string of the graph
         """
         self.DeleteUnusedNodes(self.outputs)
-        self.TopologicalSort(self.get_nodes())
+        multi_inputs = []
+        for i in range(len(self._nodes)):
+            if self._nodes[i].op_type == 'input':
+                multi_inputs.append(self._nodes[i])
+        if len(multi_inputs) <= 1:
+            self.TopologicalSort(self.get_nodes())
+        
         self.UpdateProto()
 
         ops = []
@@ -1202,6 +1209,7 @@ class Graph(object):
         Return:
             a list of nodes
         """
+        res = []
         res_set = set()
         if not outputs_name:
             return list(res_set)
@@ -1216,8 +1224,13 @@ class Graph(object):
                 if node.is_graph_input():
                     if node not in res_set:
                         res_set.add(node)
+        res = []
+        for i in range(len(self._nodes)):
+            if self._nodes[i].op_type == 'input':
+                res.append(self._nodes[i])
+                res_set.discard(self._nodes[i])
 
-        return list(res_set)
+        return res + list(res_set)
 
     def DeleteUnusedNodes(self, outputs_name):
         """Delete nodes not in subgraph ending with output_names."""
@@ -1233,6 +1246,7 @@ class Graph(object):
             if attr_body_graphs:
                 for _, body_graph in attr_body_graphs.items():
                     body_graph.DeleteUnusedNodes(body_graph.outputs)
+
         self.ResetNodes(related_nodes)
 
     def SafeToRemoveNodes(self, to_delete):
