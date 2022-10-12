@@ -923,11 +923,11 @@ class Graph(object):
         self.DeleteUnusedNodes(self.outputs)
         multi_inputs = []
         for i in range(len(self._nodes)):
-            if self._nodes[i].op_type == 'input':
+            if self._nodes[i].op_type == "input":
                 multi_inputs.append(self._nodes[i])
         if len(multi_inputs) <= 1:
             self.TopologicalSort(self.get_nodes())
-        
+
         self.UpdateProto()
 
         ops = []
@@ -1226,7 +1226,7 @@ class Graph(object):
                         res_set.add(node)
         res = []
         for i in range(len(self._nodes)):
-            if self._nodes[i].op_type == 'input':
+            if self._nodes[i].op_type == "input":
                 res.append(self._nodes[i])
                 res_set.discard(self._nodes[i])
 

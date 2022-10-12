@@ -77,7 +77,7 @@ def OptimizeGraph(graph):
     try:
         multi_inputs = []
         for i in range(len(graph._nodes)):
-            if graph._nodes[i].op_type == 'input':
+            if graph._nodes[i].op_type == "input":
                 multi_inputs.append(graph._nodes[i])
         if len(multi_inputs) <= 1:
             graph.TopologicalSort(graph.get_nodes())

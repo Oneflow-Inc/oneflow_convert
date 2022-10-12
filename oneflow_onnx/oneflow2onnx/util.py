@@ -34,14 +34,14 @@ def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[Orde
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
             ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape)
-            if ipt.type == 'tensor(int64)':
+            if ipt.type == "tensor(int64)":
                 ipt_data = ipt_data.astype(np.int64)
-            elif ipt.type == 'tensor(float)':
+            elif ipt.type == "tensor(float)":
                 ipt_data = ipt_data.astype(np.float32)
-            elif ipt.type == 'tensor(bool)':
+            elif ipt.type == "tensor(bool)":
                 ipt_data = ipt_data.astype(np.bool)
             else:
-                raise NotImplementedError(f'{ipt.type} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
+                raise NotImplementedError(f"{ipt.type} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .")
             ipt_dict[ipt.name] = ipt_data
 
     onnx_res = sess.run([], ipt_dict)[0]
@@ -104,6 +104,8 @@ def convert_to_onnx_and_check(
         else:
             ipt_dict, onnx_res = run_onnx(onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize)
 
+        oneflow_res = None
+
         if device == "gpu":
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
@@ -111,17 +113,22 @@ def convert_to_onnx_and_check(
                 graph_input_tensor = []
                 for _, value in ipt_dict.items():
                     value_tensor = None
-                    if value.dtype == 'int64':
+                    if value.dtype == "int64":
                         value_tensor = flow.tensor(value, dtype=flow.int64, device="cpu")
-                    elif value.dtype == 'float':
+                    elif value.dtype == "float":
                         value_tensor = flow.tensor(value, dtype=flow.float32, device="cpu")
-                    elif value.dtype == 'bool':
+                    elif value.dtype == "bool":
                         value_tensor = flow.tensor(value, dtype=flow.bool, device="cpu")
                     else:
-                        raise NotImplementedError(f'{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
+                        raise NotImplementedError(f"{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .")
                     graph_input_tensor.append(value_tensor)
 
-                oneflow_res = graph(graph_input_tensor)
+                try:
+                    oneflow_res = graph(graph_input_tensor)
+                except:
+                    print(
+                        f"\033[0;36mInput Tensor or Weight by nn.Graph complied is not in Eager Local mode, maybe in Eager Global mode? In Eager Local Mode we can not compare result diffrience, so the inference result of the onnx model maybe not correct. We strongly recommend that you export onnx in Eager Local mode!\033[0;36m"
+                    )
         else:
             if len(ipt_dict) == 0:
                 oneflow_res = graph()
@@ -129,24 +136,28 @@ def convert_to_onnx_and_check(
                 graph_input_tensor = []
                 for _, value in ipt_dict.items():
                     value_tensor = None
-                    if value.dtype == 'int64':
+                    if value.dtype == "int64":
                         value_tensor = flow.tensor(value, dtype=flow.int64, device="cpu")
-                    elif value.dtype == 'float':
+                    elif value.dtype == "float":
                         value_tensor = flow.tensor(value, dtype=flow.float32, device="cpu")
-                    elif value.dtype == 'bool':
+                    elif value.dtype == "bool":
                         value_tensor = flow.tensor(value, dtype=flow.bool, device="cpu")
                     else:
-                        raise NotImplementedError(f'{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .')
+                        raise NotImplementedError(f"{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .")
                     graph_input_tensor.append(value_tensor)
+                try:
+                    oneflow_res = graph(graph_input_tensor)
+                except:
+                    print(
+                        f"\033[0;36mInput Tensor or Weight by nn.Graph complied is not in Eager Local mode, maybe in Eager Global mode? In Eager Local Mode we can not compare result diffrience, so the inference result of the onnx model maybe not correct. We strongly recommend that you export onnx in Eager Local mode!\033[0;36m"
+                    )
 
-                oneflow_res = graph(graph_input_tensor)
-
-                oneflow_res = graph(value_tensor)
-        if not isinstance(oneflow_res, np.ndarray):
-            if flow.is_tensor(oneflow_res):
-                oneflow_res = oneflow_res.numpy()
-            else:
-                oneflow_res = oneflow_res[0].numpy()
-        compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
+        if oneflow_res is not None:
+            if not isinstance(oneflow_res, np.ndarray):
+                if flow.is_tensor(oneflow_res):
+                    oneflow_res = oneflow_res.numpy()
+                else:
+                    oneflow_res = oneflow_res[0].numpy()
+            compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
 
     # cleanup()

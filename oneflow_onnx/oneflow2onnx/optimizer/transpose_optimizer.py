@@ -89,7 +89,7 @@ class TransposeOptimizer(GraphOptimizerBase):
 
             multi_inputs = []
             for i in range(len(self.g._nodes)):
-                if self.g._nodes[i].op_type == 'input':
+                if self.g._nodes[i].op_type == "input":
                     multi_inputs.append(self.g._nodes[i])
             if len(multi_inputs) <= 1:
                 self._g.TopologicalSort(self._g.get_nodes())
@@ -141,7 +141,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                     )
                     multi_inputs = []
                     for i in range(len(self.g._nodes)):
-                        if self.g._nodes[i].op_type == 'input':
+                        if self.g._nodes[i].op_type == "input":
                             multi_inputs.append(self.g._nodes[i])
                     if len(multi_inputs) <= 1:
                         self._g.TopologicalSort(self._g.get_nodes())

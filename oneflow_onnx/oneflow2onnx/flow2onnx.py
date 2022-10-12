@@ -291,7 +291,7 @@ def ProcessFlowGraph(
 
     multi_inputs = []
     for i in range(len(g._nodes)):
-        if g._nodes[i].op_type == 'input':
+        if g._nodes[i].op_type == "input":
             multi_inputs.append(g._nodes[i])
 
     # some nodes may already copied into inner Graph, so remove them from main Graph.
