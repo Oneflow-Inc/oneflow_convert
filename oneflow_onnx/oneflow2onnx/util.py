@@ -21,7 +21,7 @@ import onnxruntime as ort
 from typing import Optional, Union, Tuple, List
 from collections import OrderedDict
 from oneflow_onnx.oneflow2onnx.flow2onnx import Export
-
+os.environ['NVIDIA_TF32_OVERRIDE=0'] = 0
 
 def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[OrderedDict] = None, ort_optimize: bool = True,) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
     ort_sess_opt = ort.SessionOptions()
