@@ -194,11 +194,19 @@ def convert_to_onnx_and_check(
         if oneflow_res is not None:
             if not isinstance(oneflow_res, np.ndarray):
                 if flow.is_tensor(oneflow_res):
-                    if "global" in device:
-                        oneflow_res = oneflow_res.to_local()
-                    oneflow_res = oneflow_res.numpy()
+                    pass
+                elif isinstance(oneflow_res, dict):
+                    for key, value in oneflow_res.items():
+                        oneflow_res = value
+                        break
+                elif isinstance(oneflow_res, list):
+                    oneflow_res = oneflow_res[0]
                 else:
-                    oneflow_res = oneflow_res[0].numpy()
+                    raise NotImplementedError
+            if flow.is_tensor(oneflow_res):
+                if "global" in device:
+                    oneflow_res = oneflow_res.to_local()
+                oneflow_res = oneflow_res.numpy()
             print("Comparing result between oneflow and onnx....")
             compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
             print("Compare succeed!")
