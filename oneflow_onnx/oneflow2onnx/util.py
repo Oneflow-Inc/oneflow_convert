@@ -23,7 +23,13 @@ from collections import OrderedDict
 from oneflow_onnx.oneflow2onnx.flow2onnx import Export
 
 
-def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[OrderedDict] = None, ort_optimize: bool = True,) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
+def run_onnx(
+    onnx_model_path: str, 
+    providers: List[str], 
+    ipt_dict: Optional[OrderedDict] = None, 
+    ort_optimize: bool = True,
+    input_tensor_range: List = None,
+) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
     ort_sess_opt = ort.SessionOptions()
     ort_sess_opt.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED if ort_optimize else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
     sess = ort.InferenceSession(onnx_model_path, sess_options=ort_sess_opt, providers=providers)
@@ -33,7 +39,11 @@ def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[Orde
     if ipt_dict is None:
         ipt_dict = OrderedDict()
         for ipt in sess.get_inputs():
-            ipt_data = np.random.uniform(low=-10, high=10, size=ipt.shape)
+            low, high = -10, 10
+            if input_tensor_range is not None:
+                low = input_tensor_range[0]
+                high = input_tensor_range[1]
+            ipt_data = np.random.uniform(low=low, high=high, size=ipt.shape)
             if ipt.type == "tensor(int64)":
                 ipt_data = ipt_data.astype(np.int64)
             elif ipt.type == "tensor(float)":
@@ -52,7 +62,12 @@ def run_onnx(onnx_model_path: str, providers: List[str], ipt_dict: Optional[Orde
 
 
 def export_onnx_model(
-    graph, external_data=False, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False,
+    graph, 
+    external_data=False, 
+    opset=None, 
+    flow_weight_dir=None, 
+    onnx_model_path="/tmp", 
+    dynamic_batch_size=False,
 ):
     flow_weight_clean_flag = False
     if flow_weight_dir is None:
@@ -70,9 +85,11 @@ def export_onnx_model(
     onnx_model_dir = onnx_model_path
     if os.path.isdir(onnx_model_path):
         onnx_model_path = os.path.join(onnx_model_dir, "model.onnx")
+    print("Converting model to onnx....")
     Export(
         graph, flow_weight_dir, onnx_model_path, opset=opset, external_data=external_data, dynamic_batch_size=dynamic_batch_size,
     )
+    print(f"Succeed converting model, save model to {onnx_model_path}")
 
     def cleanup():
         if os.path.exists(flow_weight_dir) and flow_weight_clean_flag:
@@ -82,7 +99,11 @@ def export_onnx_model(
 
 
 def compare_result(
-    a: np.ndarray, b: np.ndarray, rtol: float = 1e-2, atol: float = 1e-5, print_outlier: bool = False,
+    a: np.ndarray, 
+    b: np.ndarray, 
+    rtol: float = 1e-2, 
+    atol: float = 1e-5, 
+    print_outlier: bool = False,
 ):
     if print_outlier:
         a = a.flatten()
@@ -94,15 +115,39 @@ def compare_result(
 
 
 def convert_to_onnx_and_check(
-    graph, print_outlier=True, external_data=False, ort_optimize=True, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False, device="cpu",
+    graph, print_outlier=True, 
+    external_data=False, 
+    ort_optimize=True, 
+    opset=None, 
+    flow_weight_dir=None, 
+    onnx_model_path="/tmp", 
+    dynamic_batch_size=False,
+    device="cpu",
+    input_tensor_range=None,
 ):
     onnx_model_path, cleanup = export_onnx_model(graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size,)
 
+    if input_tensor_range is not None:
+        assert isinstance(input_tensor_range, List), f"input_tensor_range {input_tensor_range} must be a List, e.g. [-5, 5]"
+        assert len(input_tensor_range) == 2 and input_tensor_range[0] < input_tensor_range[1], (
+                f"input_tensor_range {input_tensor_range} must be a increasing List with two elements, e.g. [0, 10]"
+            )
+
     if dynamic_batch_size != True:
         if ort.__version__ > "1.9.0":
-            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",], ort_optimize=ort_optimize,)
+            ipt_dict, onnx_res = run_onnx(
+                onnx_model_path, 
+                ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",], 
+                ort_optimize=ort_optimize,
+                input_tensor_range=input_tensor_range,
+            )
         else:
-            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize)
+            ipt_dict, onnx_res = run_onnx(
+                onnx_model_path, 
+                ["CPUExecutionProvider"],
+                 ort_optimize=ort_optimize,
+                 input_tensor_range=input_tensor_range,
+            )
 
         oneflow_res = None
 
@@ -154,6 +199,7 @@ def convert_to_onnx_and_check(
                     oneflow_res = oneflow_res.numpy()
                 else:
                     oneflow_res = oneflow_res[0].numpy()
+            print("Comparing result between oneflow and onnx....")
             compare_result(oneflow_res, onnx_res, print_outlier=print_outlier)
-
+            print("Compare succeed!")
     # cleanup()
