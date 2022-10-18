@@ -562,7 +562,6 @@ class Graph(object):
         remained_dtypes = {}
         remained_shapes = {}
         remained_sub_graphs = {}
-        cnt = 0
         for op in ops:
             for op_output in op.output_tensor_names:
                 # this check should be removed once we make sure all output tensors have dtype/shape.
