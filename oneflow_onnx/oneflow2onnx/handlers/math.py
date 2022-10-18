@@ -64,8 +64,9 @@ class AddN:
         input_length = len(node.input_tensor_names)
         if input_length <= 2:
             pass
-        ctx.RemoveNode(node.name)
-        ctx.MakeNode("Sum", node.input_tensor_names, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul")
+        else:
+            ctx.RemoveNode(node.name)
+            ctx.MakeNode("Sum", node.input_tensor_names, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul")
 
 
 @flow_op("bias_add", onnx_op="Add", flow_ibns=["a", "b"])

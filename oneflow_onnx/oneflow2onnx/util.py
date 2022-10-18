@@ -158,13 +158,14 @@ def convert_to_onnx_and_check(
 
         if oneflow_res is not None:
             if not isinstance(oneflow_res, np.ndarray):
+                print(type(oneflow_res))
                 if flow.is_tensor(oneflow_res):
                     pass
                 elif isinstance(oneflow_res, dict):
                     for key, value in oneflow_res.items():
                         oneflow_res = value
                         break
-                elif isinstance(oneflow_res, list):
+                elif isinstance(oneflow_res, (list, tuple)):
                     oneflow_res = oneflow_res[0]
                 else:
                     raise NotImplementedError
