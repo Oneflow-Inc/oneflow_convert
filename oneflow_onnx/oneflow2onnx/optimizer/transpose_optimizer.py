@@ -91,8 +91,7 @@ class TransposeOptimizer(GraphOptimizerBase):
             for i in range(len(self.g._nodes)):
                 if self.g._nodes[i].op_type == "input":
                     multi_inputs.append(self.g._nodes[i])
-            if len(multi_inputs) <= 1:
-                self._g.TopologicalSort(self._g.get_nodes())
+            self._g.TopologicalSort(self._g.get_nodes())
 
     def PoseOptimizeAction(self):
         def _CalculateNewShape(graph, op):
@@ -143,8 +142,7 @@ class TransposeOptimizer(GraphOptimizerBase):
                     for i in range(len(self.g._nodes)):
                         if self.g._nodes[i].op_type == "input":
                             multi_inputs.append(self.g._nodes[i])
-                    if len(multi_inputs) <= 1:
-                        self._g.TopologicalSort(self._g.get_nodes())
+                    self._g.TopologicalSort(self._g.get_nodes())
 
     def MergeDuplicatedTransposes(self):
         # strategy used in previous procedure is to move transpose nodes down if possible,

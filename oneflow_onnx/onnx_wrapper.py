@@ -893,7 +893,7 @@ class Graph(object):
         label = [-1 for _ in range(n)]
         stack = []
         in_stack = dict()
-        not_visited = dict.fromkeys(range(n))
+        not_visited = dict.fromkeys(range(n-1, -1, -1))
         label_counter = n - 1
 
         while not_visited:
@@ -921,12 +921,7 @@ class Graph(object):
             doc: text for doc string of the graph
         """
         self.DeleteUnusedNodes(self.outputs)
-        multi_inputs = []
-        for i in range(len(self._nodes)):
-            if self._nodes[i].op_type == "input":
-                multi_inputs.append(self._nodes[i])
-        if len(multi_inputs) <= 1:
-            self.TopologicalSort(self.get_nodes())
+        self.TopologicalSort(self.get_nodes())
 
         self.UpdateProto()
 

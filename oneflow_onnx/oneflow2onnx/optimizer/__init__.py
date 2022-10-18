@@ -75,12 +75,7 @@ def OptimizeGraph(graph):
                 logger.warning("Failed to apply %s", name, exc_info=1)
 
     try:
-        multi_inputs = []
-        for i in range(len(graph._nodes)):
-            if graph._nodes[i].op_type == "input":
-                multi_inputs.append(graph._nodes[i])
-        if len(multi_inputs) <= 1:
-            graph.TopologicalSort(graph.get_nodes())
+        graph.TopologicalSort(graph.get_nodes())
     except Exception:  # pylint: disable=broad-except
         logger.warning("Failed TopologicalSort", exc_info=1)
 

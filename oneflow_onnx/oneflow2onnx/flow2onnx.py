@@ -289,14 +289,9 @@ def ProcessFlowGraph(
     # create ops mapping for the desired opsets
     ops_mapping = handler.flow_op.CreateMapping(g.opset, g.extra_opset)
 
-    multi_inputs = []
-    for i in range(len(g._nodes)):
-        if g._nodes[i].op_type == "input":
-            multi_inputs.append(g._nodes[i])
 
     # some nodes may already copied into inner Graph, so remove them from main Graph.
-    if len(multi_inputs) <= 1:
-        TopologicalSort(g, continue_on_error)
+    TopologicalSort(g, continue_on_error)
 
     mapped_op, unmapped_op, exceptions = FlowOnnxMapping(g, ops_mapping)
     if unmapped_op:
@@ -305,8 +300,7 @@ def ProcessFlowGraph(
         raise exceptions[0]
 
     # onnx requires topological sorting
-    if len(multi_inputs) <= 1:
-        TopologicalSort(g, continue_on_error)
+    TopologicalSort(g, continue_on_error)
 
     g.UpdateProto()
     logger.debug("Summay Stats:\n" "\toneflow ops: {}\n" "\toneflow attr: {}\n" "\tonnx mapped: {}\n" "\tonnx unmapped: {}".format(op_cnt, attr_cnt, mapped_op, unmapped_op))
