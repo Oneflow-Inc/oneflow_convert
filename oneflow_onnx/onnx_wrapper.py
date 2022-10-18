@@ -892,7 +892,7 @@ class Graph(object):
         label = [-1 for _ in range(n)]
         stack = []
         in_stack = dict()
-        not_visited = dict.fromkeys(range(n))
+        not_visited = dict.fromkeys(range(n - 1, -1, -1))
         label_counter = n - 1
 
         while not_visited:
@@ -921,6 +921,7 @@ class Graph(object):
         """
         self.DeleteUnusedNodes(self.outputs)
         self.TopologicalSort(self.get_nodes())
+
         self.UpdateProto()
 
         ops = []
@@ -1202,6 +1203,7 @@ class Graph(object):
         Return:
             a list of nodes
         """
+        res = []
         res_set = set()
         if not outputs_name:
             return list(res_set)
@@ -1216,8 +1218,13 @@ class Graph(object):
                 if node.is_graph_input():
                     if node not in res_set:
                         res_set.add(node)
+        res = []
+        for i in range(len(self._nodes)):
+            if self._nodes[i].op_type == "input":
+                res.append(self._nodes[i])
+                res_set.discard(self._nodes[i])
 
-        return list(res_set)
+        return res + list(res_set)
 
     def DeleteUnusedNodes(self, outputs_name):
         """Delete nodes not in subgraph ending with output_names."""
@@ -1233,6 +1240,7 @@ class Graph(object):
             if attr_body_graphs:
                 for _, body_graph in attr_body_graphs.items():
                     body_graph.DeleteUnusedNodes(body_graph.outputs)
+
         self.ResetNodes(related_nodes)
 
     def SafeToRemoveNodes(self, to_delete):

@@ -33,6 +33,7 @@ import traceback
 from typing import Text, Optional, Dict, Callable, List
 
 import numpy as np
+import onnx
 from onnx import helper, onnx_pb
 
 import oneflow
@@ -266,6 +267,15 @@ def Export(
                     e
                 )
             )
+    try:
+        from onnxsim import simplify
+
+        model = onnx.load(onnx_filename)
+        model_simp, check = simplify(model)
+        onnx.save(model_simp, onnx_filename)
+    except Exception:
+        logger.info("If you want to simplify the onnx model, please install onnxsim and run again!")
+
     return
 
 
@@ -302,7 +312,6 @@ def ProcessFlowGraph(
     TopologicalSort(g, continue_on_error)
 
     g.UpdateProto()
-
     logger.debug("Summay Stats:\n" "\toneflow ops: {}\n" "\toneflow attr: {}\n" "\tonnx mapped: {}\n" "\tonnx unmapped: {}".format(op_cnt, attr_cnt, mapped_op, unmapped_op))
 
     return g

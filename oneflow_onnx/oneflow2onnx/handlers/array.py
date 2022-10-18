@@ -340,7 +340,7 @@ class Constant:
         if is_floating_value:
             values = np.full(shape=shape, fill_value=floating_value, dtype=np.float32)
         else:
-            values = np.full(shape=shape, fill_value=integer_value, dtype=np.float32)
+            values = np.full(shape=shape, fill_value=integer_value, dtype=np.int64)
         output_name = node.output_tensor_names[0]
         ctx.RemoveNode(node.name)
         if is_floating_value:
