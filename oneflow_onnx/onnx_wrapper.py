@@ -892,7 +892,7 @@ class Graph(object):
         label = [-1 for _ in range(n)]
         stack = []
         in_stack = dict()
-        not_visited = dict.fromkeys(range(n-1, -1, -1))
+        not_visited = dict.fromkeys(range(n - 1, -1, -1))
         label_counter = n - 1
 
         while not_visited:

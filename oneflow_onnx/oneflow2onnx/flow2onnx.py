@@ -269,6 +269,7 @@ def Export(
             )
     try:
         from onnxsim import simplify
+
         model = onnx.load(onnx_filename)
         model_simp, check = simplify(model)
         onnx.save(model_simp, onnx_filename)
@@ -297,7 +298,6 @@ def ProcessFlowGraph(
 
     # create ops mapping for the desired opsets
     ops_mapping = handler.flow_op.CreateMapping(g.opset, g.extra_opset)
-
 
     # some nodes may already copied into inner Graph, so remove them from main Graph.
     TopologicalSort(g, continue_on_error)

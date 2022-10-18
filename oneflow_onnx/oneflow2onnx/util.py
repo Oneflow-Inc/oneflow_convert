@@ -21,14 +21,12 @@ import onnxruntime as ort
 from typing import Optional, Union, Tuple, List
 from collections import OrderedDict
 from oneflow_onnx.oneflow2onnx.flow2onnx import Export
-os.environ['NVIDIA_TF32_OVERRIDE'] = '0'
+
+os.environ["NVIDIA_TF32_OVERRIDE"] = "0"
+
 
 def run_onnx(
-    onnx_model_path: str, 
-    providers: List[str], 
-    ipt_dict: Optional[OrderedDict] = None, 
-    ort_optimize: bool = True,
-    input_tensor_range: List = None,
+    onnx_model_path: str, providers: List[str], ipt_dict: Optional[OrderedDict] = None, ort_optimize: bool = True, input_tensor_range: List = None,
 ) -> Union[Tuple[OrderedDict, np.ndarray], np.ndarray]:
     ort_sess_opt = ort.SessionOptions()
     ort_sess_opt.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED if ort_optimize else ort.GraphOptimizationLevel.ORT_DISABLE_ALL
@@ -62,12 +60,7 @@ def run_onnx(
 
 
 def export_onnx_model(
-    graph, 
-    external_data=False, 
-    opset=None, 
-    flow_weight_dir=None, 
-    onnx_model_path="/tmp", 
-    dynamic_batch_size=False,
+    graph, external_data=False, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False,
 ):
     flow_weight_clean_flag = False
     if flow_weight_dir is None:
@@ -99,11 +92,7 @@ def export_onnx_model(
 
 
 def compare_result(
-    a: np.ndarray, 
-    b: np.ndarray, 
-    rtol: float = 1e-2, 
-    atol: float = 1e-5, 
-    print_outlier: bool = False,
+    a: np.ndarray, b: np.ndarray, rtol: float = 1e-2, atol: float = 1e-5, print_outlier: bool = False,
 ):
     if print_outlier:
         a = a.flatten()
@@ -115,39 +104,21 @@ def compare_result(
 
 
 def convert_to_onnx_and_check(
-    graph, print_outlier=True, 
-    external_data=False, 
-    ort_optimize=True, 
-    opset=None, 
-    flow_weight_dir=None, 
-    onnx_model_path="/tmp", 
-    dynamic_batch_size=False,
-    device="cpu",
-    input_tensor_range=None,
+    graph, print_outlier=True, external_data=False, ort_optimize=True, opset=None, flow_weight_dir=None, onnx_model_path="/tmp", dynamic_batch_size=False, device="cpu", input_tensor_range=None,
 ):
     onnx_model_path, cleanup = export_onnx_model(graph, external_data, opset, flow_weight_dir, onnx_model_path, dynamic_batch_size,)
 
     if input_tensor_range is not None:
         assert isinstance(input_tensor_range, List), f"input_tensor_range {input_tensor_range} must be a List, e.g. [-5, 5]"
-        assert len(input_tensor_range) == 2 and input_tensor_range[0] < input_tensor_range[1], (
-                f"input_tensor_range {input_tensor_range} must be a increasing List with two elements, e.g. [0, 10]"
-            )
+        assert len(input_tensor_range) == 2 and input_tensor_range[0] < input_tensor_range[1], f"input_tensor_range {input_tensor_range} must be a increasing List with two elements, e.g. [0, 10]"
 
     if dynamic_batch_size != True:
         if ort.__version__ > "1.9.0":
             ipt_dict, onnx_res = run_onnx(
-                onnx_model_path, 
-                ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",], 
-                ort_optimize=ort_optimize,
-                input_tensor_range=input_tensor_range,
+                onnx_model_path, ["TensorrtExecutionProvider", "CUDAExecutionProvider", "CPUExecutionProvider",], ort_optimize=ort_optimize, input_tensor_range=input_tensor_range,
             )
         else:
-            ipt_dict, onnx_res = run_onnx(
-                onnx_model_path, 
-                ["CPUExecutionProvider"],
-                 ort_optimize=ort_optimize,
-                 input_tensor_range=input_tensor_range,
-            )
+            ipt_dict, onnx_res = run_onnx(onnx_model_path, ["CPUExecutionProvider"], ort_optimize=ort_optimize, input_tensor_range=input_tensor_range,)
 
         oneflow_res = None
 
@@ -156,15 +127,9 @@ def convert_to_onnx_and_check(
         elif device == "cpu":
             device_kwargs = dict(device="cpu")
         elif device == "gpu_global":
-            device_kwargs = dict(
-                sbp=flow.sbp.broadcast,
-                placement=flow.placement("cuda", ranks=[0])
-            )
+            device_kwargs = dict(sbp=flow.sbp.broadcast, placement=flow.placement("cuda", ranks=[0]))
         elif device == "cpu_global":
-            device_kwargs = dict(
-                sbp=flow.sbp.broadcast,
-                placement=flow.placement("cpu", ranks=[0])
-            )
+            device_kwargs = dict(sbp=flow.sbp.broadcast, placement=flow.placement("cpu", ranks=[0]))
         else:
             raise NotImplementedError
 
@@ -176,7 +141,7 @@ def convert_to_onnx_and_check(
                 value_tensor = None
                 if value.dtype == "int64":
                     value_tensor = flow.tensor(value, dtype=flow.int64, **device_kwargs)
-                elif (value.dtype == "float" or value.dtype == 'float32'):
+                elif value.dtype == "float" or value.dtype == "float32":
                     value_tensor = flow.tensor(value, dtype=flow.float32, **device_kwargs)
                 elif value.dtype == "bool":
                     value_tensor = flow.tensor(value, dtype=flow.bool, **device_kwargs)
@@ -190,7 +155,7 @@ def convert_to_onnx_and_check(
                 print(
                     f"\033[0;36mInput Tensor or Weight by nn.Graph complied is not in Eager Local mode, maybe in Eager Global mode? In Eager Local Mode we can not compare result diffrience, so the inference result of the onnx model maybe not correct. We strongly recommend that you export onnx in Eager Local mode!\033[0;36m"
                 )
-            
+
         if oneflow_res is not None:
             if not isinstance(oneflow_res, np.ndarray):
                 if flow.is_tensor(oneflow_res):
