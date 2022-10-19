@@ -46,6 +46,8 @@ def run_onnx(
                 ipt_data = ipt_data.astype(np.int64)
             elif ipt.type == "tensor(float)":
                 ipt_data = ipt_data.astype(np.float32)
+            elif ipt.type == "tensor(double)":
+                ipt_data = ipt_data.astype(np.float64)
             elif ipt.type == "tensor(bool)":
                 ipt_data = ipt_data.astype(np.bool)
             else:
@@ -139,11 +141,14 @@ def convert_to_onnx_and_check(
             graph_input_tensor = []
             for _, value in ipt_dict.items():
                 value_tensor = None
-                if value.dtype == "int64":
+                if str(value.dtype) == "int64":
                     value_tensor = flow.tensor(value, dtype=flow.int64, **device_kwargs)
-                elif value.dtype == "float" or value.dtype == "float32":
+                elif str(value.dtype) == "float" or str(value.dtype) == "float32":
                     value_tensor = flow.tensor(value, dtype=flow.float32, **device_kwargs)
-                elif value.dtype == "bool":
+                elif str(value.dtype) == "float64":
+                    print("enter here")
+                    value_tensor = flow.tensor(value, dtype=flow.float64, **device_kwargs)
+                elif str(value.dtype) == "bool":
                     value_tensor = flow.tensor(value, dtype=flow.bool, **device_kwargs)
                 else:
                     raise NotImplementedError(f"{value.dtype} is not supported now, please give a feedback in https://github.com/Oneflow-Inc/oneflow_convert/issues/new .")

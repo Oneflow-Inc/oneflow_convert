@@ -130,7 +130,10 @@ def Numpy2OnnxDtype(np_dtype):
 
 
 def Onnx2NumpyDtype(onnx_type):
-    return ONNX_2_NUMPY_DTYPE[onnx_type]
+    for onnx_dtype, numpy_dtype in ONNX_2_NUMPY_DTYPE.items():
+        if onnx_dtype == onnx_type:
+            return numpy_dtype
+    raise ValueError("unsupported dtype " + onnx_type + " for mapping")
 
 
 def MakeOnnxShape(shape):
