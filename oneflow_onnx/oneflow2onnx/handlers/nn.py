@@ -533,17 +533,18 @@ class UpSampleNearest2D:
             sizes_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("sizes"), np.array(sizes).astype(np.int64),)
             node.input_tensor_names.append(sizes_node.output_tensor_names[0])
 
+
 @flow_op(["layer_norm"])
 class LayerNorm:
     @classmethod
     def Version_9(cls, ctx, node, **kwargs):
         dtypes = node.output_dtypes
         input_shape = ctx.get_shape(node.input_tensor_names[0])
-        center = node.attrs["center"] #bool
-        scale = node.attrs["scale"] #bool
-        begin_norm_axis = node.attrs["begin_norm_axis"] #int
-        begin_params_axis = node.attrs["begin_params_axis"] #int
-        epsilon = node.attrs["epsilon"] #float
+        center = node.attrs["center"]  # bool
+        scale = node.attrs["scale"]  # bool
+        begin_norm_axis = node.attrs["begin_norm_axis"]  # int
+        begin_params_axis = node.attrs["begin_params_axis"]  # int
+        epsilon = node.attrs["epsilon"]  # float
 
         axes = [-i for i in range(len(input_shape) - begin_norm_axis, 0, -1)]
         two_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("two"), np.array(2.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
@@ -561,4 +562,3 @@ class LayerNorm:
             normalized = ctx.MakeNode("Add", [normalized.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="normalized_center", dtypes=[dtypes[0]])
         ctx.RemoveNode(node.name)
         ctx.MakeNode("Identity", [normalized.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="rdenominator", dtypes=[dtypes[0]])
-
