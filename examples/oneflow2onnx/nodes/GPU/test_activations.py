@@ -85,8 +85,11 @@ class PReLUOpGraph(flow.nn.Graph):
         out = self.m(x)
         return out
 
+
 gelu = flow.nn.GELU()
 gelu = gelu.to("cuda")
+
+
 class GeluOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
@@ -95,6 +98,7 @@ class GeluOpGraph(flow.nn.Graph):
     def build(self, x):
         out = self.m(x)
         return out
+
 
 def test_relu():
 
@@ -152,12 +156,14 @@ def test_prelu_n_channels():
         flow.save(prelu.state_dict(), tmpdirname)
         convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
+
 def test_gelu():
 
     gelu_graph = GeluOpGraph()
     gelu_graph._compile(flow.randn(1, 3, 3).to("cuda"))
 
     convert_to_onnx_and_check(gelu_graph, onnx_model_path="/tmp", device="gpu")
+
 
 test_prelu_one_channels()
 test_prelu_n_channels()
