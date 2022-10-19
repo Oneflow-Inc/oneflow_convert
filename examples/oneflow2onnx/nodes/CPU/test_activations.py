@@ -83,6 +83,19 @@ class HardSigmoidOpGraph(flow.nn.Graph):
         return out
 
 
+gelu = flow.nn.GELU()
+
+
+class GeluOpGraph(flow.nn.Graph):
+    def __init__(self):
+        super().__init__()
+        self.m = gelu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
 def test_relu():
 
     relu_graph = ReLUOpGraph()
@@ -130,9 +143,18 @@ def test_prelu_n_channels():
     convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp")
 
 
+def test_gelu():
+
+    gelu_graph = GeluOpGraph()
+    gelu_graph._compile(flow.randn(1, 3, 3))
+
+    convert_to_onnx_and_check(gelu_graph, onnx_model_path="/tmp")
+
+
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
 test_silu()
 test_hard_swish()
 test_hard_sigmoid()
+test_gelu()

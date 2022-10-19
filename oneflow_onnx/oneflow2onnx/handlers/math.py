@@ -23,6 +23,7 @@ from __future__ import absolute_import
 
 import logging
 
+import math
 import oneflow
 import numpy as np
 from onnx import onnx_pb
@@ -255,6 +256,39 @@ class Silu:
     @classmethod
     def Version_10(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
+
+
+@flow_op("gelu")
+class Gelu:
+    @classmethod
+    def Version_9(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        # kBeta = math.sqrt(2 / math.pi)
+        # kKappa = 0.044715
+        # beta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("beta"), np.array(kBeta, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        # kappa = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("kKappa"), np.array(kKappa, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        # one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("one"), np.array(1.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        # half = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("half"), np.array(0.5, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        # mul_node_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul1", dtypes=dtypes)
+        # cube = ctx.MakeNode("Mul", [node.input_tensor_names[0], mul_node_1.output_tensor_names[0]], op_name_scope=node.name, name="cube", dtypes=dtypes)
+        # mul_node_2 = ctx.MakeNode("Mul", [kappa.output_tensor_names[0], cube.output_tensor_names[0]], op_name_scope=node.name, name="mul2", dtypes=dtypes)
+        # add_node_1 = ctx.MakeNode("Add", [mul_node_2.output_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="add1", dtypes=dtypes)
+        # inner = ctx.MakeNode("Mul", [add_node_1.output_tensor_names[0], beta.output_tensor_names[0]], op_name_scope=node.name, name="inner", dtypes=dtypes)
+        # tanh_node = ctx.MakeNode("Tanh", [inner.output_tensor_names[0]], op_name_scope=node.name, name="tanh", dtypes=dtypes)
+        # add_node_2 = ctx.MakeNode("Add", [tanh_node.output_tensor_names[0], one.output_tensor_names[0]], op_name_scope=node.name, name="add2", dtypes=dtypes)
+        # mul_node_3 = ctx.MakeNode("Mul", [add_node_2.output_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul3", dtypes=dtypes)
+        # ctx.RemoveNode(node.name)
+        # ctx.MakeNode("Mul", [mul_node_3.output_tensor_names[0], half.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul4", dtypes=dtypes)
+
+        _sqrt2 = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("sqrt2"), np.array(1.4142135623730951, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        div1 = ctx.MakeNode("Div", [node.input_tensor_names[0], _sqrt2.output_tensor_names[0]], op_name_scope=node.name, name="div1", dtypes=dtypes)
+        erf = ctx.MakeNode("Erf", [div1.output_tensor_names[0]], op_name_scope=node.name, name="erf", dtypes=dtypes)
+        one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("one"), np.array(1.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        erf_plusone = ctx.MakeNode("Add", [one.output_tensor_names[0], erf.output_tensor_names[0]], op_name_scope=node.name, name="erf_plusone", dtypes=dtypes)
+        half = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("half"), np.array(0.5, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        mul_node_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], erf_plusone.output_tensor_names[0]], op_name_scope=node.name, name="mul1", dtypes=dtypes)
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode("Mul", [mul_node_1.output_tensor_names[0], half.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul2", dtypes=dtypes)
 
 
 @flow_op("hardsigmoid", onnx_op="HardSigmoid")
