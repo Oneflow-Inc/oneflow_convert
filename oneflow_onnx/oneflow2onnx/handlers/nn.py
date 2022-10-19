@@ -532,3 +532,33 @@ class UpSampleNearest2D:
             sizes.append(node_sizes[1])
             sizes_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("sizes"), np.array(sizes).astype(np.int64),)
             node.input_tensor_names.append(sizes_node.output_tensor_names[0])
+
+
+@flow_op(["layer_norm"])
+class LayerNorm:
+    @classmethod
+    def Version_9(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        input_shape = ctx.get_shape(node.input_tensor_names[0])
+        center = node.attrs["center"]  # bool
+        scale = node.attrs["scale"]  # bool
+        begin_norm_axis = node.attrs["begin_norm_axis"]  # int
+        begin_params_axis = node.attrs["begin_params_axis"]  # int
+        epsilon = node.attrs["epsilon"]  # float
+
+        axes = [-i for i in range(len(input_shape) - begin_norm_axis, 0, -1)]
+        two_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("two"), np.array(2.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        eps_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("eps"), np.array(epsilon, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        mean = ctx.MakeNode("ReduceMean", [node.input_tensor_names[0]], op_name_scope=node.name, name="mean_1", dtypes=[dtypes[0]], attr={"axes": axes, "keepdims": True})
+        numerator = ctx.MakeNode("Sub", [node.input_tensor_names[0], mean.output_tensor_names[0]], op_name_scope=node.name, name="numerator", dtypes=[dtypes[0]])
+        pow_node = ctx.MakeNode("Pow", [numerator.output_tensor_names[0], two_cast.output_tensor_names[0]], op_name_scope=node.name, name="pow_node", dtypes=[dtypes[0]])
+        variance = ctx.MakeNode("ReduceMean", [pow_node.output_tensor_names[0]], op_name_scope=node.name, name="mean_2", dtypes=[dtypes[0]], attr={"axes": axes, "keepdims": True})
+        add_node_1 = ctx.MakeNode("Add", [variance.output_tensor_names[0], eps_cast.output_tensor_names[0]], op_name_scope=node.name, name="add_node_1", dtypes=[dtypes[0]])
+        denominator = ctx.MakeNode("Sqrt", [add_node_1.output_tensor_names[0]], op_name_scope=node.name, name="denominator", dtypes=[dtypes[0]])
+        normalized = ctx.MakeNode("Div", [numerator.output_tensor_names[0], denominator.output_tensor_names[0]], op_name_scope=node.name, name="normalized", dtypes=[dtypes[0]])
+        if scale:
+            normalized = ctx.MakeNode("Mul", [normalized.output_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="normalized_scale", dtypes=[dtypes[0]])
+        if center:
+            normalized = ctx.MakeNode("Add", [normalized.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="normalized_center", dtypes=[dtypes[0]])
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode("Identity", [normalized.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="rdenominator", dtypes=[dtypes[0]])
