@@ -322,7 +322,7 @@ class Cast:
         cls.Version_6(ctx, node, **kwargs)
 
 
-@flow_op("identity", "Identity")
+@flow_op(["identity", "amp_white_identity", "amp_black_identity"], "Identity")
 class Identity:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
