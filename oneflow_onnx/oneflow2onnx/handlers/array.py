@@ -109,35 +109,41 @@ class Reshape:
             ctx.CopyShape(node.output_tensor_names[0], output_cast.output_tensor_names[0])
 
 
-@flow_op("flatten", "Flatten")
+@flow_op("flatten")
 class Flatten:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
+        shape = ctx.get_shape(node.input_tensor_names[0])
+        dim = len(shape)
         start_dim = node.attrs.get("start_dim", 1)
-        dtype = ctx.get_dtype(node.input_tensor_names[0])
-        assert dtype == 1, f"onnx opset version 1/9 only support float32 data_type!"
-        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
-        node.attrs["axis"] = start_dim
+        end_dim = node.attrs.get("end_dim", -1)
+        if end_dim < 0:
+            end_dim += dim
+        if start_dim == 1 and end_dim == dim - 1:
+            ctx.RemoveNode(node.name)
+            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": start_dim}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="flatten")
+            return
+        if start_dim ==0 and end_dim == dim - 2:
+            ctx.RemoveNode(node.name)
+            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": end_dim+1}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="flatten")
+            return
 
-    @classmethod
-    def Version_9(cls, ctx, node, **kwargs):
-        start_dim = node.attrs.get("start_dim", 1)
-        dtype = ctx.get_dtype(node.input_tensor_names[0])
-        assert dtype == 1, f"onnx opset version 1/9 only support float32 data_type!"
-        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
-        node.attrs["axis"] = start_dim
+        if start_dim > 1:
+            flatten_node = ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": 0}, op_name_scope=node.name, name="flatten")
+            new_shape = []
+            for i in range(start_dim):
+                new_shape.append(shape[i])
+            shape2 = 1
+            for i in range(start_dim, end_dim+1):
+                shape2 *= shape[i]
+            new_shape.append(shape2)
+            for i in range(end_dim+1, dim):
+                new_shape.append(shape[i])
+            ctx.RemoveNode(node.name)
+            new_shape_name = oneflow._oneflow_internal.UniqueStr("new_shape")
+            ctx.MakeConst(new_shape_name, np.array(new_shape, dtype=np.int64))
+            ctx.MakeNode("Reshape", [flatten_node.output_tensor_names[0], new_shape_name], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="new_shape")
 
-    @classmethod
-    def Version_11(cls, ctx, node, **kwargs):
-        start_dim = node.attrs.get("start_dim", 1)
-        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
-        node.attrs["axis"] = start_dim
-
-    @classmethod
-    def Version_13(cls, ctx, node, **kwargs):
-        start_dim = node.attrs.get("start_dim", 1)
-        assert start_dim >= 0, f"oneflow flatten can't support neagetive dim now!"
-        node.attrs["axis"] = start_dim
 
 
 @flow_op("squeeze", "Squeeze")

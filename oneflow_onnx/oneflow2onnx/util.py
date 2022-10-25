@@ -146,7 +146,6 @@ def convert_to_onnx_and_check(
                 elif str(value.dtype) == "float" or str(value.dtype) == "float32":
                     value_tensor = flow.tensor(value, dtype=flow.float32, **device_kwargs)
                 elif str(value.dtype) == "float64":
-                    print("enter here")
                     value_tensor = flow.tensor(value, dtype=flow.float64, **device_kwargs)
                 elif str(value.dtype) == "bool":
                     value_tensor = flow.tensor(value, dtype=flow.bool, **device_kwargs)
