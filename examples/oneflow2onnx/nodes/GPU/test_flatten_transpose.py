@@ -27,6 +27,7 @@ class FlattenTranspose(flow.nn.Module):
         print(res.shape)
         return res
 
+
 flatten_transpose = FlattenTranspose()
 flatten_transpose = flatten_transpose.to("cuda")
 
