@@ -499,6 +499,7 @@ class MatMul:
     def Version_1(cls, ctx, node, **kwargs):
         transpose_a = node.attrs.get("transpose_a", 0)
         transpose_b = node.attrs.get("transpose_b", 0)
+        alpha = node.attrs.get("alpha")
 
         if transpose_a != 0:
             shape = ctx.get_shape(node.input_tensor_names[0])
@@ -523,6 +524,14 @@ class MatMul:
             val = node.attrs.get(i, 0)
             if val != 0:
                 raise ValueError(node.op_type + " attribute " + i + " is not supported")
+
+        if alpha != 1.0:
+            dtypes = node.output_dtypes
+            alpha = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("alpha"), np.array(alpha, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+            mul = ctx.InsertNewNodeOnOutput("Mul", node.output_tensor_names[0], op_name_scope=node.name, name="mul_alpha")
+            mul.input_tensor_names.append(alpha.output_tensor_names[0])
+            ctx.set_dtype(mul.output_tensor_names[0], ctx.get_dtype(node.output_tensor_names[0]))
+            ctx.CopyShape(node.output_tensor_names[0], mul.output_tensor_names[0])
 
 
 @flow_op("erf", onnx_op="Erf")

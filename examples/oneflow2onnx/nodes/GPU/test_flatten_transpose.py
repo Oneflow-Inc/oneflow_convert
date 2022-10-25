@@ -18,37 +18,38 @@ import oneflow as flow
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 
-class MatMul(flow.nn.Module):
+class FlattenTranspose(flow.nn.Module):
     def __init__(self) -> None:
-        super(MatMul, self).__init__()
-        self.matmul = flow.nn.Linear(20, 30)
+        super(FlattenTranspose, self).__init__()
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        return self.matmul(x) + flow.matmul(x, flow.ones(20, 1).to("cuda"), alpha=0.2)
+        res = x.flatten(2).transpose(1, 2)
+        print(res.shape)
+        return res
 
 
-matmul = MatMul()
-matmul = matmul.to("cuda")
+flatten_transpose = FlattenTranspose()
+flatten_transpose = flatten_transpose.to("cuda")
 
 
-class matmulOpGraph(flow.nn.Graph):
+class FlattenTransposeOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
-        self.m = matmul
+        self.m = flatten_transpose
 
     def build(self, x):
         out = self.m(x)
         return out
 
 
-def test_matmul():
+def test_flatten_transpose():
 
-    matmul_graph = matmulOpGraph()
-    matmul_graph._compile(flow.randn(1, 20).to("cuda"))
+    flatten_transpose_graph = FlattenTransposeOpGraph()
+    flatten_transpose_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(matmul.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(matmul_graph, onnx_model_path="/tmp", device="gpu")
+        flow.save(flatten_transpose_graph.state_dict(), tmpdirname)
+        convert_to_onnx_and_check(flatten_transpose_graph, onnx_model_path="/tmp", device="gpu")
 
 
-test_matmul()
+test_flatten_transpose()
