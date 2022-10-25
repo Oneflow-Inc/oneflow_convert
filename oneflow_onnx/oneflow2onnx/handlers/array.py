@@ -121,15 +121,15 @@ class Flatten:
             end_dim += dim
         if start_dim == 1 and end_dim == dim - 1:
             ctx.RemoveNode(node.name)
-            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": start_dim}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="flatten")
+            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": start_dim}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="new_flatten")
             return
         if start_dim ==0 and end_dim == dim - 2:
             ctx.RemoveNode(node.name)
-            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": end_dim+1}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="flatten")
+            ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": end_dim+1}, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="new_flatten")
             return
 
         if start_dim > 1:
-            flatten_node = ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": 0}, op_name_scope=node.name, name="flatten")
+            flatten_node = ctx.MakeNode("Flatten", [node.input_tensor_names[0]], attr={"aixs": 0}, op_name_scope=node.name, name="new_flatten")
             new_shape = []
             for i in range(start_dim):
                 new_shape.append(shape[i])
@@ -142,7 +142,7 @@ class Flatten:
             ctx.RemoveNode(node.name)
             new_shape_name = oneflow._oneflow_internal.UniqueStr("new_shape")
             ctx.MakeConst(new_shape_name, np.array(new_shape, dtype=np.int64))
-            ctx.MakeNode("Reshape", [flatten_node.output_tensor_names[0], new_shape_name], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="new_shape")
+            ctx.MakeNode("Reshape", [flatten_node.output_tensor_names[0], new_shape_name], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="new_reshape")
 
 
 
