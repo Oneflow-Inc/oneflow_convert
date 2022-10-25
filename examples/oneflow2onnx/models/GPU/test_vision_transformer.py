@@ -15,13 +15,9 @@ limitations under the License.
 """
 
 import oneflow as flow
-import oneflow.nn as nn
-from typing import Union, List, Dict, Any, cast
 from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 from flowvision.models import ModelCreator
-
-import tempfile
 
 vit = ModelCreator.create_model("vit_base_patch16_224", pretrained=False)
 vit = vit.to("cuda")
