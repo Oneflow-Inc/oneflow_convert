@@ -110,7 +110,7 @@ from oneflow_onnx.oneflow2onnx.util import convert_to_onnx_and_check
 
 convert_to_onnx_and_check(...)
 ```
-`convert_to_onnx_and_check` 函数的参数是 `export_onnx_model` 函数的参数的超集，可以额外传入 `print_outlier=True` 来输出检查过程中发现的超出合理误差范围内的异常值。
+`convert_to_onnx_and_check` 函数的参数是 `export_onnx_model` 函数的参数的超集，可以额外传入 `print_outlier=True` 来输出检查过程中发现的超出合理误差范围内的异常值；`input_tensor_range` 来指定精度验证时生成随机输入的取值范围；`device` 则用来指定做精度验证的设备类型，有 `cpu/gpu/cpu_global/gpu_global` 4种选择。
 
 ### 导出模型时的注意点
 
