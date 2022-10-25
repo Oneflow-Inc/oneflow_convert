@@ -24,7 +24,7 @@ class MatMul(flow.nn.Module):
         self.matmul = flow.nn.Linear(20, 30)
 
     def forward(self, x: flow.Tensor) -> flow.Tensor:
-        return self.matmul(x)
+        return self.matmul(x) + flow.matmul(x, flow.ones(20, 1).to("cuda"), alpha=0.2)
 
 
 matmul = MatMul()
