@@ -23,5 +23,10 @@
 | 62   | Reshape    | 63   | Squeeze        | 64   | Transpose   | 65   | Concat             |
 | 66   | Cast       | 67   | Identity       | 68   | Mul         | 69   | PReLU              |
 | 70   | LeakyReLU  | 71   | Constant       | 72   | Flatten     | 73   | Slice              |
-| 74   | Pooling    | 75   | Groupconvd     |      |             |      |                    |
-
+| 74   | Pooling    | 75   | Groupconvd     | 76   | HardSwish   | 77   | HardSigmoid        |
+| 78   | Arange     | 79   | ExpandDims     | 80   | Narrow      | 81   | SiLU               |
+| 82   | Upsample   | 83   | Var            | 84   | Conv1D      | 85   | ScalarDiv          |
+| 86   | CublasFusedMLP| 87| Unsqueeze      | 88   | BroadcastMatmul | 89| Where             |
+| 90   | ScalarLogicalLess| 91| ScalarLogicalGreater| 92| Gather  | 93  | Expand             |
+| 94   | fill_      | 95   | GeLU           | 96   | LayerNorm    | 97  | AmpIdentity        |
+      
