@@ -26,7 +26,7 @@ long_description += "Email: zhangxiaoyu@oneflow.org"
 
 setuptools.setup(
     name="oneflow_onnx",
-    version="0.5.5",
+    version="0.6.0",
     author="zhangxiaoyu",
     author_email="zhangxiaoyu@oneflow.org",
     description="a toolkit for converting trained model of OneFlow to ONNX.",
