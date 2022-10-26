@@ -528,7 +528,8 @@ class MatMul:
         if alpha != 1.0:
             dtypes = node.output_dtypes
             alpha = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("alpha"), np.array(alpha, dtype=util.Onnx2NumpyDtype(dtypes[0])))
-            mul = ctx.InsertNewNodeOnOutput("Mul", node.output_tensor_names[0], op_name_scope=node.name, name="mul_alpha")
+            op_name = oneflow._oneflow_internal.UniqueStr(node.name)
+            mul = ctx.InsertNewNodeOnOutput("Mul", node.output_tensor_names[0], op_name_scope=node.name, name=op_name)
             mul.input_tensor_names.append(alpha.output_tensor_names[0])
             ctx.set_dtype(mul.output_tensor_names[0], ctx.get_dtype(node.output_tensor_names[0]))
             ctx.CopyShape(node.output_tensor_names[0], mul.output_tensor_names[0])
