@@ -34,7 +34,7 @@ setuptools.setup(
     long_description_content_type="text/plain",
     url="https://github.com/Oneflow-Inc/oneflow_convert_tools/oneflow_onnx",
     packages=setuptools.find_packages(),
-    install_requires=["six", "protobuf", "onnx", "onnx-simplifier", "onnxruntime-gpu"],
+    install_requires=["six", "protobuf", "onnx", "onnx-simplifier", "onnxruntime"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
