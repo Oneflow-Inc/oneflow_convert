@@ -34,7 +34,7 @@ ONNX 对应多个相关库，常见的几个库的功能如下所述：
 
 1. [onnx](https://github.com/onnx/onnx): ONNX 模型格式标准
 
-2. [onnxruntime & onnxruntime-gpu](https://github.com/microsoft/onnxruntime): ONNX 运行时，用于加载 ONNX 模型进行推理。onnxruntime 和 onnxruntime-gpu 分别支持 CPU 推理和 GPU推理
+2. [onnxruntime](https://github.com/microsoft/onnxruntime): ONNX 运行时，用于加载 ONNX 模型进行推理。
 
 3. [onnx-simplifier](https://github.com/daquexian/onnx-simplifier): 用于简化 ONNX 模型的结构，例如消除结果恒为常量的算子
    
