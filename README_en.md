@@ -34,7 +34,7 @@ There are multiple ONNX-related libraries, and their features are briefly descri
 
 1. [onnx](https://github.com/onnx/onnx): ONNX model format standard
 
-2. [onnxruntime & onnxruntime-gpu](https://github.com/microsoft/onnxruntime): ONNX runtime that is used to load the ONNX model for inference. onnxruntime and onnxruntime-gpu support CPU inference and GPU inference respectively.
+2. [onnxruntime](https://github.com/microsoft/onnxruntime): ONNX runtime that is used to load the ONNX model for inference.
 
 3. [onnx-simplifier](https://github.com/daquexian/onnx-simplifier): for simplifying ONNX models, e.g. eliminating operators with constant results
    
@@ -54,7 +54,7 @@ python>=3.5
 onnx>=1.8.0
 onnx-simplifier>=0.3.3
 onnxoptimizer>=0.2.5
-onnxruntime-gpu>=1.8.0
+onnxruntime>=1.8.0
 oneflow (https://github.com/Oneflow-Inc/oneflow#install-with-pip-package)
 ```
 
