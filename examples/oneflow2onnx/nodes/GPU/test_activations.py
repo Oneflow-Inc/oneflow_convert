@@ -100,6 +100,34 @@ class GeluOpGraph(flow.nn.Graph):
         return out
 
 
+new_gelu = flow.nn.GELU(approximate='tanh')
+new_gelu = new_gelu.to("cuda")
+
+
+class NewGeluOpGraph(flow.nn.Graph):
+    def __init__(self) -> None:
+        super().__init__()
+        self.m = new_gelu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
+quick_gelu = flow.nn.QuickGELU()
+quick_gelu = quick_gelu.to("cuda")
+
+
+class QuickGeluOpGraph(flow.nn.Graph):
+    def __init__(self) -> None:
+        super().__init__()
+        self.m = quick_gelu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
 def test_relu():
 
     relu_graph = ReLUOpGraph()
@@ -165,6 +193,22 @@ def test_gelu():
     convert_to_onnx_and_check(gelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
+def test_new_gelu():
+
+    fast_gelu_graph = NewGeluOpGraph()
+    fast_gelu_graph._compile(flow.randn(1, 3, 3).to("cuda"))
+
+    convert_to_onnx_and_check(fast_gelu_graph, onnx_model_path="/tmp", device="gpu")
+
+
+def test_quick_gelu():
+
+    quick_gelu_graph = QuickGeluOpGraph()
+    quick_gelu_graph._compile(flow.randn(1, 3, 3).to("cuda"))
+
+    convert_to_onnx_and_check(quick_gelu_graph, onnx_model_path="/tmp", device="gpu")
+
+
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
@@ -172,3 +216,5 @@ test_silu()
 test_hard_swish()
 test_hard_sigmoid()
 test_gelu()
+test_new_gelu()
+test_quick_gelu()

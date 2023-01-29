@@ -258,7 +258,7 @@ class Silu:
         cls.Version_1(ctx, node, **kwargs)
 
 
-@flow_op(["gelu", "fast_gelu"])
+@flow_op(["gelu", "fast_gelu", "quick_gelu"])
 class Gelu:
     @classmethod
     def Version_9(cls, ctx, node, **kwargs):
@@ -292,6 +292,13 @@ class Gelu:
             mul_node_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], erf_plusone.output_tensor_names[0]], op_name_scope=node.name, name="mul1", dtypes=dtypes)
             ctx.RemoveNode(node.name)
             ctx.MakeNode("Mul", [mul_node_1.output_tensor_names[0], half.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul2", dtypes=dtypes)
+
+        elif node.op_type == "quick_gelu":
+            beta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("beta"), np.array(1.702, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+            mul_node_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], beta.output_tensor_names[0]], op_name_scope=node.name, name="mul1", dtypes=dtypes)
+            sigmoid_node = ctx.MakeNode("Sigmoid", [mul_node_1.output_tensor_names[0]], op_name_scope=node.name, name="sigmoid", dtypes=dtypes)
+            ctx.RemoveNode(node.name)
+            ctx.MakeNode("Mul", [node.input_tensor_names[0], sigmoid_node.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="mul2", dtypes=dtypes)
 
 
 @flow_op("hardsigmoid", onnx_op="HardSigmoid")
