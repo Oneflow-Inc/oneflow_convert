@@ -152,9 +152,7 @@ def test_hard_swish():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(
-            hard_swish_graph, onnx_model_path="/tmp", opset=14, device="gpu"
-        )
+        convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14, device="gpu")
 
 
 def test_hard_sigmoid():
@@ -163,9 +161,7 @@ def test_hard_sigmoid():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(hard_swish.state_dict(), tmpdirname)
-        convert_to_onnx_and_check(
-            hard_sigmoid_graph, onnx_model_path="/tmp", device="gpu"
-        )
+        convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp", device="gpu")
 
 
 def test_prelu_one_channels():
