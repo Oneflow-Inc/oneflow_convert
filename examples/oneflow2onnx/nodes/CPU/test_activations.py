@@ -96,7 +96,7 @@ class GeluOpGraph(flow.nn.Graph):
         return out
 
 
-new_gelu = flow.nn.GELU(approximate='tanh')
+new_gelu = flow.nn.GELU(approximate="tanh")
 
 
 class NewGeluOpGraph(flow.nn.Graph):
