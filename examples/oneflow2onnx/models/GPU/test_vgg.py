@@ -44,7 +44,7 @@ def test_vgg16():
     vgg16_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(vgg16.state_dict(), tmpdirname)
+        flow.save(vgg16.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(vgg16_graph, onnx_model_path=".", device="gpu")
 
 

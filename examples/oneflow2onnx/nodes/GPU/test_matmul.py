@@ -47,7 +47,7 @@ def test_matmul():
     matmul_graph._compile(flow.randn(1, 20).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(matmul.state_dict(), tmpdirname)
+        flow.save(matmul.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(matmul_graph, onnx_model_path="/tmp", device="gpu")
 
 

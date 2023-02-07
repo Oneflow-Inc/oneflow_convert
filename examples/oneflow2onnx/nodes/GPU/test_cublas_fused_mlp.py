@@ -47,7 +47,7 @@ def test_cublas_fused_mlp():
     graph._compile(flow.randn(32, 8).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(mlp.state_dict(), tmpdirname)
+        flow.save(mlp.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(graph, onnx_model_path="/tmp", device="gpu")
 
 

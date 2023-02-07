@@ -134,7 +134,7 @@ def test_relu():
     relu_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(relu.state_dict(), tmpdirname)
+        flow.save(relu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -151,7 +151,7 @@ def test_hard_swish():
     hard_swish_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
+        flow.save(hard_swish.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14, device="gpu")
 
 
@@ -160,7 +160,7 @@ def test_hard_sigmoid():
     hard_sigmoid_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
+        flow.save(hard_swish.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -170,7 +170,7 @@ def test_prelu_one_channels():
     prelu_graph._compile(flow.randn(1, 1, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
+        flow.save(prelu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -181,7 +181,7 @@ def test_prelu_n_channels():
     prelu_graph._compile(flow.randn(1, channels, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
+        flow.save(prelu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
