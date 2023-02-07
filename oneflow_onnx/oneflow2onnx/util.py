@@ -67,7 +67,7 @@ def export_onnx_model(
     flow_weight_clean_flag = False
     if flow_weight_dir is None:
         flow_weight_clean_flag = True
-        flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model"))
+        flow_weight_dir = os.path.join("/tmp/", flow._oneflow_internal.UniqueStr("oneflow_model_wright"))
         if os.path.exists(flow_weight_dir):
             shutil.rmtree(flow_weight_dir)
         if graph._is_global_view:
