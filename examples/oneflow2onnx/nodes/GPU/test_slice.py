@@ -47,7 +47,7 @@ def test_slice():
     # print(slice_graph._full_graph_proto)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(slice.state_dict(), tmpdirname)
+        flow.save(slice.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(slice_graph, onnx_model_path="/tmp", device="gpu")
 
 

@@ -47,7 +47,7 @@ def test_inceptionv3():
     inceptionv3_graph._compile(flow.randn(1, 3, 299, 299).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(inceptionv3.state_dict(), tmpdirname)
+        flow.save(inceptionv3.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(inceptionv3_graph, onnx_model_path=".", print_outlier=True, device="gpu")
 
 
