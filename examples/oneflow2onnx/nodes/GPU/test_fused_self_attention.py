@@ -46,7 +46,7 @@ def test_fused_self_attention():
     graph._compile(flow.randn(512, 4, 768).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(fused_self_att.state_dict(), tmpdirname)
+        flow.save(fused_self_att.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(graph, onnx_model_path="/tmp", device="gpu")
 
 
