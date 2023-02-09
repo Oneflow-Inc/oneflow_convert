@@ -48,7 +48,7 @@ def test_pool():
     pool_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(pool.state_dict(), tmpdirname)
+        flow.save(pool.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(pool_graph, onnx_model_path="/tmp", device="gpu")
 
 

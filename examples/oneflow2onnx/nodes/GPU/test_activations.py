@@ -100,13 +100,41 @@ class GeluOpGraph(flow.nn.Graph):
         return out
 
 
+new_gelu = flow.nn.GELU(approximate="tanh")
+new_gelu = new_gelu.to("cuda")
+
+
+class NewGeluOpGraph(flow.nn.Graph):
+    def __init__(self) -> None:
+        super().__init__()
+        self.m = new_gelu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
+quick_gelu = flow.nn.QuickGELU()
+quick_gelu = quick_gelu.to("cuda")
+
+
+class QuickGeluOpGraph(flow.nn.Graph):
+    def __init__(self) -> None:
+        super().__init__()
+        self.m = quick_gelu
+
+    def build(self, x):
+        out = self.m(x)
+        return out
+
+
 def test_relu():
 
     relu_graph = ReLUOpGraph()
     relu_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(relu.state_dict(), tmpdirname)
+        flow.save(relu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(relu_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -123,7 +151,7 @@ def test_hard_swish():
     hard_swish_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
+        flow.save(hard_swish.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(hard_swish_graph, onnx_model_path="/tmp", opset=14, device="gpu")
 
 
@@ -132,7 +160,7 @@ def test_hard_sigmoid():
     hard_sigmoid_graph._compile(flow.randn(1, 3, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(hard_swish.state_dict(), tmpdirname)
+        flow.save(hard_swish.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(hard_sigmoid_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -142,7 +170,7 @@ def test_prelu_one_channels():
     prelu_graph._compile(flow.randn(1, 1, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
+        flow.save(prelu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -153,7 +181,7 @@ def test_prelu_n_channels():
     prelu_graph._compile(flow.randn(1, channels, 224, 224).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(prelu.state_dict(), tmpdirname)
+        flow.save(prelu.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(prelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
@@ -165,6 +193,22 @@ def test_gelu():
     convert_to_onnx_and_check(gelu_graph, onnx_model_path="/tmp", device="gpu")
 
 
+def test_new_gelu():
+
+    fast_gelu_graph = NewGeluOpGraph()
+    fast_gelu_graph._compile(flow.randn(1, 3, 3).to("cuda"))
+
+    convert_to_onnx_and_check(fast_gelu_graph, onnx_model_path="/tmp", device="gpu")
+
+
+def test_quick_gelu():
+
+    quick_gelu_graph = QuickGeluOpGraph()
+    quick_gelu_graph._compile(flow.randn(1, 3, 3).to("cuda"))
+
+    convert_to_onnx_and_check(quick_gelu_graph, onnx_model_path="/tmp", device="gpu")
+
+
 test_prelu_one_channels()
 test_prelu_n_channels()
 test_relu()
@@ -172,3 +216,5 @@ test_silu()
 test_hard_swish()
 test_hard_sigmoid()
 test_gelu()
+test_new_gelu()
+test_quick_gelu()

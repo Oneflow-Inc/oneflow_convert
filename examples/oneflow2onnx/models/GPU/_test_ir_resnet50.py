@@ -172,7 +172,7 @@ def test_resnet50():
     model_graph._compile(flow.randn(1, 3, 112, 112).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(model_module.state_dict(), tmpdirname)
+        flow.save(model_module.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(model_graph, onnx_model_path="/tmp", print_outlier=True, device="gpu")
 
 

@@ -46,7 +46,7 @@ def test_large_tensor():
     graph._compile(flow.randn(1024, 1024).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        flow.save(graph.state_dict(), tmpdirname)
+        flow.save(graph.state_dict(), tmpdirname, save_as_external_data=True)
         convert_to_onnx_and_check(graph, print_outlier=False, onnx_model_path="/tmp", device="gpu")
 
 
