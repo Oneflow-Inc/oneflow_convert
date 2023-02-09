@@ -30,7 +30,7 @@ fused_self_att = FusedSelfAtt()
 fused_self_att = fused_self_att.to("cuda")
 
 
-class TestGraph(flow.nn.Graph):
+class FusedSelfAttOpGraph(flow.nn.Graph):
     def __init__(self):
         super().__init__()
         self.m = fused_self_att
@@ -42,7 +42,7 @@ class TestGraph(flow.nn.Graph):
 
 def test_fused_self_attention():
 
-    graph = TestGraph()
+    graph = FusedSelfAttOpGraph()
     graph._compile(flow.randn(512, 4, 768).to("cuda"))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
