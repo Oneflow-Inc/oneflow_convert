@@ -545,30 +545,31 @@ class MatMul:
             ctx.CopyShape(node.output_tensor_names[0], mul.output_tensor_names[0])
 
 
-@flow_op("fused_self_attention", flow_ibns=["hidden_states", "head_size", "alpha"], flow_obns=["query_mul_key", "value"])
+@flow_op("fused_self_attention_query_mul_key_and_value", flow_ibns=["hidden_states"], flow_obns=["query_mul_key", "value"])
 class FusedSelfAttention:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
         head_size = node.attrs.get("head_size")
+        scope = node.name
         dtypes = node.output_dtypes
         shape = ctx.get_shape(node.input_tensor_names[0])
         new_shape = [shape[0], shape[1], int(shape[2] / 3 / head_size), 3 * head_size]
         slice_tup_list_q = [
-            [None, None, None],
-            [None, None, None],
-            [None, None, None],
+            [0, shape[0], 1],
+            [0, shape[1], 1],
+            [0, int(shape[2] / 3 / head_size), 1],
             [0, head_size, 1],
         ]
         slice_tup_list_k = [
-            [None, None, None],
-            [None, None, None],
-            [None, None, None],
+            [0, shape[0], 1],
+            [0, shape[1], 1],
+            [0, int(shape[2] / 3 / head_size), 1],
             [head_size,2 * head_size, 1],
         ]
         slice_tup_list_v = [
-            [None, None, None],
-            [None, None, None],
-            [None, None, None],
+            [0, shape[0], 1],
+            [0, shape[1], 1],
+            [0, int(shape[2] / 3 / head_size), 1],
             [2 * head_size, 3 * head_size, 1],
         ]
 
@@ -581,49 +582,30 @@ class FusedSelfAttention:
         slice_name_q =  oneflow._oneflow_internal.UniqueStr("slice_q")
         ctx.MakeConst(slice_name_q, np.array(slice_tup_list_q))
         slice_node_q = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_q])
-        transpose_node_q = ctx.MakeNode("Transpose", slice_node_q.output_tensor_names[0], perm=[1, 2, 0, 3])
+        perm1 = oneflow._oneflow_internal.UniqueStr("perm1")
+        ctx.MakeConst(perm1, np.array([1, 2, 0, 3]))
+        transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0], perm1])
 
         # key
         slice_name_k =  oneflow._oneflow_internal.UniqueStr("slice_k")
-        ctx.MakeConst(slice_name_q, np.array(slice_tup_list_k))
+        ctx.MakeConst(slice_name_k, np.array(slice_tup_list_k))
         slice_node_k = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_k])
-        transpose_node_k = ctx.MakeNode("Transpose", slice_node_k.output_tensor_names[0], perm=[1, 2, 3, 0])
+        perm2 = oneflow._oneflow_internal.UniqueStr("perm2")
+        ctx.MakeConst(perm2, np.array([1, 2, 3, 0]))
+        transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0], perm2])
 
         # value
         slice_name_v =  oneflow._oneflow_internal.UniqueStr("slice_v")
-        ctx.MakeConst(slice_name_q, np.array(slice_tup_list_v))
+        ctx.MakeConst(slice_name_v, np.array(slice_tup_list_v))
         slice_node_v = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_v])
-        transpose_node_v = ctx.MakeNode("Transpose", slice_node_v.output_tensor_names[0], perm=[1, 2, 0, 3])
+        transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0], perm1])
 
         # q * k
-        matmul_node_qk = ctx.MakeNode(
-            "MatMul", 
-            [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], 
-            name="matmul_qk"
-        )
-
-        # attention
-        matmul_node_att = ctx.MakeNode(
-            "MatMul", 
-            [matmul_node_qk.output_tensor_names[0], transpose_node_v.output_tensor_names[0]], 
-            name="matmul_att"
-        )
+        matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk")
 
         ctx.RemoveNode(node.name)
-        ctx.MakeNode(
-            "Identity",
-            [matmul_node_att.output_tensor_names[0]],
-            outputs=[matmul_node_att.output_tensor_names[0], transpose_node_v.output_tensor_names[0]],
-            op_name_scope=node.name,
-            dtypes=[dtypes[0]]
-        )
-        ctx.MakeNode(
-            "Identity",
-            [transpose_node_v.output_tensor_names[0]],
-            outputs=[transpose_node_v.output_tensor_names[0]],
-            op_name_scope=node.name,
-            dtypes=[dtypes[0]]
-        )
+        # attention
+        ctx.MakeNode("MatMul", [matmul_node_qk.output_tensor_names[0], transpose_node_v.output_tensor_names[0]], name="matmul_att",op_name_scope=scope,)
 
 
 @flow_op("erf", onnx_op="Erf")
