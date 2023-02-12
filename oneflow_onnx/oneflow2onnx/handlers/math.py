@@ -551,27 +551,34 @@ class FusedSelfAttention:
     def Version_1(cls, ctx, node, **kwargs):
         head_size = node.attrs.get("head_size")
         scope = node.name
+        names1 = node.output_tensor_names[0]
+        names2 = node.output_tensor_names[1]
         dtypes = node.output_dtypes
         shape = ctx.get_shape(node.input_tensor_names[0])
         new_shape = [shape[0], shape[1], int(shape[2] / 3 / head_size), 3 * head_size]
-        slice_tup_list_q = [
-            [0, shape[0], 1],
-            [0, shape[1], 1],
-            [0, int(shape[2] / 3 / head_size), 1],
-            [0, head_size, 1],
-        ]
-        slice_tup_list_k = [
-            [0, shape[0], 1],
-            [0, shape[1], 1],
-            [0, int(shape[2] / 3 / head_size), 1],
-            [head_size,2 * head_size, 1],
-        ]
-        slice_tup_list_v = [
-            [0, shape[0], 1],
-            [0, shape[1], 1],
-            [0, int(shape[2] / 3 / head_size), 1],
-            [2 * head_size, 3 * head_size, 1],
-        ]
+
+        starts_q = 0
+        ends_q = head_size
+
+        starts_k = head_size
+        ends_k = 2 * head_size
+
+        starts_v = 2 * head_size
+        ends_v = 3 * head_size
+
+        steps = 1
+        axes = 3
+
+        starts_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_q"), np.array(starts_q).astype(np.int64),)
+        starts_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_k"), np.array(starts_k).astype(np.int64),)
+        starts_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_v"), np.array(starts_v).astype(np.int64),)
+
+        ends_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_q"), np.array(ends_q).astype(np.int64),)
+        ends_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_k"), np.array(ends_k).astype(np.int64),)
+        ends_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_v"), np.array(ends_v).astype(np.int64),)
+
+        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(steps).astype(np.int64),)
+        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(axes).astype(np.int64),)
 
         # reshape
         new_shape_name = oneflow._oneflow_internal.UniqueStr("new_shape")
@@ -579,33 +586,63 @@ class FusedSelfAttention:
         reshape = ctx.MakeNode("Reshape", [node.input_tensor_names[0], new_shape_name])
 
         # query
-        slice_name_q =  oneflow._oneflow_internal.UniqueStr("slice_q")
-        ctx.MakeConst(slice_name_q, np.array(slice_tup_list_q))
-        slice_node_q = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_q])
+        slice_node_q = ctx.MakeNode("Slice", [
+            reshape.output_tensor_names[0], 
+            starts_q.output_tensor_names[0], 
+            ends_q.output_tensor_names[0], 
+            axes.output_tensor_names[0],
+            steps.output_tensor_names[0],
+        ])
         perm1 = oneflow._oneflow_internal.UniqueStr("perm1")
-        ctx.MakeConst(perm1, np.array([1, 2, 0, 3]))
+        ctx.MakeConst(perm1, np.array([1, 2, 0, 3], dtype=np.int64))
         transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0], perm1])
 
         # key
-        slice_name_k =  oneflow._oneflow_internal.UniqueStr("slice_k")
-        ctx.MakeConst(slice_name_k, np.array(slice_tup_list_k))
-        slice_node_k = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_k])
+        slice_node_k = ctx.MakeNode("Slice", [
+            reshape.output_tensor_names[0], 
+            starts_k.output_tensor_names[0], 
+            ends_k.output_tensor_names[0], 
+            axes.output_tensor_names[0],
+            steps.output_tensor_names[0],
+        ])
         perm2 = oneflow._oneflow_internal.UniqueStr("perm2")
         ctx.MakeConst(perm2, np.array([1, 2, 3, 0]))
         transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0], perm2])
 
         # value
-        slice_name_v =  oneflow._oneflow_internal.UniqueStr("slice_v")
-        ctx.MakeConst(slice_name_v, np.array(slice_tup_list_v))
-        slice_node_v = ctx.MakeNode("Slice", [reshape.output_tensor_names[0], slice_name_v])
+        slice_node_v = ctx.MakeNode("Slice", [
+            reshape.output_tensor_names[0], 
+            starts_v.output_tensor_names[0], 
+            ends_v.output_tensor_names[0],
+            axes.output_tensor_names[0],
+            steps.output_tensor_names[0],
+        ])
+        print(ctx.get_shape(slice_node_v.output_tensor_names[0]), ctx.get_shape(perm1))
         transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0], perm1])
+        print('.................')
+        print(transpose_node_v)
 
         # q * k
         matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk")
 
         ctx.RemoveNode(node.name)
         # attention
-        ctx.MakeNode("MatMul", [matmul_node_qk.output_tensor_names[0], transpose_node_v.output_tensor_names[0]], name="matmul_att",op_name_scope=scope,)
+        matmul_node_att = ctx.MakeNode("MatMul", [matmul_node_qk.output_tensor_names[0], transpose_node_v.output_tensor_names[0]], name="matmul_att", op_name_scope=scope,)
+
+        ctx.MakeNode(
+            "Identity",
+            [matmul_node_att.output_tensor_names[0]],
+            outputs=[names1],
+            op_name_scope=node.name,
+            dtypes=[dtypes[0]]
+        )
+        ctx.MakeNode(
+            "Identity",
+            [transpose_node_v.output_tensor_names[0]],
+            outputs=[names2],
+            op_name_scope=node.name,
+            dtypes=[dtypes[0]]
+        )
 
 
 @flow_op("erf", onnx_op="Erf")
