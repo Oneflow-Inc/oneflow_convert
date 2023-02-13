@@ -575,54 +575,30 @@ class FusedSelfAttention:
         reshape = ctx.MakeNode("Reshape", [node.input_tensor_names[0], new_shape_name])
 
         # query
-        slice_node_q = ctx.MakeNode("Slice", [
-            reshape.output_tensor_names[0], 
-            starts_q.output_tensor_names[0], 
-            ends_q.output_tensor_names[0], 
-            axes.output_tensor_names[0],
-            steps.output_tensor_names[0],
-        ])
-        transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0]], attr={'perm': [1, 2, 0, 3]})
+        slice_node_q = ctx.MakeNode(
+            "Slice", [reshape.output_tensor_names[0], starts_q.output_tensor_names[0], ends_q.output_tensor_names[0], axes.output_tensor_names[0], steps.output_tensor_names[0],]
+        )
+        transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0]], attr={"perm": [1, 2, 0, 3]})
 
         # key
-        slice_node_k = ctx.MakeNode("Slice", [
-            reshape.output_tensor_names[0], 
-            starts_k.output_tensor_names[0], 
-            ends_k.output_tensor_names[0], 
-            axes.output_tensor_names[0],
-            steps.output_tensor_names[0],
-        ])
-        transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0]], attr={'perm': [1, 2, 3, 0]})
+        slice_node_k = ctx.MakeNode(
+            "Slice", [reshape.output_tensor_names[0], starts_k.output_tensor_names[0], ends_k.output_tensor_names[0], axes.output_tensor_names[0], steps.output_tensor_names[0],]
+        )
+        transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0]], attr={"perm": [1, 2, 3, 0]})
 
         # value
-        slice_node_v = ctx.MakeNode("Slice", [
-            reshape.output_tensor_names[0], 
-            starts_v.output_tensor_names[0], 
-            ends_v.output_tensor_names[0],
-            axes.output_tensor_names[0],
-            steps.output_tensor_names[0],
-        ])
-        transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0]], attr={'perm': [1, 2, 0, 3]})
+        slice_node_v = ctx.MakeNode(
+            "Slice", [reshape.output_tensor_names[0], starts_v.output_tensor_names[0], ends_v.output_tensor_names[0], axes.output_tensor_names[0], steps.output_tensor_names[0],]
+        )
+        transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0]], attr={"perm": [1, 2, 0, 3]})
 
         # q * k
         matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk", op_name_scope=scope,)
 
         ctx.RemoveNode(node.name)
 
-        ctx.MakeNode(
-            "Identity",
-            [matmul_node_qk.output_tensor_names[0]],
-            outputs=[output_name1],
-            op_name_scope=node.name,
-            dtypes=[dtypes[0]]
-        )
-        ctx.MakeNode(
-            "Identity",
-            [transpose_node_v.output_tensor_names[0]],
-            outputs=[output_name2],
-            op_name_scope=node.name,
-            dtypes=[dtypes[0]]
-        )
+        ctx.MakeNode("Identity", [matmul_node_qk.output_tensor_names[0]], outputs=[output_name1], op_name_scope=node.name, dtypes=[dtypes[0]])
+        ctx.MakeNode("Identity", [transpose_node_v.output_tensor_names[0]], outputs=[output_name2], op_name_scope=node.name, dtypes=[dtypes[0]])
 
 
 @flow_op("erf", onnx_op="Erf")

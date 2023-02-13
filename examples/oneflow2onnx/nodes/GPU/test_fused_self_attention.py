@@ -26,6 +26,7 @@ class FusedSelfAtt(flow.nn.Module):
         (fused_qmk, fused_v) = flow._C.fused_self_attention(x, head_size=head_size, alpha=alpha,)
         return fused_qmk, fused_v
 
+
 fused_self_att = FusedSelfAtt()
 fused_self_att = fused_self_att.to("cuda")
 
