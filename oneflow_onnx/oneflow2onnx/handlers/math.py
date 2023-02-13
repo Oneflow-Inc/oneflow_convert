@@ -551,8 +551,8 @@ class FusedSelfAttention:
     def Version_1(cls, ctx, node, **kwargs):
         head_size = node.attrs.get("head_size")
         scope = node.name
-        names1 = node.output_tensor_names[0]
-        names2 = node.output_tensor_names[1]
+        output_name1 = node.output_tensor_names[0]
+        output_name2 = node.output_tensor_names[1]
         dtypes = node.output_dtypes
         shape = ctx.get_shape(node.input_tensor_names[0])
         new_shape = [shape[0], shape[1], int(shape[2] / 3 / head_size), 3 * head_size]
@@ -608,20 +608,18 @@ class FusedSelfAttention:
         matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk", op_name_scope=scope,)
 
         ctx.RemoveNode(node.name)
-        # attention
-        matmul_node_att = ctx.MakeNode("MatMul", [matmul_node_qk.output_tensor_names[0], transpose_node_v.output_tensor_names[0]], name="matmul_att", op_name_scope=scope,)
 
         ctx.MakeNode(
             "Identity",
-            [matmul_node_att.output_tensor_names[0]],
-            outputs=[names1],
+            [matmul_node_qk.output_tensor_names[0]],
+            outputs=[output_name1],
             op_name_scope=node.name,
             dtypes=[dtypes[0]]
         )
         ctx.MakeNode(
             "Identity",
             [transpose_node_v.output_tensor_names[0]],
-            outputs=[names2],
+            outputs=[output_name2],
             op_name_scope=node.name,
             dtypes=[dtypes[0]]
         )
