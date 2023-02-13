@@ -557,28 +557,17 @@ class FusedSelfAttention:
         shape = ctx.get_shape(node.input_tensor_names[0])
         new_shape = [shape[0], shape[1], int(shape[2] / 3 / head_size), 3 * head_size]
 
-        starts_q = [0]
-        ends_q = [head_size]
+        starts_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_q"), np.array([0]).astype(np.int64),)
+        ends_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_q"), np.array([head_size]).astype(np.int64),)
 
-        starts_k = [head_size]
-        ends_k = [2 * head_size]
+        starts_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_k"), np.array([head_size]).astype(np.int64),)
+        ends_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_k"), np.array([2 * head_size]).astype(np.int64),)
 
-        starts_v = [2 * head_size]
-        ends_v = [3 * head_size]
+        starts_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_v"), np.array([2 * head_size]).astype(np.int64),)
+        ends_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_v"), np.array([3 * head_size]).astype(np.int64),)
 
-        steps = [1]
-        axes = [3]
-
-        starts_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_q"), np.array(starts_q).astype(np.int64),)
-        starts_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_k"), np.array(starts_k).astype(np.int64),)
-        starts_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start_v"), np.array(starts_v).astype(np.int64),)
-
-        ends_q = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_q"), np.array(ends_q).astype(np.int64),)
-        ends_k = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_k"), np.array(ends_k).astype(np.int64),)
-        ends_v = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop_v"), np.array(ends_v).astype(np.int64),)
-
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(steps).astype(np.int64),)
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(axes).astype(np.int64),)
+        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array([1]).astype(np.int64),)
+        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array([3]).astype(np.int64),)
 
         # reshape
         new_shape_name = oneflow._oneflow_internal.UniqueStr("new_shape")
