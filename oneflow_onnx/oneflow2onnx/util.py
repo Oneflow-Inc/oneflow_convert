@@ -169,7 +169,7 @@ def convert_to_onnx_and_check(
                         oneflow_res = value
                         break
                 elif isinstance(oneflow_res, (list, tuple)):
-                    oneflow_res = oneflow_res[1]
+                    oneflow_res = oneflow_res[0]
                 else:
                     raise NotImplementedError
             if flow.is_tensor(oneflow_res):
