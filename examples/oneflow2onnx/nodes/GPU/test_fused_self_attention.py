@@ -47,7 +47,7 @@ def test_fused_self_attention():
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(fused_self_att.state_dict(), tmpdirname, save_as_external_data=True)
-        convert_to_onnx_and_check(graph, onnx_model_path="/tmp", device="gpu")
+        convert_to_onnx_and_check(graph, onnx_model_path="/tmp", device="gpu", input_tensor_range=[-0.001, 0.001])
 
 
 test_fused_self_attention()

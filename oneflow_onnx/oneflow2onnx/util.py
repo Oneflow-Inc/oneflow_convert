@@ -159,7 +159,7 @@ def convert_to_onnx_and_check(
                 print(
                     f"\033[0;36mInput Tensor or Weight by nn.Graph complied is not in Eager Local mode, maybe in Eager Global mode? In Eager Local Mode we can not compare result diffrience, so the inference result of the onnx model maybe not correct. We strongly recommend that you export onnx in Eager Local mode!\033[0;36m"
                 )
-
+        
         if oneflow_res is not None:
             if not isinstance(oneflow_res, np.ndarray):
                 if flow.is_tensor(oneflow_res):
@@ -169,7 +169,7 @@ def convert_to_onnx_and_check(
                         oneflow_res = value
                         break
                 elif isinstance(oneflow_res, (list, tuple)):
-                    oneflow_res = oneflow_res[0]
+                    oneflow_res = oneflow_res[1]
                 else:
                     raise NotImplementedError
             if flow.is_tensor(oneflow_res):

@@ -582,8 +582,7 @@ class FusedSelfAttention:
             axes.output_tensor_names[0],
             steps.output_tensor_names[0],
         ])
-        transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0]])
-        transpose_node_q.attrs["perm"] = [1, 2, 0, 3]
+        transpose_node_q = ctx.MakeNode("Transpose", [slice_node_q.output_tensor_names[0]], attr={'perm': [1, 2, 0, 3]})
 
         # key
         slice_node_k = ctx.MakeNode("Slice", [
@@ -593,8 +592,7 @@ class FusedSelfAttention:
             axes.output_tensor_names[0],
             steps.output_tensor_names[0],
         ])
-        transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0]])
-        transpose_node_k.attrs["perm"] = [1, 2, 3, 0]
+        transpose_node_k = ctx.MakeNode("Transpose", [slice_node_k.output_tensor_names[0]], attr={'perm': [1, 2, 3, 0]})
 
         # value
         slice_node_v = ctx.MakeNode("Slice", [
@@ -604,11 +602,10 @@ class FusedSelfAttention:
             axes.output_tensor_names[0],
             steps.output_tensor_names[0],
         ])
-        transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0]])
-        transpose_node_v.attrs["perm"] = [1, 2, 0, 3]
+        transpose_node_v = ctx.MakeNode("Transpose", [slice_node_v.output_tensor_names[0]], attr={'perm': [1, 2, 0, 3]})
 
         # q * k
-        matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk")
+        matmul_node_qk = ctx.MakeNode("MatMul", [transpose_node_q.output_tensor_names[0], transpose_node_k.output_tensor_names[0]], name="matmul_qk", op_name_scope=scope,)
 
         ctx.RemoveNode(node.name)
         # attention
