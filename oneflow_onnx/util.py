@@ -71,7 +71,7 @@ ONNX_2_NUMPY_DTYPE = {
     onnx_pb.TensorProto.UINT16: np.uint16,
     onnx_pb.TensorProto.INT64: np.int64,
     onnx_pb.TensorProto.UINT64: np.uint64,
-    onnx_pb.TensorProto.BOOL: np.bool,
+    onnx_pb.TensorProto.BOOL: np.bool_,
 }
 
 #
