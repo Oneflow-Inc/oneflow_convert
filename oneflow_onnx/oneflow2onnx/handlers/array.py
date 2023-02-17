@@ -241,6 +241,69 @@ class Concat:
         # Opset 11 supports negative axis, but core logic is same
         cls.Version_1(ctx, node, **kwargs)
 
+@flow_op("concat", "Concat")
+class Concat:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        # old concat op has axis as input[0]
+        axis_val = node.attrs.get("axis", None)
+
+        if axis_val < 0:
+            input_shape = ctx.get_shape(node.input_tensor_names[0])
+            axis_val = len(input_shape) + axis_val
+        node.attrs["axis"] = axis_val
+
+        if ctx.opset < 8:
+            # opset < 8: might need to wrap concat in casts since only float is supported
+            _WrapConcatWithCast(ctx, node)
+            return
+
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        # Opset 11 supports negative axis, but core logic is same
+        cls.Version_1(ctx, node, **kwargs)
+
+@flow_op("stack", "ConcatFromSequence")
+class Stack:
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        axis_val = node.attrs.get("axis", None)
+        dtypes = node.output_dtypes
+        ctx.RemoveNode(node.name)
+        node1 = ctx.MakeNode(
+            "ConcatFromSequence",
+            node.input_tensor_names,
+            outputs=[node.output_tensor_names[0]],
+            op_name_scope=node.name, name="stack",
+            dtypes=dtypes, attr={"new_axis": 1, "axis": axis_val}
+        )
+
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        axis_val = node.attrs.get("axis", None)
+        dtypes = node.output_dtypes
+        output_shape = node.output_shapes[0]
+        node_concat = ctx.MakeNode(
+            "Concat",
+            node.input_tensor_names,
+            op_name_scope=node.name, name="concat",
+            dtypes=dtypes, attr={"axis": axis_val}
+        )
+        node_unsqueeze = ctx.MakeNode(
+            "Unsqueeze",
+            node_concat.output_tensor_names,
+            op_name_scope=node.name, name="unsqueeze",
+            dtypes=dtypes, attr={"axes": [axis_val]},
+        )
+        ctx.RemoveNode(node.name)
+        node_reshape = ctx.MakeNode(
+            "Reshape",
+            node_unsqueeze.output_tensor_names,
+            outputs=node.output_tensor_names,
+            op_name_scope=node.name, name="reshape",
+            dtypes=dtypes, attr={"shape": output_shape},
+        )
+
 
 @flow_op("slice", "Slice")
 class Slice:
