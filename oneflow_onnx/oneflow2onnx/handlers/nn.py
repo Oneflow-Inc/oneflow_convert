@@ -572,11 +572,12 @@ class RMSLayerNorm:
         axes = [-1]
         two_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("two"), np.array(2.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
         eps_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("eps"), np.array(node.input_tensor_names[2], dtype=util.Onnx2NumpyDtype(dtypes[0])))
-        
+
         pow_node = ctx.MakeNode("Pow", [node.input_tensor_names[0], two_cast.output_tensor_names[0]], op_name_scope=node.name, name="pow_node", dtypes=[dtypes[0]])
         mean = ctx.MakeNode("ReduceMean", [pow_node.output_tensor_names[0]], op_name_scope=node.name, name="mean_1", dtypes=[dtypes[0]], attr={"axes": axes, "keepdims": True})
         add_node = ctx.MakeNode("Add", [mean.output_tensor_names[0], eps_cast.output_tensor_names[0]], op_name_scope=node.name, name="add_node", dtypes=[dtypes[0]])
         rsqrt = ctx.MakeNode("Rsqrt", [add_node.output_tensor_names[0]], op_name_scope=node.name, name="rsqrt", dtypes=[dtypes[0]])
         mul_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], rsqrt.output_tensor_names[0]], op_name_scope=node.name, name="mul_node1", dtypes=[dtypes[0]])
+        mul_2 = ctx.MakeNode("Mul", [node.input_tensor_names[1], mul_1.output_tensor_names[0]], op_name_scope=node.name, name="mul_node2", dtypes=[dtypes[0]])
         ctx.RemoveNode(node.name)
-        ctx.MakeNode("Mul", [node.input_tensor_names[1], mul_1.output_tensor_names[0]], op_name_scope=node.name, name="mul_node2", dtypes=[dtypes[0]])
+        ctx.MakeNode("Identity", [mul_2.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, dtypes=[dtypes[0]])
