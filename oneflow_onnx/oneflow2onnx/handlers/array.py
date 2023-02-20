@@ -243,6 +243,7 @@ class Concat:
         # Opset 11 supports negative axis, but core logic is same
         cls.Version_1(ctx, node, **kwargs)
 
+
 @flow_op("stack", "ConcatFromSequence")
 class Stack:
     @classmethod
@@ -251,13 +252,7 @@ class Stack:
         axis_val = node.attrs.get("axis", None)
         dtypes = node.output_dtypes
         ctx.RemoveNode(node.name)
-        ctx.MakeNode(
-            "ConcatFromSequence",
-            node.input_tensor_names,
-            outputs=[node.output_tensor_names[0]],
-            op_name_scope=node.name, name="stack",
-            dtypes=dtypes, attr={"new_axis": 1, "axis": axis_val}
-        )
+        ctx.MakeNode("ConcatFromSequence", node.input_tensor_names, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="stack", dtypes=dtypes, attr={"new_axis": 1, "axis": axis_val})
 
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -268,8 +263,10 @@ class Stack:
         node_concat = ctx.MakeNode(
             "Concat",
             node.input_tensor_names,
-            op_name_scope=node.name, name="concat",
-            dtypes=dtypes, attr={"axis": axis_val},
+            op_name_scope=node.name,
+            name="concat",
+            dtypes=dtypes,
+            attr={"axis": axis_val},
         )
         ctx.RemoveNode(node.name)
         # since opset 5
@@ -277,7 +274,7 @@ class Stack:
         if ctx.opset > 4:
             output_shape = np.array(output_shape)
             output_shape_tensor = helper.make_tensor(
-                name='const_tensor',
+                name="const_tensor",
                 data_type=TensorProto.INT64,
                 dims=output_shape.shape,
                 vals=output_shape.flatten(),
@@ -285,14 +282,17 @@ class Stack:
             node_constant = ctx.MakeNode(
                 "Constant",
                 [],
-                op_name_scope=node.name, name="constant",
-                dtypes=dtypes, attr={"value": output_shape_tensor},
+                op_name_scope=node.name,
+                name="constant",
+                dtypes=dtypes,
+                attr={"value": output_shape_tensor},
             )
             node_reshape = ctx.MakeNode(
                 "Reshape",
                 node_concat.output_tensor_names + node_constant.output_tensor_names,
                 outputs=node.output_tensor_names,
-                op_name_scope=node.name, name="reshape",
+                op_name_scope=node.name,
+                name="reshape",
                 dtypes=dtypes,
             )
         else:
@@ -300,26 +300,41 @@ class Stack:
                 "Reshape",
                 node_concat.output_tensor_names,
                 outputs=node.output_tensor_names,
-                op_name_scope=node.name, name="reshape",
-                dtypes=dtypes, attr={"shape": output_shape},
+                op_name_scope=node.name,
+                name="reshape",
+                dtypes=dtypes,
+                attr={"shape": output_shape},
             )
+
 
 @flow_op("slice", "Slice")
 class Slice:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["start"]).astype(np.int64),)
+        starts = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("start"),
+            np.array(node.attrs["start"]).astype(np.int64),
+        )
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop"), np.array(node.attrs["stop"]).astype(np.int64),)
+        ends = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("stop"),
+            np.array(node.attrs["stop"]).astype(np.int64),
+        )
         node.input_tensor_names.append(ends.output_tensor_names[0])
         slice_axes = []
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         for i in range(len(input_shape)):
             slice_axes.append(i)
 
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64),)
+        axes = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("axes"),
+            np.array(slice_axes).astype(np.int64),
+        )
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64),)
+        steps = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("steps"),
+            np.array(node.attrs["step"]).astype(np.int64),
+        )
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod
@@ -350,13 +365,25 @@ class Narrow:
                 slice_starts.append(0)
                 slice_ends.append(input_shape[i])
 
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_start"), np.array(slice_starts).astype(np.int64),)
+        starts = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_start"),
+            np.array(slice_starts).astype(np.int64),
+        )
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_length"), np.array(slice_ends).astype(np.int64),)
+        ends = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_length"),
+            np.array(slice_ends).astype(np.int64),
+        )
         node.input_tensor_names.append(ends.output_tensor_names[0])
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_axes"), np.array(slice_axes).astype(np.int64),)
+        axes = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_axes"),
+            np.array(slice_axes).astype(np.int64),
+        )
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_steps"), np.array(slice_steps).astype(np.int64),)
+        steps = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_steps"),
+            np.array(slice_steps).astype(np.int64),
+        )
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod
