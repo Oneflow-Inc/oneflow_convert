@@ -23,8 +23,10 @@ from __future__ import absolute_import
 
 import logging
 import sys
+from pdb import set_trace
 
 import numpy as np
+from onnx import helper
 from onnx import numpy_helper
 from onnx import onnx_pb
 from onnx.onnx_pb import TensorProto
@@ -245,10 +247,11 @@ class Concat:
 class Stack:
     @classmethod
     def Version_11(cls, ctx, node, **kwargs):
+        print("version_11")
         axis_val = node.attrs.get("axis", None)
         dtypes = node.output_dtypes
         ctx.RemoveNode(node.name)
-        node1 = ctx.MakeNode(
+        ctx.MakeNode(
             "ConcatFromSequence",
             node.input_tensor_names,
             outputs=[node.output_tensor_names[0]],
@@ -258,6 +261,7 @@ class Stack:
 
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
+        print(f"version_1: {ctx.opset}")
         axis_val = node.attrs.get("axis", None)
         dtypes = node.output_dtypes
         output_shape = node.output_shapes[0]
@@ -265,23 +269,40 @@ class Stack:
             "Concat",
             node.input_tensor_names,
             op_name_scope=node.name, name="concat",
-            dtypes=dtypes, attr={"axis": axis_val}
-        )
-        node_unsqueeze = ctx.MakeNode(
-            "Unsqueeze",
-            node_concat.output_tensor_names,
-            op_name_scope=node.name, name="unsqueeze",
-            dtypes=dtypes, attr={"axes": [axis_val]},
+            dtypes=dtypes, attr={"axis": axis_val},
         )
         ctx.RemoveNode(node.name)
-        node_reshape = ctx.MakeNode(
-            "Reshape",
-            node_unsqueeze.output_tensor_names,
-            outputs=node.output_tensor_names,
-            op_name_scope=node.name, name="reshape",
-            dtypes=dtypes, attr={"shape": output_shape},
-        )
-
+        # since opset 5
+        # set_trace()
+        if ctx.opset > 4:
+            output_shape = np.array(output_shape)
+            output_shape_tensor = helper.make_tensor(
+                name='const_tensor',
+                data_type=TensorProto.INT64,
+                dims=output_shape.shape,
+                vals=output_shape.flatten(),
+            )
+            node_constant = ctx.MakeNode(
+                "Constant",
+                [],
+                op_name_scope=node.name, name="constant",
+                dtypes=dtypes, attr={"value": output_shape_tensor},
+            )
+            node_reshape = ctx.MakeNode(
+                "Reshape",
+                node_concat.output_tensor_names + node_constant.output_tensor_names,
+                outputs=node.output_tensor_names,
+                op_name_scope=node.name, name="reshape",
+                dtypes=dtypes,
+            )
+        else:
+            node_reshape = ctx.MakeNode(
+                "Reshape",
+                node_concat.output_tensor_names,
+                outputs=node.output_tensor_names,
+                op_name_scope=node.name, name="reshape",
+                dtypes=dtypes, attr={"shape": output_shape},
+            )
 
 @flow_op("slice", "Slice")
 class Slice:
