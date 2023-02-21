@@ -23,10 +23,8 @@ from __future__ import absolute_import
 
 import logging
 import sys
-from pdb import set_trace
 
 import numpy as np
-from onnx import helper
 from onnx import numpy_helper
 from onnx import onnx_pb
 from onnx.onnx_pb import TensorProto
@@ -272,20 +270,8 @@ class Stack:
         # since opset 5
         # set_trace()
         if ctx.opset > 4:
-            output_shape = np.array(output_shape)
-            output_shape_tensor = helper.make_tensor(
-                name="const_tensor",
-                data_type=TensorProto.INT64,
-                dims=output_shape.shape,
-                vals=output_shape.flatten(),
-            )
-            node_constant = ctx.MakeNode(
-                "Constant",
-                [],
-                op_name_scope=node.name,
-                name="constant",
-                dtypes=dtypes,
-                attr={"value": output_shape_tensor},
+            node_constant = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("shape"), np.array(output_shape).astype(np.int64)
             )
             node_reshape = ctx.MakeNode(
                 "Reshape",
