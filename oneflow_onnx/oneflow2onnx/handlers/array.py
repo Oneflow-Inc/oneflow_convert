@@ -270,9 +270,7 @@ class Stack:
         # since opset 5
         # set_trace()
         if ctx.opset > 4:
-            node_constant = ctx.MakeConst(
-                oneflow._oneflow_internal.UniqueStr("shape"), np.array(output_shape).astype(np.int64)
-            )
+            node_constant = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(output_shape).astype(np.int64))
             node_reshape = ctx.MakeNode(
                 "Reshape",
                 node_concat.output_tensor_names + node_constant.output_tensor_names,
