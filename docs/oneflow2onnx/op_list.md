@@ -29,4 +29,4 @@
 | 86   | CublasFusedMLP| 87| Unsqueeze      | 88   | BroadcastMatmul | 89| Where             |
 | 90   | ScalarLogicalLess| 91| ScalarLogicalGreater| 92| Gather  | 93  | Expand             |
 | 94   | fill_      | 95   | GeLU           | 96   | LayerNorm    | 97  | AmpIdentity        |
-| 98   | fast_gelu  | 99   | quick_gelu     | 100  | fused_self_attention   |     |          |
+| 98   | fast_gelu  | 99   | quick_gelu     | 100  | fused_self_attention |101 |RMSLayerNorm |
