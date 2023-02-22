@@ -30,3 +30,4 @@
 | 90   | ScalarLogicalLess| 91| ScalarLogicalGreater| 92| Gather  | 93  | Expand             |
 | 94   | fill_      | 95   | GeLU           | 96   | LayerNorm    | 97  | AmpIdentity        |
 | 98   | fast_gelu  | 99   | quick_gelu     | 100  | fused_self_attention |101 |RMSLayerNorm |
+| 102  | stack      |
