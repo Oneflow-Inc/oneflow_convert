@@ -591,7 +591,7 @@ class RMSNorm:
         normalized_shape = node.attrs["normalized_shape"]
         epsilon = node.attrs["normalized_shape"]
         x_shape = ctx.get_shape(node.input_tensor_names[0])
-        norm_dims = tuple(range(len(x_shape) - len(normalized_shape), len(x_shape)))  
+        norm_dims = tuple(range(len(x_shape) - len(normalized_shape), len(x_shape)))
         eps_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("eps"), np.array(epsilon, dtype=util.Onnx2NumpyDtype(dtypes[0])))
 
         mul_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul_node1", dtypes=[dtypes[0]])
