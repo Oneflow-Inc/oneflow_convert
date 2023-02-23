@@ -54,7 +54,8 @@ class LoopOptimizer(GraphOptimizerBase):
     @staticmethod
     def ConsumerNodesNum(graph, node):
         util.MakeSure(
-            len(node.output_tensor_names) == 1, "only consider node with only one output",
+            len(node.output_tensor_names) == 1,
+            "only consider node with only one output",
         )
         res = len(graph.FindOutputConsumers(node.output_tensor_names[0]))
         return res

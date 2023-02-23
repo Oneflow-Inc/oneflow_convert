@@ -27,8 +27,7 @@ from oneflow_onnx import util
 
 
 class GraphOptimizerBase(object):
-    """optimizer graph to improve performance
-    """
+    """optimizer graph to improve performance"""
 
     def __init__(self):
         self._logger = logging.getLogger(".".join(__name__.split(".")[:-1] + [self.__class__.__name__]))
@@ -47,7 +46,7 @@ class GraphOptimizerBase(object):
         self._graph_been_opt = value
 
     def Optimize(self, graph):
-        """ optimize graph, return optimized graph. """
+        """optimize graph, return optimized graph."""
         before = graph.DumpNodeStatistics()
 
         graph = self._Optimize(graph)
@@ -59,7 +58,7 @@ class GraphOptimizerBase(object):
         return graph
 
     def _Optimize(self, graph):
-        """ Derived class should override this function. """
+        """Derived class should override this function."""
         raise NotImplementedError
 
     @staticmethod

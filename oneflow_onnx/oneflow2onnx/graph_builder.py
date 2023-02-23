@@ -96,10 +96,19 @@ class GraphBuilder(object):
             for input_data in inputs[1:]:
                 if input_data != util.ONNX_EMPTY_INPUT:
                     util.MakeSure(
-                        dtype == self.graph.get_dtype(input_data), "dtype should be same",
+                        dtype == self.graph.get_dtype(input_data),
+                        "dtype should be same",
                     )
 
-        return self.graph.MakeNode(op_type="Slice", inputs=inputs, attr=attr, name=name, outputs=outputs, shapes=shapes, dtypes=dtypes,).output[0]
+        return self.graph.MakeNode(
+            op_type="Slice",
+            inputs=inputs,
+            attr=attr,
+            name=name,
+            outputs=outputs,
+            shapes=shapes,
+            dtypes=dtypes,
+        ).output[0]
 
     def ConvertToInput(self, tensor, is_optional=False, dtype=None):
         """in ONNX, input shold come from node, so it must be a string"""
