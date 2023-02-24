@@ -598,7 +598,7 @@ class RMSNorm:
         mean = ctx.MakeNode("ReduceMean", [mul_1.output_tensor_names[0]], op_name_scope=node.name, name="mean", dtypes=[dtypes[0]], attr={"axes": norm_dims, "keepdims": True})
         add_node = ctx.MakeNode("Add", [mean.output_tensor_names[0], eps_cast.output_tensor_names[0]], op_name_scope=node.name, name="add_node", dtypes=[dtypes[0]])
         denominator = ctx.MakeNode("Sqrt", [add_node.output_tensor_names[0]], op_name_scope=node.name, name="denominator", dtypes=[dtypes[0]])
-        reciprocal = ctx.MakeNode("Reciprocal", [denominator.output_tensor_names[0]], op_name_scope=node.name, name="reciprocal", dtypes=[dtypes[0]]) 
+        reciprocal = ctx.MakeNode("Reciprocal", [denominator.output_tensor_names[0]], op_name_scope=node.name, name="reciprocal", dtypes=[dtypes[0]])
         mul_2 = ctx.MakeNode("Mul", [node.input_tensor_names[0], reciprocal.output_tensor_names[0]], op_name_scope=node.name, name="mul_node2", dtypes=[dtypes[0]])
         mul_3 = ctx.MakeNode("Mul", [mul_2.output_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="mul_node3", dtypes=[dtypes[0]])
         ctx.RemoveNode(node.name)
