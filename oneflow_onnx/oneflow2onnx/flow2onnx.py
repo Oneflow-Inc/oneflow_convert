@@ -251,7 +251,14 @@ def Export(
     assert os.getenv("ENABLE_USER_OP") != "False"
     assert os.path.isdir(model_save_dir)
     job = graph._full_graph_proto
-    onnx_graph = ProcessFlowGraph(job, model_save_dir, continue_on_error=continue_on_error, opset=opset, extra_opset=extra_opset, shape_override=shape_override,)
+    onnx_graph = ProcessFlowGraph(
+        job,
+        model_save_dir,
+        continue_on_error=continue_on_error,
+        opset=opset,
+        extra_opset=extra_opset,
+        shape_override=shape_override,
+    )
     onnx_graph = optimizer.OptimizeGraph(onnx_graph)
     model_proto = onnx_graph.MakeModel("tmp", onnx_filename, external_data=external_data)
 
@@ -280,21 +287,43 @@ def Export(
 
 
 def ProcessFlowGraph(
-    flow_graph, model_save_dir, continue_on_error=False, opset=None, extra_opset=None, shape_override=None,
+    flow_graph,
+    model_save_dir,
+    continue_on_error=False,
+    opset=None,
+    extra_opset=None,
+    shape_override=None,
 ):
     opset = util.FindOpset(opset)
     logger.info("Using opset <onnx, %s>", opset)
     if opset > schemas.get_max_supported_opset_version():
         logger.warning(
-            "Currently installed onnx package %s is too low to support opset %s, " "please upgrade onnx package to avoid potential conversion issue.", util.get_onnx_version(), opset,
+            "Currently installed onnx package %s is too low to support opset %s, " "please upgrade onnx package to avoid potential conversion issue.",
+            util.get_onnx_version(),
+            opset,
         )
 
     if shape_override is None:
         shape_override = {}
 
-    (onnx_nodes, flow_nodes, op_cnt, attr_cnt, dtypes, output_shapes,) = FlowToOnnxNaive(flow_graph, shape_override)
+    (
+        onnx_nodes,
+        flow_nodes,
+        op_cnt,
+        attr_cnt,
+        dtypes,
+        output_shapes,
+    ) = FlowToOnnxNaive(flow_graph, shape_override)
 
-    g = Graph(onnx_nodes, flow_nodes, model_save_dir, output_shapes, dtypes, opset, extra_opset,)
+    g = Graph(
+        onnx_nodes,
+        flow_nodes,
+        model_save_dir,
+        output_shapes,
+        dtypes,
+        opset,
+        extra_opset,
+    )
 
     # create ops mapping for the desired opsets
     ops_mapping = handler.flow_op.CreateMapping(g.opset, g.extra_opset)

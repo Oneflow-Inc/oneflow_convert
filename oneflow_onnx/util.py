@@ -146,9 +146,9 @@ def MakeOnnxShape(shape):
 
 def MakeOnnxInputsOutputs(name, elem_type, shape, **kwargs):
     """Wrapper for creating onnx graph inputs or outputs
-       name,  # type: Text
-       elem_type,  # type: TensorProto.DataType
-       shape,  # type: Optional[Sequence[int]]
+    name,  # type: Text
+    elem_type,  # type: TensorProto.DataType
+    shape,  # type: Optional[Sequence[int]]
     """
     if elem_type is None:
         elem_type = onnx_pb.TensorProto.UNDEFINED
@@ -184,7 +184,7 @@ def MakeSure(bool_val, error_msg, *args):
 
 
 def AreShapesEqual(src, dest):
-    """ Check whether 2 shapes are equal. """
+    """Check whether 2 shapes are equal."""
     if src is None:
         return dest is None
     if dest is None:
