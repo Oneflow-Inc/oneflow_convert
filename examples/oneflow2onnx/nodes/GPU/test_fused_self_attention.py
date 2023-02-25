@@ -23,7 +23,11 @@ class FusedSelfAtt(flow.nn.Module):
         super(FusedSelfAtt, self).__init__()
 
     def forward(self, x: flow.Tensor, head_size: int, alpha: float) -> flow.Tensor:
-        (fused_qmk, fused_v) = flow._C.fused_self_attention(x, head_size=head_size, alpha=alpha,)
+        (fused_qmk, fused_v) = flow._C.fused_self_attention(
+            x,
+            head_size=head_size,
+            alpha=alpha,
+        )
         return fused_qmk, fused_v
 
 

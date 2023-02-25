@@ -53,7 +53,7 @@ def _get_optimizers():
 
 
 def OptimizeGraph(graph):
-    """ Optimize graph, return optimized graph. No throw. """
+    """Optimize graph, return optimized graph. No throw."""
     logger = logging.getLogger(__name__)
     logger.info("Optimizing ONNX model")
 
