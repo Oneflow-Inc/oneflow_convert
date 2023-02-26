@@ -132,7 +132,10 @@ class TransposeOptimizer(GraphOptimizerBase):
                     # replace transpose with reshape
                     self._g.RemoveNode(op.name)
                     self._g.MakeNode(
-                        "Reshape", [op.input_tensor_names[0], new_shape], name=op.name, outputs=op.output_tensor_names,
+                        "Reshape",
+                        [op.input_tensor_names[0], new_shape],
+                        name=op.name,
+                        outputs=op.output_tensor_names,
                     )
                     self._g.TopologicalSort(self._g.get_nodes())
 
@@ -310,7 +313,9 @@ class TransposeOptimizer(GraphOptimizerBase):
 
     def _RemoveUselessTranpose(self, trans):
         self._g.ReplaceAllInputs(
-            self._g.get_nodes(), trans.output_tensor_names[0], trans.input_tensor_names[0],
+            self._g.get_nodes(),
+            trans.output_tensor_names[0],
+            trans.input_tensor_names[0],
         )
         self._g.RemoveNode(trans.name)
 
@@ -338,7 +343,11 @@ class TransposeOptimizer(GraphOptimizerBase):
         # add Transpose(0, 3, 1, 2) and Transpose(0, 2, 3, 1) before each non_nchw_trans_consumers
         for consumer in non_nchw_trans_consumers:
             nchw_node = self._g.MakeNode("Transpose", [node.output_tensor_names[0]], attr={"perm": NHWC_TO_NCHW})
-            nhwc_node = self._g.MakeNode("Transpose", [nchw_node.output_tensor_names[0]], attr={"perm": NCHW_TO_NHWC},)
+            nhwc_node = self._g.MakeNode(
+                "Transpose",
+                [nchw_node.output_tensor_names[0]],
+                attr={"perm": NCHW_TO_NHWC},
+            )
             self._g.ReplaceAllInputs(consumer, node.output_tensor_names[0], nhwc_node.output_tensor_names[0])
 
     def _CreateTransposePairsBeforeNode(self, node):
@@ -347,7 +356,8 @@ class TransposeOptimizer(GraphOptimizerBase):
             # still count on the broadcasting op to tile the tensor
             if ori_shape.count(-1) >= 2:
                 self.logger.warning(
-                    "%s shape can contain one -1 at most, otherwise reshape op can't work", node.name,
+                    "%s shape can contain one -1 at most, otherwise reshape op can't work",
+                    node.name,
                 )
                 return None
             ori_rank = len(ori_shape)
@@ -394,7 +404,11 @@ class TransposeOptimizer(GraphOptimizerBase):
                 input_of_new_trans = reshape
 
             nchw_node = self._g.MakeNode("Transpose", [input_of_new_trans], attr={"perm": NHWC_TO_NCHW})
-            nhwc_node = self._g.MakeNode("Transpose", [nchw_node.output_tensor_names[0]], attr={"perm": NCHW_TO_NHWC},)
+            nhwc_node = self._g.MakeNode(
+                "Transpose",
+                [nchw_node.output_tensor_names[0]],
+                attr={"perm": NCHW_TO_NHWC},
+            )
             self._g.ReplaceAllInputs(node, input_id, nhwc_node.output_tensor_names[0])
         return True
 
@@ -452,7 +466,11 @@ class TransposeOptimizer(GraphOptimizerBase):
             dtype = node.graph.get_dtype(node.output_tensor_names[0])
             if node.output_tensor_names[0] in node.graph.outputs:
                 node.graph.MakeNode(
-                    "Identity", [trans.input_tensor_names[0]], outputs=node.output_tensor_names, shapes=[shape], dtypes=[dtype],
+                    "Identity",
+                    [trans.input_tensor_names[0]],
+                    outputs=node.output_tensor_names,
+                    shapes=[shape],
+                    dtypes=[dtype],
                 )
             self._g.RemoveNode(trans.name)
             node.graph.RemoveNode(node.name)
@@ -561,7 +579,8 @@ class TransposeOptimizer(GraphOptimizerBase):
             else:
                 new_squeeze_output_shape = [-1] * 4
                 self.logger.warning(
-                    "%s's shape is unknown, which may interfere further optimization", node.input_tensor_names[0],
+                    "%s's shape is unknown, which may interfere further optimization",
+                    node.input_tensor_names[0],
                 )
             self._g.set_shape(node.output_tensor_names[0], new_squeeze_output_shape)
             return True
@@ -590,7 +609,19 @@ class TransposeOptimizer(GraphOptimizerBase):
         if node.input_nodes[1].is_const():
             pads = node.input_nodes[1].get_tensor_value()
             # NHWC->NCHW
-            new_pads = np.array([pads[0], pads[3], pads[1], pads[2], pads[4], pads[7], pads[5], pads[6],], dtype=np.int64,)
+            new_pads = np.array(
+                [
+                    pads[0],
+                    pads[3],
+                    pads[1],
+                    pads[2],
+                    pads[4],
+                    pads[7],
+                    pads[5],
+                    pads[6],
+                ],
+                dtype=np.int64,
+            )
             node.input_nodes[1].set_tensor_value(new_pads)
             return self._SwitchTransposeAndNode(node, trans)
         return False
@@ -624,7 +655,9 @@ class TransposeOptimizer(GraphOptimizerBase):
                     else:
                         new_axes_const = self._g.MakeConst(oneflow._oneflow_internal.UniqueStr(node.input_nodes[3].name), new_axes)
                         self._g.ReplaceAllInputs(
-                            node, node.input_tensor_names[3], new_axes_const.output_tensor_names[0],
+                            node,
+                            node.input_tensor_names[3],
+                            new_axes_const.output_tensor_names[0],
                         )
                     return self._SwitchTransposeAndNode(node, trans)
         return False
@@ -643,7 +676,11 @@ class TransposeOptimizer(GraphOptimizerBase):
         self._g.RemoveNode(node.name)
         shape_node = self._g.MakeNode("Shape", [trans.input_tensor_names[0]])
         const_node = self._g.MakeConst(oneflow._oneflow_internal.UniqueStr("Const"), np.array(trans.attrs["perm"]))
-        gather_node = self._g.MakeNode("Gather", [shape_node.output_tensor_names[0], const_node.output_tensor_names[0]], outputs=node.output_tensor_names,)
+        gather_node = self._g.MakeNode(
+            "Gather",
+            [shape_node.output_tensor_names[0], const_node.output_tensor_names[0]],
+            outputs=node.output_tensor_names,
+        )
         self._g.set_shape(gather_node.output_tensor_names[0], output_shape)
         self._g.set_dtype(gather_node.output_tensor_names[0], output_dtype)
         return True

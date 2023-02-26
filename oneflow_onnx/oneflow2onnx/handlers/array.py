@@ -246,18 +246,30 @@ class Concat:
 class Slice:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("start"), np.array(node.attrs["start"]).astype(np.int64),)
+        starts = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("start"),
+            np.array(node.attrs["start"]).astype(np.int64),
+        )
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("stop"), np.array(node.attrs["stop"]).astype(np.int64),)
+        ends = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("stop"),
+            np.array(node.attrs["stop"]).astype(np.int64),
+        )
         node.input_tensor_names.append(ends.output_tensor_names[0])
         slice_axes = []
         input_shape = ctx.get_shape(node.input_tensor_names[0])
         for i in range(len(input_shape)):
             slice_axes.append(i)
 
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("axes"), np.array(slice_axes).astype(np.int64),)
+        axes = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("axes"),
+            np.array(slice_axes).astype(np.int64),
+        )
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("steps"), np.array(node.attrs["step"]).astype(np.int64),)
+        steps = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("steps"),
+            np.array(node.attrs["step"]).astype(np.int64),
+        )
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod
@@ -288,13 +300,25 @@ class Narrow:
                 slice_starts.append(0)
                 slice_ends.append(input_shape[i])
 
-        starts = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_start"), np.array(slice_starts).astype(np.int64),)
+        starts = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_start"),
+            np.array(slice_starts).astype(np.int64),
+        )
         node.input_tensor_names.append(starts.output_tensor_names[0])
-        ends = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_length"), np.array(slice_ends).astype(np.int64),)
+        ends = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_length"),
+            np.array(slice_ends).astype(np.int64),
+        )
         node.input_tensor_names.append(ends.output_tensor_names[0])
-        axes = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_axes"), np.array(slice_axes).astype(np.int64),)
+        axes = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_axes"),
+            np.array(slice_axes).astype(np.int64),
+        )
         node.input_tensor_names.append(axes.output_tensor_names[0])
-        steps = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("narrow_steps"), np.array(slice_steps).astype(np.int64),)
+        steps = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("narrow_steps"),
+            np.array(slice_steps).astype(np.int64),
+        )
         node.input_tensor_names.append(steps.output_tensor_names[0])
 
     @classmethod

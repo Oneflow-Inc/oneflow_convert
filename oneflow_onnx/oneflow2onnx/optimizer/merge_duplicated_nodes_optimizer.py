@@ -33,8 +33,7 @@ _KeyToGroupNodes = namedtuple("key", "type input")
 
 
 class MergeDuplicatedNodesOptimizer(GraphOptimizerBase):
-    """Remove duplicate nodes.
-    """
+    """Remove duplicate nodes."""
 
     def __init__(self):
         super(MergeDuplicatedNodesOptimizer, self).__init__()

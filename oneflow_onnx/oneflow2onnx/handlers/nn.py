@@ -45,19 +45,24 @@ def _SpatialMap(shape, perm):
 
 
 def _ConvConvertInputs(
-    ctx, node, with_kernel=False, new_kernel_shape=None, input_indices=None, output_indices=None,
+    ctx,
+    node,
+    with_kernel=False,
+    new_kernel_shape=None,
+    input_indices=None,
+    output_indices=None,
 ):
     """Convert input and kernel from oneflow to onnx. This maybe require to
-        to insert transpose ops for input, kernel and output unless they are constants
-        and we can transpose the constant.
-        We transpose inputs and the kernel if the input is in NHWC
-        Outputs are transposed if the format is NHWC.
-        Some convolutions like depthwise_conv2d require a reshape of the kernel.
-        Args:
-            ctx: the parent graph
-            node: node of the convolution op
-            with_kernel: transpose the kernel
-            new_kernel_shape: reshape the kernel
+    to insert transpose ops for input, kernel and output unless they are constants
+    and we can transpose the constant.
+    We transpose inputs and the kernel if the input is in NHWC
+    Outputs are transposed if the format is NHWC.
+    Some convolutions like depthwise_conv2d require a reshape of the kernel.
+    Args:
+        ctx: the parent graph
+        node: node of the convolution op
+        with_kernel: transpose the kernel
+        new_kernel_shape: reshape the kernel
     """
 
     if input_indices is None:
@@ -150,7 +155,10 @@ def _AddPadding(ctx, node, kernel_shape, strides, dilations=None, spatial=2, cei
     # check if the input shape is valid
     if len(input_shape) != len(pads):
         logger.error(
-            "node %s input needs to be rank %d, is %d", node.name, len(pads), len(input_shape),
+            "node %s input needs to be rank %d, is %d",
+            node.name,
+            len(pads),
+            len(input_shape),
         )
     # transpose shape to nchw
     if node.is_nhwc():
@@ -370,7 +378,8 @@ class Pad:
 
 
 @flow_op(
-    ["normalization"], flow_ibns=["x", "gamma", "beta", "moving_mean", "moving_variance"],
+    ["normalization"],
+    flow_ibns=["x", "gamma", "beta", "moving_mean", "moving_variance"],
 )
 class BatchNorm:
     @classmethod
@@ -404,13 +413,19 @@ class BatchNorm:
         val_type = util.Onnx2NumpyDtype(ctx.get_dtype(node.input_tensor_names[1]))
 
         if mean_shape != scale_shape:
-            new_mean_value = np.array(np.resize(node.input_nodes[3].get_tensor_value(as_list=False), scale_shape), dtype=val_type,)
+            new_mean_value = np.array(
+                np.resize(node.input_nodes[3].get_tensor_value(as_list=False), scale_shape),
+                dtype=val_type,
+            )
             new_mean_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_mean_node_name, new_mean_value)
             node.input_tensor_names[3] = new_mean_node_name
 
         if var_shape != scale_shape:
-            new_var_value = np.array(np.resize(node.input_nodes[4].get_tensor_value(as_list=False), scale_shape), dtype=val_type,)
+            new_var_value = np.array(
+                np.resize(node.input_nodes[4].get_tensor_value(as_list=False), scale_shape),
+                dtype=val_type,
+            )
             new_val_node_name = oneflow._oneflow_internal.UniqueStr(node.name)
             ctx.MakeConst(new_val_node_name, new_var_value)
             node.input_tensor_names[4] = new_val_node_name
@@ -469,7 +484,10 @@ class UpSampleNearest2D:
             scales = [1.0, 1.0]
             scales.append(node.attrs["height_scale"])
             scales.append(node.attrs["width_scale"])
-            scales_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("scales"), np.array(scales).astype(np.float32),)
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
             node.input_tensor_names.append(scales_node.output_tensor_names[0])
         else:
             raise NotImplementedError("Opset 10 don't support specify output_size attribute!")
@@ -486,13 +504,19 @@ class UpSampleNearest2D:
         for i in range(len(input_shape)):
             roi.append(0)
             roi.append(input_shape[i])
-        roi_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("roi"), np.array(roi).astype(np.float32),)
+        roi_node = ctx.MakeConst(
+            oneflow._oneflow_internal.UniqueStr("roi"),
+            np.array(roi).astype(np.float32),
+        )
         node.input_tensor_names.append(roi_node.output_tensor_names[0])
         if len(node.attrs["output_size"]) == 0:
             scales = [1.0, 1.0]
             scales.append(node.attrs["height_scale"])
             scales.append(node.attrs["width_scale"])
-            scales_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("scales"), np.array(scales).astype(np.float32),)
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
             node.input_tensor_names.append(scales_node.output_tensor_names[0])
             node.input_tensor_names.append("")
         else:
@@ -503,7 +527,10 @@ class UpSampleNearest2D:
             sizes.append(input_shape[1])
             sizes.append(node_sizes[0])
             sizes.append(node_sizes[1])
-            sizes_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("sizes"), np.array(sizes).astype(np.int64),)
+            sizes_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("sizes"),
+                np.array(sizes).astype(np.int64),
+            )
             node.input_tensor_names.append(sizes_node.output_tensor_names[0])
 
     @classmethod
@@ -517,7 +544,10 @@ class UpSampleNearest2D:
             scales = [1.0, 1.0]
             scales.append(node.attrs["height_scale"])
             scales.append(node.attrs["width_scale"])
-            scales_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("scales"), np.array(scales).astype(np.float32),)
+            scales_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("scales"),
+                np.array(scales).astype(np.float32),
+            )
             node.input_tensor_names.append(scales_node.output_tensor_names[0])
             node.input_tensor_names.append("")
         else:
@@ -530,7 +560,10 @@ class UpSampleNearest2D:
             sizes.append(input_shape[1])
             sizes.append(node_sizes[0])
             sizes.append(node_sizes[1])
-            sizes_node = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("sizes"), np.array(sizes).astype(np.int64),)
+            sizes_node = ctx.MakeConst(
+                oneflow._oneflow_internal.UniqueStr("sizes"),
+                np.array(sizes).astype(np.int64),
+            )
             node.input_tensor_names.append(sizes_node.output_tensor_names[0])
 
 

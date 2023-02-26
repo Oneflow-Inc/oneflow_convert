@@ -92,7 +92,7 @@ def _RegisterAllSchemasWithHistory():
 
 
 def _ParseDomainOpsetVersions(schemas):
-    """ Get max opset version among all schemas within each domain. """
+    """Get max opset version among all schemas within each domain."""
     domain_opset_versions = dict()
     for domain_version_schema_map in schemas.values():
         for domain, version_schema_map in domain_version_schema_map.items():
@@ -137,7 +137,12 @@ def InferOnnxShapeDtype(node, opset_version, input_shapes, input_dtypes, initial
 
     def BuildOnnxOp(node):
         """Build onnx op"""
-        onnx_node = helper.make_node(node.op_type, node.input_tensor_names, node.output_tensor_names, name=node.name,)
+        onnx_node = helper.make_node(
+            node.op_type,
+            node.input_tensor_names,
+            node.output_tensor_names,
+            name=node.name,
+        )
         # deal with attributes
         attr = []
         attr_graphs = node.get_body_graphs()
@@ -167,7 +172,10 @@ def InferOnnxShapeDtype(node, opset_version, input_shapes, input_dtypes, initial
         inferred_model = shape_inference.infer_shapes(model_proto)
     except Exception:  # pylint: disable=broad-except
         logger.warning(
-            "ONNX Failed to infer shapes and dtypes for [%s, type: %s]", node.name, node.op_type, exc_info=1,
+            "ONNX Failed to infer shapes and dtypes for [%s, type: %s]",
+            node.name,
+            node.op_type,
+            exc_info=1,
         )
         return None, None
 
