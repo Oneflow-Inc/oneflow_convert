@@ -42,7 +42,7 @@ class FusedBiasAddScaleMaskSoftmaxDropoutOpGraph(flow.nn.Graph):
 def test_fused_bias_add_scale_mask_softmax_dropout():
 
     graph = FusedBiasAddScaleMaskSoftmaxDropoutOpGraph()
-    graph._compile(flow.randn(4, 2, 3).to("cuda"), flow.randn(4, 2, 3).to("cuda"), flow.randint(0, 2, size=[4, 2, 3]).to("cuda"))
+    graph._compile(flow.randn(4, 2, 3).to("cuda"), flow.randn(4, 2, 3).to("cuda"), flow.randint(0, 2, size=[4, 2, 3]).to("cuda").to(flow.bool))
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         flow.save(fused_bias_add_scale_mask_softmax_dropout.state_dict(), tmpdirname, save_as_external_data=True)

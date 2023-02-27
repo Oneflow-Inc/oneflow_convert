@@ -1130,8 +1130,8 @@ class FusedBiasAddScaleMaskSoftmaxDropout:
         one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("one"), np.array(1, dtype=util.Onnx2NumpyDtype(dtypes[0])))
 
         add_node_1 = ctx.MakeNode("Add", [node.input_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="add_node_1", dtypes=[dtypes[0]])
-        mul__node_1 = ctx.MakeNode("Mul", [add_node_1.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="mul_node_1", dtypes=[dtypes[0]])
-        masked = ctx.MakeNode("Mul", [mul__node_1.output_tensor_names[0], scale.output_tensor_names[0]], op_name_scope=node.name, name="masked", dtypes=[dtypes[0]])
+        mul_node_1 = ctx.MakeNode("Mul", [add_node_1.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="mul_node_1", dtypes=[dtypes[0]])
+        masked = ctx.MakeNode("Mul", [mul_node_1.output_tensor_names[0], scale.output_tensor_names[0]], op_name_scope=node.name, name="masked", dtypes=[dtypes[0]])
         unmask = ctx.MakeNode("Sub", [one.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="unmask", dtypes=[dtypes[0]])
         mul_node_2 = ctx.MakeNode("Mul", [mask_fill.output_tensor_names[0], unmask.output_tensor_names[0]], op_name_scope=node.name, name="mul_node_2", dtypes=[dtypes[0]])
         mul_node_3 = ctx.MakeNode("Mul", [masked.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="mul_node_3", dtypes=[dtypes[0]])
