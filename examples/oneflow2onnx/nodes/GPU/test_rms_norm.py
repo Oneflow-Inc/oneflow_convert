@@ -44,10 +44,10 @@ class RMSNormOpGraph(flow.nn.Graph):
 
 def test_rmsnorm():
 
-    layernorm_graph = RMSNormOpGraph()
-    layernorm_graph._compile(flow.randn(4, 5, 10).to("cuda"))
+    rms_norm_graph = RMSNormOpGraph()
+    rms_norm_graph._compile(flow.randn(4, 5, 10).to("cuda"))
 
-    convert_to_onnx_and_check(layernorm_graph, onnx_model_path="/tmp", device="gpu")
+    convert_to_onnx_and_check(rms_norm_graph, onnx_model_path="/tmp", device="gpu")
 
 
 test_rmsnorm()
