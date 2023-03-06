@@ -1,7 +1,7 @@
 set -ex
 python3 -m pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple
 python3 -m pip install --user --upgrade pip
-if [ -f requirements.txt ]; then python3 -m pip install -r requirements.txt --user; fi
+if [ -f requirements.txt ]; then python3 -m pip install --force-reinstall --no-cache-dir -r requirements.txt --user; fi
 python3 -m pip install --force-reinstall --no-cache-dir --pre oneflow -f https://staging.oneflow.info/branch/master/cu117 
 python3 setup.py install
 pip install flowvision==0.0.3 --user
