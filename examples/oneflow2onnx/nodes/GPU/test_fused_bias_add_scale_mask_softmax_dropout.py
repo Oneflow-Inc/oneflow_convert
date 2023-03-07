@@ -26,6 +26,7 @@ class FusedBiasAddScaleMaskSoftmaxDropout(flow.nn.Module):
 
 
 fused_bias_add_scale_mask_softmax_dropout = FusedBiasAddScaleMaskSoftmaxDropout()
+fused_bias_add_scale_mask_softmax_dropout = fused_bias_add_scale_mask_softmax_dropout.to("cuda")
 
 
 class FusedBiasAddScaleMaskSoftmaxDropoutOpGraph(flow.nn.Graph):
