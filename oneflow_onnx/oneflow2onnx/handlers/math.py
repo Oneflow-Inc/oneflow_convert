@@ -602,7 +602,7 @@ class MatMul:
             ctx.CopyShape(node.output_tensor_names[0], mul.output_tensor_names[0])
 
 
-@flow_op("fused_self_attention_query_mul_key_and_value", flow_ibns=["hidden_states"], flow_obns=["query_mul_key", "value"])
+@flow_op("fused_self_attention_query_mul_key_and_value")
 class FusedSelfAttention:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -1114,11 +1114,18 @@ class Fill:
     def Version_13(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
 
+@flow_op("random_mask_like")
+class RandomMaskLike:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        pass
+
 
 @flow_op("fused_bias_add_scale_mask_softmax_dropout")
 class FusedBiasAddScaleMaskSoftmaxDropout:
     @classmethod
-    def version1(cls, ctx, node, **kwargs):
+    def Version_1(cls, ctx, node, **kwargs):
+        print('enter here')
         dtypes = node.output_dtypes
         scale_value = node.attrs.get("scale_value")
         mask_fill_value = node.attrs.get("mask_fill_value")
@@ -1137,7 +1144,7 @@ class FusedBiasAddScaleMaskSoftmaxDropout:
         mul_node_3 = ctx.MakeNode("Mul", [masked.output_tensor_names[0], node.input_tensor_names[2]], op_name_scope=node.name, name="mul_node_3", dtypes=[dtypes[0]])
         sub_node_1 = ctx.MakeNode("Sub", [mul_node_2.output_tensor_names[0], mul_node_3.output_tensor_names[0]], op_name_scope=node.name, name="sub_node_1", dtypes=[dtypes[0]])
         add_node_2 = ctx.MakeNode("Add", [sub_node_1.output_tensor_names[0], masked.output_tensor_names[0]], op_name_scope=node.name, name="add_node_2", dtypes=[dtypes[0]])
-        softmax_y = ctx.MakeNode("SoftMax", [add_node_2.output_tensor_names[0]], attr={"axis": 2}, op_name_scope=node.name, name="add_node_2", dtypes=[dtypes[0]])
+        softmax_y = ctx.MakeNode("SoftMax", [add_node_2.output_tensor_names[0]], attr={"axis": 2}, op_name_scope=node.name, name="softmax_node_1", dtypes=[dtypes[0]])
 
         ctx.RemoveNode(node.name)
         ctx.MakeNode("Identity", [softmax_y.output_tensor_names[0]], outputs=[output_name1], op_name_scope=node.name, dtypes=[dtypes[0]])
