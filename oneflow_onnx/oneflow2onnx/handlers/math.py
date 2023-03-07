@@ -1114,12 +1114,6 @@ class Fill:
     def Version_13(cls, ctx, node, **kwargs):
         cls.Version_1(ctx, node, **kwargs)
 
-@flow_op("random_mask_like")
-class RandomMaskLike:
-    @classmethod
-    def Version_1(cls, ctx, node, **kwargs):
-        pass
-
 
 @flow_op("fused_bias_add_scale_mask_softmax_dropout")
 class FusedBiasAddScaleMaskSoftmaxDropout:
