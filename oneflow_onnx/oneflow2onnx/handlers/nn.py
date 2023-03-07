@@ -597,7 +597,7 @@ class LayerNorm:
         ctx.MakeNode("Identity", [normalized.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="rdenominator", dtypes=[dtypes[0]])
 
 
-@flow_op(["rms_layer_norm"], flow_ibns=["hidden_states, weight, variance_epsilon"])
+@flow_op(["rms_layer_norm"], flow_ibns=["hidden_states", "weight", "variance_epsilon"])
 class RMSLayerNorm:
     @classmethod
     def Version_1(cls, ctx, node, **kwargs):
@@ -614,3 +614,25 @@ class RMSLayerNorm:
         mul_2 = ctx.MakeNode("Mul", [node.input_tensor_names[1], mul_1.output_tensor_names[0]], op_name_scope=node.name, name="mul_node2", dtypes=[dtypes[0]])
         ctx.RemoveNode(node.name)
         ctx.MakeNode("Identity", [mul_2.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, dtypes=[dtypes[0]])
+
+
+@flow_op(["rms_norm"], flow_ibns=["x", "weight"])
+class RMSNorm:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        normalized_shape = node.attrs["normalized_shape"]
+        epsilon = node.attrs["epsilon"]
+        x_shape = ctx.get_shape(node.input_tensor_names[0])
+        norm_dims = tuple(range(len(x_shape) - len(normalized_shape), len(x_shape)))
+        eps_cast = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("eps"), np.array(epsilon, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+
+        mul_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul_node1", dtypes=[dtypes[0]])
+        mean = ctx.MakeNode("ReduceMean", [mul_1.output_tensor_names[0]], op_name_scope=node.name, name="mean", dtypes=[dtypes[0]], attr={"axes": norm_dims, "keepdims": True})
+        add_node = ctx.MakeNode("Add", [mean.output_tensor_names[0], eps_cast.output_tensor_names[0]], op_name_scope=node.name, name="add_node", dtypes=[dtypes[0]])
+        denominator = ctx.MakeNode("Sqrt", [add_node.output_tensor_names[0]], op_name_scope=node.name, name="denominator", dtypes=[dtypes[0]])
+        reciprocal = ctx.MakeNode("Reciprocal", [denominator.output_tensor_names[0]], op_name_scope=node.name, name="reciprocal", dtypes=[dtypes[0]])
+        mul_2 = ctx.MakeNode("Mul", [node.input_tensor_names[0], reciprocal.output_tensor_names[0]], op_name_scope=node.name, name="mul_node2", dtypes=[dtypes[0]])
+        mul_3 = ctx.MakeNode("Mul", [mul_2.output_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="mul_node3", dtypes=[dtypes[0]])
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode("Identity", [mul_3.output_tensor_names[0]], outputs=[node.output_tensor_names[0]], op_name_scope=node.name, dtypes=[dtypes[0]])
