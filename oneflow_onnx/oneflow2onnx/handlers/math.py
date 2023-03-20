@@ -1167,7 +1167,6 @@ class FusedFastGeluMul:
         add_node_2 = ctx.MakeNode("Add", [tanh_node.output_tensor_names[0], one.output_tensor_names[0]], op_name_scope=node.name, name="add2", dtypes=dtypes)
         mul_node_3 = ctx.MakeNode("Mul", [add_node_2.output_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul3", dtypes=dtypes)
         mul_node_4 = ctx.MakeNode("Mul", [mul_node_3.output_tensor_names[0], half.output_tensor_names[0]], op_name_scope=node.name, name="mul4", dtypes=dtypes)
-
         mul_node = ctx.MakeNode("Mul", [mul_node_4.output_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="mul_node", dtypes=[dtypes[0]])
 
         ctx.RemoveNode(node.name)
