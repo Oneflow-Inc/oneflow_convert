@@ -1143,3 +1143,31 @@ class FusedBiasAddScaleMaskSoftmaxDropout:
         ctx.RemoveNode(node.name)
         ctx.MakeNode("Identity", [softmax_y.output_tensor_names[0]], outputs=[output_name1], op_name_scope=node.name, dtypes=[dtypes[0]])
         ctx.MakeNode("Identity", [softmax_y.output_tensor_names[0]], outputs=[output_name2], op_name_scope=node.name, dtypes=[dtypes[0]])
+
+
+@flow_op("fused_fast_gelu_mul")
+class FusedFastGeluMul:
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        dtypes = node.output_dtypes
+        output_name = node.output_tensor_names[0]
+
+        kBeta = math.sqrt(2 / math.pi)
+        kKappa = 0.044715
+        beta = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("beta"), np.array(kBeta, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        kappa = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("kKappa"), np.array(kKappa, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        one = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("one"), np.array(1.0, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        half = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("half"), np.array(0.5, dtype=util.Onnx2NumpyDtype(dtypes[0])))
+        mul_node_1 = ctx.MakeNode("Mul", [node.input_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul1", dtypes=dtypes)
+        cube = ctx.MakeNode("Mul", [node.input_tensor_names[0], mul_node_1.output_tensor_names[0]], op_name_scope=node.name, name="cube", dtypes=dtypes)
+        mul_node_2 = ctx.MakeNode("Mul", [kappa.output_tensor_names[0], cube.output_tensor_names[0]], op_name_scope=node.name, name="mul2", dtypes=dtypes)
+        add_node_1 = ctx.MakeNode("Add", [mul_node_2.output_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="add1", dtypes=dtypes)
+        inner = ctx.MakeNode("Mul", [add_node_1.output_tensor_names[0], beta.output_tensor_names[0]], op_name_scope=node.name, name="inner", dtypes=dtypes)
+        tanh_node = ctx.MakeNode("Tanh", [inner.output_tensor_names[0]], op_name_scope=node.name, name="tanh", dtypes=dtypes)
+        add_node_2 = ctx.MakeNode("Add", [tanh_node.output_tensor_names[0], one.output_tensor_names[0]], op_name_scope=node.name, name="add2", dtypes=dtypes)
+        mul_node_3 = ctx.MakeNode("Mul", [add_node_2.output_tensor_names[0], node.input_tensor_names[0]], op_name_scope=node.name, name="mul3", dtypes=dtypes)
+        mul_node_4 = ctx.MakeNode("Mul", [mul_node_3.output_tensor_names[0], half.output_tensor_names[0]], op_name_scope=node.name, name="mul4", dtypes=dtypes)
+        mul_node = ctx.MakeNode("Mul", [mul_node_4.output_tensor_names[0], node.input_tensor_names[1]], op_name_scope=node.name, name="mul_node", dtypes=[dtypes[0]])
+
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode("Identity", [mul_node.output_tensor_names[0]], outputs=[output_name], op_name_scope=node.name, dtypes=[dtypes[0]])
