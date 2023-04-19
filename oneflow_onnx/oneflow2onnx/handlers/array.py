@@ -242,6 +242,55 @@ class Concat:
         cls.Version_1(ctx, node, **kwargs)
 
 
+@flow_op("stack", "ConcatFromSequence")
+class Stack:
+    @classmethod
+    def Version_11(cls, ctx, node, **kwargs):
+        print("version_11")
+        axis_val = node.attrs.get("axis", None)
+        dtypes = node.output_dtypes
+        ctx.RemoveNode(node.name)
+        ctx.MakeNode("ConcatFromSequence", node.input_tensor_names, outputs=[node.output_tensor_names[0]], op_name_scope=node.name, name="stack", dtypes=dtypes, attr={"new_axis": 1, "axis": axis_val})
+
+    @classmethod
+    def Version_1(cls, ctx, node, **kwargs):
+        print(f"version_1: {ctx.opset}")
+        axis_val = node.attrs.get("axis", None)
+        dtypes = node.output_dtypes
+        output_shape = node.output_shapes[0]
+        node_concat = ctx.MakeNode(
+            "Concat",
+            node.input_tensor_names,
+            op_name_scope=node.name,
+            name="concat",
+            dtypes=dtypes,
+            attr={"axis": axis_val},
+        )
+        ctx.RemoveNode(node.name)
+        # since opset 5
+        # set_trace()
+        if ctx.opset > 4:
+            node_constant = ctx.MakeConst(oneflow._oneflow_internal.UniqueStr("shape"), np.array(output_shape).astype(np.int64))
+            node_reshape = ctx.MakeNode(
+                "Reshape",
+                node_concat.output_tensor_names + node_constant.output_tensor_names,
+                outputs=node.output_tensor_names,
+                op_name_scope=node.name,
+                name="reshape",
+                dtypes=dtypes,
+            )
+        else:
+            node_reshape = ctx.MakeNode(
+                "Reshape",
+                node_concat.output_tensor_names,
+                outputs=node.output_tensor_names,
+                op_name_scope=node.name,
+                name="reshape",
+                dtypes=dtypes,
+                attr={"shape": output_shape},
+            )
+
+
 @flow_op("slice", "Slice")
 class Slice:
     @classmethod
